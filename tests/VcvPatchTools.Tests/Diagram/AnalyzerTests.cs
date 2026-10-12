@@ -472,4 +472,17 @@ public class AnalyzerTests
             new[] { "Mix #2", "Sequential Switch 4 to 1 #2", "VCA #3", "VCO #2", "VCO #3" },
             zoneA.ModuleIds.Select(id => sub37.Module(id).Title).Order());
     }
+
+    [Fact]
+    public void EveryVoiceHasItsOwnLaneFoldedOrNot()
+    {
+        List<string> VoiceLanes(IReadOnlySet<string>? unfold) => PatchDiagram.Layout(analysis, "t", unfold).Bands
+            .Where(b => b.Band == Band.Voice).OrderBy(b => b.Y).Select(b => b.Group ?? b.Title).ToList();
+
+        // Unfolding a voice opens it in its own lane, where it already stood.
+        Assert.Equal(new[] { "Voice 1", "Voice 2" }, VoiceLanes(null));
+        Assert.Equal(new[] { "voice-1", "Voice 2" }, VoiceLanes(new HashSet<string> { "voice-1" }));
+        Assert.Equal(new[] { "Voice 1", "voice-2" }, VoiceLanes(new HashSet<string> { "voice-2" }));
+    }
+
 }

@@ -139,8 +139,8 @@ public sealed record DiagramLayout(
 
     /// <summary>Boxes drawn in a band.</summary>
     public IEnumerable<DiagramNode> Members(DiagramBand band) =>
-        Nodes.Where(n => band.Group is not null ? n.Group == band.Group && !n.IsFolded
-            : band.IsVertical ? n.Band == band.Band : n.IsFolded && n.Band == band.Band);
+        // A band can hold several lanes of the same kind (one per voice): a horizontal band holds what's drawn inside it.
+        Nodes.Where(n => band.IsVertical ? n.Band == band.Band : n.Y >= band.Y && n.Y < band.Y + band.Height);
 
     /// <summary>Left edge and width of a band as drawn: horizontal bands span the diagram, with a small margin.</summary>
     public (double X, double Width) Extent(DiagramBand band) => band.IsVertical ? (band.X!.Value, band.Width!.Value) : (8, HorizontalBandsWidth - 16);

@@ -5,11 +5,13 @@ flowchart LR
   subgraph b1["Time & sequencing"]
     n_g_time["Sequencing<br/>Clkd, ADDR-SEQ"]:::time
   end
-  subgraph b2["Voices"]
+  subgraph b2["Voice 1"]
     n_g_voice_1["LVCO ← ADDR-SEQ<br/>VCF #2 · +3 mod"]:::source
+  end
+  subgraph b3["Voice 2"]
     n_g_voice_2["PULSE ← Host MIDI<br/>VCF #1 → Waveshaper → EQ · +4 mod"]:::source
   end
-  subgraph b3["Mix & effects"]
+  subgraph b4["Mix & effects"]
     n_g_bus["Mix & effects<br/>MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
   end
   n_g_voice_1 ==>|"into MIX4"| n_g_bus

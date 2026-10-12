@@ -33,7 +33,7 @@
                 @foreach (DiagramBand band in Layout.Bands)
                 {
                     (double bandX, double bandWidth) = Layout.Extent(band);
-                    <g class="@SvgRenderer.BandClass(band)" @onclick="() => OnBandClicked.InvokeAsync(band)">
+                    <g class="@SvgRenderer.BandClass(band)" @onclick="() => BandClickedAsync(band)">
                         @if (band.Group is not null)
                         {
                             <title>Click to fold this group back</title>
@@ -61,7 +61,7 @@
                 {
                     <g class="@SvgRenderer.NodeClass(node) @(highlighted.Contains(node.Key) ? "hl" : "")"
                        @onmouseenter="() => Highlight(node.Key)" @onmouseleave="() => Highlight(null)"
-                       @onclick="() => OnNodeClicked.InvokeAsync(node)">
+                       @onclick="() => NodeClickedAsync(node)">
                         <title>@string.Join("\n", node.Details)@(node.IsFolded ? "\n\nClick to unfold" : "")</title>
                         @if (node.IsFolded)
                         {
@@ -156,9 +156,30 @@
     private double zoom = 1;
     private HashSet<string> highlighted = new HashSet<string>();
     private HashSet<string> highlightedEdges = new HashSet<string>();
+    // Folding or unfolding a group moves it to another band: the view scrolls by as much, so it stays under the pointer.
+    private (string Group, double BandY)? anchor;
+    private DiagramLayout? anchoredLayout;
+    private double pendingShift;
+    // The pinned module last brought into view, so it's done once per selection.
+    private string? revealed;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (pendingShift != 0)
+        {
+            double shift = pendingShift;
+            pendingShift = 0;
+            await JS.InvokeVoidAsync("vpdShiftScroll", scroller, shift);
+        }
+        if (PinnedNode != revealed)
+        {
+            revealed = PinnedNode;
+            if (Layout.Nodes.FirstOrDefault(n => n.Key == PinnedNode) is DiagramNode node)
+            {
+                // Its details open in a sheet over the bottom of the screen: keep the module above it.
+                await JS.InvokeVoidAsync("vpdRevealAboveSheet", scroller, node.X * zoom, node.Y * zoom, node.Width * zoom, node.Height * zoom);
+            }
+        }
         if (firstRender)
         {
             selfReference = DotNetObjectReference.Create(this);
@@ -175,7 +196,47 @@
         }
     }
 
-    protected override void OnParametersSet() => ApplyHighlight();
+    protected override void OnParametersSet()
+    {
+        ApplyHighlight();
+        if (anchor is (string group, double oldY) && !ReferenceEquals(Layout, anchoredLayout) && GroupBandY(group) is double newY)
+        {
+            pendingShift = (newY - oldY) * zoom;
+        }
+        anchor = null;
+    }
+
+    private Task NodeClickedAsync(DiagramNode node)
+    {
+        if (node.IsFolded)
+        {
+            Anchor(node.Group, BandAt(node.Y));
+        }
+        return OnNodeClicked.InvokeAsync(node);
+    }
+
+    private Task BandClickedAsync(DiagramBand band)
+    {
+        if (band.Group is not null)
+        {
+            Anchor(band.Group, band.Y);
+        }
+        return OnBandClicked.InvokeAsync(band);
+    }
+
+    private void Anchor(string group, double? bandY)
+    {
+        anchor = bandY is double y ? (group, y) : null;
+        anchoredLayout = Layout;
+    }
+
+    /// <summary>Top of the band a group is drawn in: its own lane when unfolded, the band holding its box when folded.</summary>
+    private double? GroupBandY(string group) =>
+        Layout.Bands.FirstOrDefault(b => b.Group == group && !b.IsVertical)?.Y
+        ?? (Layout.Nodes.FirstOrDefault(n => n.IsFolded && n.Group == group) is DiagramNode node ? BandAt(node.Y) : null);
+
+    private double? BandAt(double y) =>
+        Layout.Bands.Where(b => !b.IsVertical && b.Y <= y && y < b.Y + b.Height).Select(b => (double?)b.Y).FirstOrDefault();
 
     /// <summary>Ctrl + wheel, called from panzoom.js.</summary>
     [JSInvokable]

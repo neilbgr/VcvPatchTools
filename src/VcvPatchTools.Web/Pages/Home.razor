@@ -88,7 +88,7 @@
                         </label>
                     }
                 </div>
-                <div class="group"><label><input type="checkbox" @bind="showIntents" /> intents on every cable</label></div>
+                <div class="group"><label><input type="checkbox" checked="@showIntents" @onchange="e => ToggleIntents((bool)e.Value!)" /> intents on every cable</label></div>
                 <div class="group"><label><input type="checkbox" checked="@portTabs" @onchange="e => TogglePortTabs((bool)e.Value!)" /> port names</label></div>
                 <div class="group"><label><input type="checkbox" checked="@functionNames" @onchange="e => ToggleFunctionNames((bool)e.Value!)" /> function names</label></div>
                 <div class="group"><label title="A link to each module's VCV Library page; hover it to see the panel"><input type="checkbox" checked="@libraryLinks" @onchange="e => ToggleLibraryLinks((bool)e.Value!)" /> library links</label></div>
@@ -119,9 +119,22 @@
             @if (selectedNode is not null)
             {
                 @* What hovering shows on a desktop (tooltips, the panel preview), for a finger: a tap on a module box. *@
-                <div class="vpd-panel">
+                @* In the module's role color, with its function drawing, like its box in the diagram. *@
+                <div class="vpd-panel module role-@selectedNode.Role.ToString().ToLowerInvariant()">
                     <button class="close" title="Close" @onclick="() => selectedNode = null">×</button>
-                    <div><strong>@selectedNode.Title</strong> <span class="muted">@selectedNode.Subtitle</span></div>
+                    @if (selectedNode.LibraryKey is string preview && !missingPanels.Contains(preview))
+                    {
+                        @* The real panel, from the VCV Library's screenshots; gone if the Library has none. *@
+                        <img class="panel-shot" src="@VcvLibrary.ScreenshotUrl(preview, 200)" srcset="@($"{VcvLibrary.ScreenshotUrl(preview, 400)} 2x")"
+                             alt="@selectedNode.Title panel" @onerror="() => missingPanels.Add(preview)" />
+                    }
+                    <div>
+                        @if (selectedNode.Function is ModuleFunction function)
+                        {
+                            <svg class="icon" viewBox="-1 -1 18 14" width="22" height="17" aria-hidden="true"><path d="@Icons.Path(function)" /></svg>
+                        }
+                        <strong>@selectedNode.Title</strong> <span class="muted">@selectedNode.Subtitle</span>
+                    </div>
                     @if (selectedNode.Tabs.Count > 0)
                     {
                         <ul>
@@ -199,6 +212,7 @@
     private bool optionsOpen;
     private string theme = "auto";
     private DiagramNode? selectedNode;
+    private readonly HashSet<string> missingPanels = new HashSet<string>();
     private string? fileFilter;
 
     private string StorageKey => $"vpd-intents:{fileTitle}";
@@ -214,6 +228,7 @@
         {
             theme = "auto";
         }
+        await LoadOptionsAsync();
         try
         {
             fileFilter = await JS.InvokeAsync<bool>("vpdFinePointer") ? ".vcv" : null;
@@ -303,29 +318,39 @@
 
     private int MonitorCount => analysis?.Modules.Count(m => m.Band == Band.Monitor) ?? 0;
 
-    private void ToggleLibraryLinks(bool on)
+    private Task ToggleLibraryLinks(bool on)
     {
         libraryLinks = on;
         Relayout();
+        return SaveOptionsAsync();
     }
 
-    private void TogglePortTabs(bool on)
+    private Task TogglePortTabs(bool on)
     {
         portTabs = on;
         Relayout();
+        return SaveOptionsAsync();
     }
 
-    private void ToggleFunctionNames(bool on)
+    private Task ToggleFunctionNames(bool on)
     {
         functionNames = on;
         Relayout();
+        return SaveOptionsAsync();
     }
 
-    private void SetMonitors(MonitorView view)
+    private Task SetMonitors(MonitorView view)
     {
         monitors = view;
         selected = null;
         Relayout();
+        return SaveOptionsAsync();
+    }
+
+    private Task ToggleIntents(bool on)
+    {
+        showIntents = on;
+        return SaveOptionsAsync();
     }
 
     /// <summary>A stacked box unfolds; a module box shows (or hides) its details and keeps its cables highlighted.</summary>
@@ -373,9 +398,13 @@
         Relayout();
     }
 
-    private void ShowUpTo(int step) => hiddenLayers = DiagramLayout.Layers.Skip(step).ToHashSet();
+    private Task ShowUpTo(int step)
+    {
+        hiddenLayers = DiagramLayout.Layers.Skip(step).ToHashSet();
+        return SaveOptionsAsync();
+    }
 
-    private void ToggleLayer(string layer, bool visible)
+    private Task ToggleLayer(string layer, bool visible)
     {
         if (visible)
         {
@@ -386,6 +415,46 @@
             hiddenLayers.Add(layer);
         }
         hiddenLayers = new HashSet<string>(hiddenLayers);
+        return SaveOptionsAsync();
+    }
+
+    private const string optionsKey = "vpd-options";
+
+    /// <summary>The display options, remembered in this browser from one visit (and one patch) to the next.</summary>
+    private sealed record DisplayOptions(string[] HiddenLayers, bool ShowIntents, bool PortTabs, bool FunctionNames, bool LibraryLinks, MonitorView Monitors);
+
+    private async Task SaveOptionsAsync()
+    {
+        DisplayOptions options = new DisplayOptions(hiddenLayers.ToArray(), showIntents, portTabs, functionNames, libraryLinks, monitors);
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", optionsKey, JsonSerializer.Serialize(options));
+        }
+        catch (JSException)
+        {
+            // Storage blocked: the options last for this visit only.
+        }
+    }
+
+    private async Task LoadOptionsAsync()
+    {
+        try
+        {
+            string? json = await JS.InvokeAsync<string?>("localStorage.getItem", optionsKey);
+            if (json is not null && JsonSerializer.Deserialize<DisplayOptions>(json) is DisplayOptions options)
+            {
+                hiddenLayers = options.HiddenLayers.Where(DiagramLayout.Layers.Contains).ToHashSet();
+                showIntents = options.ShowIntents;
+                portTabs = options.PortTabs;
+                functionNames = options.FunctionNames;
+                libraryLinks = options.LibraryLinks;
+                monitors = Enum.IsDefined(options.Monitors) ? options.Monitors : MonitorView.Hidden;
+            }
+        }
+        catch (Exception ex) when (ex is JSException or JsonException)
+        {
+            // Storage blocked or corrupted: the defaults.
+        }
     }
 
     private void Select(DiagramEdge edge)

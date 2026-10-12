@@ -11,11 +11,14 @@ digraph "Ambient Jam" {
     n_g_time [label="Sequencing\nClkd, ADDR-SEQ", color="#2f74c4", penwidth=2, style="rounded,filled,bold", peripheries=2];
   }
   subgraph cluster_2 {
-    label="Voices"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
+    label="Voice 1"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
     n_g_voice_1 [label="LVCO ← ADDR-SEQ\nVCF #2 · +3 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
-    n_g_voice_2 [label="PULSE ← Host MIDI\nVCF #1 → Waveshaper → EQ · +4 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
   }
   subgraph cluster_3 {
+    label="Voice 2"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
+    n_g_voice_2 [label="PULSE ← Host MIDI\nVCF #1 → Waveshaper → EQ · +4 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
+  }
+  subgraph cluster_4 {
     label="Mix & effects"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
     n_g_bus [label="Mix & effects\nMIX4, Plateau, Delay Plus Stereo Fx, Audio 2", color="#7a52b3", penwidth=2, style="rounded,filled,bold", peripheries=2];
   }

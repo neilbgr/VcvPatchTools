@@ -18,7 +18,7 @@ namespace VcvPatchTools.Diagram.Layout;
 /// vertical channel, ordered so cables of one gap don't cross (as in ELK's orthogonal edge router).
 /// A gap is as wide as its channels need, so busy gaps widen and quiet ones stay compact.</item>
 /// </list>
-/// Folded groups are one box each, sharing their band's lane; an unfolded group gets its own lane with its
+/// Folded groups are one box each, sharing their band's lane (a voice has a lane of its own); an unfolded group gets its own lane with its
 /// modules (inserts right under their host). Cables between the same two boxes with the same signal merge.
 /// Scopes and displays, when drawn as boxes, sit in one more column on the right, out of the flow: each as close as
 /// it can be to the height of what it watches, its cables running there on tracks like any other.
@@ -119,20 +119,39 @@ public static class LayeredLayout
         // The watchers' column comes after the last one.
         int drawnColumns = columns + (watchers.Count > 0 ? 1 : 0);
 
-        // Lanes: per band, one lane for its folded groups and single modules, then one lane per unfolded group.
+        // Lanes: per band, in the groups' order, an unfolded group gets its own lane where it stands, and so does every
+        // voice even folded; the other folded groups and single modules around them share a lane.
         List<(Band Band, string? Group, string Title, List<string> Boxes)> lanes = new List<(Band, string?, string, List<string>)>();
         foreach (Band band in Enum.GetValues<Band>().Where(b => b != Band.Monitor))
         {
-            List<PatchGroup> inBand = groups.Where(g => g.Band == band).ToList();
-            List<string> folded = inBand.Where(g => !HasOwnLane(g)).Select(g => ShowsModules(g) ? ModuleKey(g.Members[0]) : GroupKey(g.Key)).ToList();
-            if (folded.Count > 0)
+            List<string> folded = new List<string>();
+            void CloseFolded()
             {
-                lanes.Add((band, null, PatchGrouping.BandTitle(band, shared: false), folded));
+                if (folded.Count > 0)
+                {
+                    lanes.Add((band, null, PatchGrouping.BandTitle(band, shared: false), folded));
+                    folded = new List<string>();
+                }
             }
-            foreach (PatchGroup group in inBand.Where(HasOwnLane))
+            foreach (PatchGroup group in groups.Where(g => g.Band == band))
             {
-                lanes.Add((band, group.Key, group.Title, boxes.Where(b => b.StartsWith('m') && group.Members.Contains(ModuleIdOf(b))).ToList()));
+                if (HasOwnLane(group))
+                {
+                    CloseFolded();
+                    lanes.Add((band, group.Key, group.Title, boxes.Where(b => b.StartsWith('m') && group.Members.Contains(ModuleIdOf(b))).ToList()));
+                }
+                else if (band == Band.Voice)
+                {
+                    // Every voice has its own lane from the start, folded or not: unfolding one doesn't move the others.
+                    CloseFolded();
+                    lanes.Add((band, null, VoiceLaneTitle(group.Title), new List<string> { ShowsModules(group) ? ModuleKey(group.Members[0]) : GroupKey(group.Key) }));
+                }
+                else
+                {
+                    folded.Add(ShowsModules(group) ? ModuleKey(group.Members[0]) : GroupKey(group.Key));
+                }
             }
+            CloseFolded();
         }
         Dictionary<string, int> laneOf = new Dictionary<string, int>();
         for (int lane = 0; lane < lanes.Count; lane++)
@@ -417,6 +436,10 @@ public static class LayeredLayout
         double width = GapRight(drawnColumns - 1) + margin;
         return new DiagramLayout(title, width, y - 8 + margin, bands, nodes, edges, groups, analysis.Diagnostics);
     }
+
+    /// <summary>"Voice 1" from "Voice 1: LVCO ← ADDR-SEQ": the box inside already says the rest.</summary>
+    private static string VoiceLaneTitle(string groupTitle) =>
+        groupTitle.IndexOf(": ", StringComparison.Ordinal) is int colon and > 0 ? groupTitle[..colon] : groupTitle;
 
     /// <summary>"Scope 'Channel A' ← SLEW #1 'Signal'" for every monitor cable leaving this box (or a module folded in it).</summary>
     private static IReadOnlyList<string> WatchersOf(PatchAnalysis analysis, DiagramNode node, HashSet<long> visible, Dictionary<long, PatchGroup> groupOf) =>

@@ -37,11 +37,13 @@ flowchart LR
   subgraph b1["Time & sequencing"]
     n_g_time["Sequencing<br/>Clkd, ADDR-SEQ"]:::time
   end
-  subgraph b2["Voices"]
+  subgraph b2["Voice 1"]
     n_g_voice_1["LVCO ← ADDR-SEQ<br/>VCF #2 · +3 mod"]:::source
+  end
+  subgraph b3["Voice 2"]
     n_g_voice_2["PULSE ← Host MIDI<br/>VCF #1 → Waveshaper → EQ · +4 mod"]:::source
   end
-  subgraph b3["Mix & effects"]
+  subgraph b4["Mix & effects"]
     n_g_bus["Mix & effects<br/>MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
   end
   n_g_voice_1 ==>|"into MIX4"| n_g_bus
@@ -272,12 +274,12 @@ Open http://localhost:5016 and drop a `.vcv` file (or add `?sample=AmbientJam` t
 
 - unfold/fold boxes, or use **Overview** / **Unfold all**;
 - step through the layers, choose how to show scopes and displays (offered when the patch has some);
-- switch port names on the box edges and function names in the titles;
+- switch port names on the box edges and function names in the titles (these display options, the layers shown and the theme are remembered by your browser for the next visit and the next patch);
 - drag the background to pan, Ctrl + wheel to zoom;
 - hover a box to follow its cables, click a cable to edit its intent;
 - export `.html`, `.svg`, `.dot`, `.mmd` or `.json`.
 
-On a phone or tablet (portrait or landscape), the diagram fills the screen and opens fitted to its width; the options fold under **Options**. Drag with a finger anywhere to pan and pinch to zoom. Tap a module box for its ports, details and VCV Library link; tap a library icon once to see the panel, twice to open the page. The theme button switches between the system theme, light and dark. The exported `.html` page pans, pinches and previews panels the same way.
+On a phone or tablet (portrait or landscape), the diagram fills the screen and opens fitted to its width; the options fold under **Options**. Drag with a finger anywhere to pan and pinch to zoom. Tap a module box for its ports, details, panel and VCV Library link; tap a library icon once to see the panel, twice to open the page. The theme button switches between the system theme, light and dark. The exported `.html` page pans, pinches and previews panels the same way.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/web-app-dark.png">
