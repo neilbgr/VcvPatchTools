@@ -20,8 +20,8 @@
 
         <div class="vpd-drop @(diagram is not null ? "compact" : "")">
             <div>@(diagram is null ? "Choose a patch file" : "Another patch:")</div>
-            @* No accept filter: phones filter by file type, and .vcv has none they know (its files would be greyed out). *@
-            <InputFile OnChange="LoadAsync" />
+            @* .vcv filter with a mouse only: phones filter by file type, and .vcv has none they know (its files would be greyed out). *@
+            <InputFile OnChange="LoadAsync" accept="@fileFilter" />
             <div><button class="vpd-link" @onclick="@(() => LoadSampleAsync("AmbientJam"))">or try the sample patch</button></div>
             @if (error is not null)
             {
@@ -199,6 +199,7 @@
     private bool optionsOpen;
     private string theme = "auto";
     private DiagramNode? selectedNode;
+    private string? fileFilter;
 
     private string StorageKey => $"vpd-intents:{fileTitle}";
 
@@ -212,6 +213,14 @@
         catch (JSException)
         {
             theme = "auto";
+        }
+        try
+        {
+            fileFilter = await JS.InvokeAsync<bool>("vpdFinePointer") ? ".vcv" : null;
+        }
+        catch (JSException)
+        {
+            fileFilter = null;
         }
         // ?sample=AmbientJam loads the bundled sample, &tab=info|convert opens that tab.
         Dictionary<string, string> query = new Uri(Navigation.Uri).Query.TrimStart('?')

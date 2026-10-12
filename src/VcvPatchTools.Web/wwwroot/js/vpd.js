@@ -18,3 +18,6 @@ window.vpdScrollIntoView = element => element.scrollIntoView({ block: 'start' })
 // Blazor side of panzoom.js: Ctrl+wheel zoom goes back to C# (PatchDiagramView.ZoomBy), which owns the zoom level.
 window.vpdPanZoomDotNet = (scroller, view) =>
   window.vpdPanZoom(scroller, factor => view.invokeMethodAsync('ZoomBy', factor));
+
+// A mouse or trackpad as the main pointer: a desktop, whose file dialog can filter on the .vcv extension.
+window.vpdFinePointer = () => window.matchMedia('(pointer: fine)').matches;
