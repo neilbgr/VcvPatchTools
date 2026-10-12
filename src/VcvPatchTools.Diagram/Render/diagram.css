@@ -1,12 +1,13 @@
 ﻿/* Shared by the SVG/HTML exporters and the Blazor app. Colors are tokens, redefined for dark mode. */
 .vpd-root {
-  --vpd-bg: #f6f5f2;
+  /* Light: cool aluminium greys, the voices' lanes slightly warm. */
+  --vpd-bg: #eef0f2;
   --vpd-panel: #ffffff;
-  --vpd-ink: #1d1d1f;
-  --vpd-muted: #6b6b70;
-  --vpd-line: #d9d7d2;
-  --vpd-band: #ecebe6;
-  --vpd-band-voice: #f3ece6;
+  --vpd-ink: #1b1d21;
+  --vpd-muted: #60656d;
+  --vpd-line: #cfd3d8;
+  --vpd-band: #e3e6ea;
+  --vpd-band-voice: #f1e9e6;
   --vpd-audio: #d64545;
   --vpd-pitch: #b97d00;
   --vpd-modulation: #2c9457;
@@ -28,7 +29,8 @@
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  .vpd-root:not([data-theme="light"]) {
+  /* A diagram inside a page follows the page's theme, even one forced against the system's. */
+  .vpd-root:not([data-theme="light"]):not([data-theme="light"] .vpd-root) {
     --vpd-bg: #16171a;
     --vpd-panel: #22242a;
     --vpd-ink: #ececee;
@@ -53,7 +55,7 @@
   }
 }
 .vpd-root[data-theme="light"] { color-scheme: light; }
-.vpd-root[data-theme="dark"] {
+.vpd-root[data-theme="dark"], .vpd-root[data-theme="dark"] .vpd-root {
   color-scheme: dark;
   --vpd-bg: #16171a;
   --vpd-panel: #22242a;

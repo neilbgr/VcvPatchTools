@@ -122,7 +122,7 @@ When a color contradicts the port (a red cable from an LFO into a cutoff CV inpu
 
 ### Layers, a teaching path
 
-The toolbar shows the patch step by step: **1 · audio** (where the sound goes), **2 · + pitch** (who plays the notes), **3 · + modulation** (what makes it move), **4 · + gate/trig/clock** (what triggers it). Each layer can also be toggled on its own.
+The toolbar shows the patch step by step: **1 · audio** (where the sound goes), **2 · + pitch** (who plays the notes), **3 · + modulation** (what makes it move), **4 · + gate/trig/clock** (what triggers it). In the web app, the layer chips do the same: a hidden layer's chip shows every layer up to it, a shown one's hides just that layer.
 
 ### Folded overview first, details on demand
 
@@ -270,16 +270,16 @@ make test
 make web
 ```
 
-Open http://localhost:5016 and drop a `.vcv` file (or add `?sample=AmbientJam` to the URL for the bundled sample, and `&tab=info` or `&tab=convert` to open that tab). In the **Diagram** tab:
+Open http://localhost:5016 and drop a `.vcv` file (or add `?sample=AmbientJam` to the URL for the bundled sample, and `&tab=info` or `&tab=convert` to open that tab). The bar at the top holds the patch name, **Open patch** (click it or drop another patch on it), the tabs, a **?** with the basics and the theme button (system, light or dark). In the **Diagram** tab, one row of tools sits above the diagram:
 
 - unfold/fold boxes, or use **Overview** / **Unfold all**;
-- step through the layers, choose how to show scopes and displays (offered when the patch has some);
-- switch port names on the box edges and function names in the titles (these display options, the layers shown and the theme are remembered by your browser for the next visit and the next patch);
+- the numbered layer chips, in their cable color: a hidden layer's chip shows every layer up to it, a shown one's hides just that layer;
+- **Options**: intents on every cable, port names on the box edges, function names in the titles, library links, and how to show scopes and displays (offered when the patch has some). These options, the layers shown and the theme are remembered by your browser for the next visit and the next patch;
 - drag the background to pan, Ctrl + wheel to zoom;
-- hover a box to follow its cables, click a cable to edit its intent;
-- export `.html`, `.svg`, `.dot`, `.mmd` or `.json`.
+- hover a box to follow its cables, click a module for its details (its real panel from the VCV Library, ports and links) in a sheet at the bottom, click a cable to edit its intent;
+- **Export** `.html`, `.svg`, `.dot`, `.mmd` or `.json`.
 
-On a phone or tablet (portrait or landscape), the diagram fills the screen and opens fitted to its width; the options fold under **Options**. Drag with a finger anywhere to pan and pinch to zoom. Tap a module box for its ports, details, panel and VCV Library link; tap a library icon once to see the panel, twice to open the page. The theme button switches between the system theme, light and dark. The exported `.html` page pans, pinches and previews panels the same way.
+On a phone or tablet (portrait or landscape), the diagram fills the screen and opens fitted to its width. Drag with a finger anywhere to pan and pinch to zoom. Tap a module box for its ports, details, panel and VCV Library link; tap a library icon once to see the panel, twice to open the page. The exported `.html` page pans, pinches and previews panels the same way.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/web-app-dark.png">
@@ -380,3 +380,5 @@ and prefer to leave out AI-generated code.
 ## License
 
 [MIT](LICENSE)
+
+The web app ships the [Barlow](https://github.com/jpt/barlow) typeface (SIL Open Font License 1.1, see `src/VcvPatchTools.Web/wwwroot/fonts/OFL.txt`).

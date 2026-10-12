@@ -36,9 +36,11 @@ window.vpdShiftScroll = (scroller, dy) => {
 window.vpdRevealAboveSheet = (scroller, x, y, width, height) => {
   const sheet = document.querySelector('.vpd-panel');
   if (!sheet || getComputedStyle(sheet).position !== 'fixed') return;
+  // The room under the diagram first, or the scroll would stop short of it.
+  window.vpdSheetRoom?.();
   const box = scroller.getBoundingClientRect();
-  // The sheet grows up to 45% of the screen (its panel image may still be loading): plan for its full height.
-  const visibleBottom = Math.min(box.bottom, window.innerHeight * 0.55) - box.top;
+  // The panel image has a fixed height: the sheet is already as tall as it will be.
+  const visibleBottom = Math.min(box.bottom, sheet.getBoundingClientRect().top) - box.top;
   const top = y - scroller.scrollTop;
   const margin = 12;
   if (top + height + margin > visibleBottom) {
@@ -48,3 +50,48 @@ window.vpdRevealAboveSheet = (scroller, x, y, width, height) => {
     scroller.scrollBy({ left: x - scroller.scrollLeft - margin, behavior: 'smooth' });
   }
 };
+
+// Drop-down menus are native <details>: a click outside one, or Escape, closes it.
+document.addEventListener('click', e => {
+  document.querySelectorAll('details.vpd-menu[open]').forEach(menu => { if (!menu.contains(e.target)) menu.open = false; });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('details.vpd-menu[open]').forEach(menu => { menu.open = false; });
+});
+
+// Room under the diagram for the details sheet (see .vpd-scroll::after in app.css): none when the diagram fits above
+// the sheet, otherwise the height the sheet covers. Kept up to date as the sheet opens, grows (its panel image loads),
+// closes, and as the diagram is zoomed, folded or the window resized.
+(() => {
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const scroller = document.querySelector('.vpd-app .vpd-scroll');
+    if (!scroller) return;
+    const sheet = document.querySelector('.vpd-app .vpd-panel');
+    const svg = scroller.querySelector('svg');
+    let room = 0;
+    if (sheet && svg) {
+      const covered = Math.max(0, scroller.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top);
+      const visible = scroller.clientHeight - covered;
+      if (svg.getBoundingClientRect().height > visible) room = covered;
+    }
+    const value = Math.round(room) + 'px';
+    if (scroller.style.getPropertyValue('--sheet-room') !== value) scroller.style.setProperty('--sheet-room', value);
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  window.vpdSheetRoom = update;
+  const resizes = new ResizeObserver(schedule);
+  let watched = [];
+  // Blazor adds and removes the sheet and the diagram: watch whichever are there now.
+  new MutationObserver(() => {
+    const now = [...document.querySelectorAll('.vpd-app .vpd-panel, .vpd-app .vpd-scroll, .vpd-app .vpd-scroll > svg')];
+    if (now.length !== watched.length || now.some((e, i) => e !== watched[i])) {
+      resizes.disconnect();
+      now.forEach(e => resizes.observe(e));
+      watched = now;
+    }
+    schedule();
+  }).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('resize', schedule);
+})();

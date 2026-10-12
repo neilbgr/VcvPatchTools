@@ -8,14 +8,14 @@
 
 <div class="@RootClass" @ref="root">
     <div class="vpd-toolbar">
-        <div class="group">Zoom:
+        @Tools
+        <div class="group zoom">
             <button title="Zoom out (or Ctrl + wheel)" @onclick="() => SetZoom(zoom / 1.15)">−</button>
             <span class="vpd-zoom-label">@((int)Math.Round(zoom * 100))%</span>
             <button title="Zoom in (or Ctrl + wheel)" @onclick="() => SetZoom(zoom * 1.15)">+</button>
             <button @onclick="() => SetZoom(1)">100%</button>
             <button title="Fit the width, without going below a readable size" @onclick="FitAsync">Fit</button>
         </div>
-        <div class="group vpd-sub vpd-hint">Drag the background to move around.</div>
     </div>
     <div class="vpd-scroll" @ref="scroller">
         <svg class="vpd-svg" viewBox="0 0 @F(Layout.Width) @F(Layout.Height)" width="@F(Layout.Width * zoom)" height="@F(Layout.Height * zoom)">
@@ -147,6 +147,9 @@
 
     /// <summary>A module whose cables stay highlighted while nothing is hovered (the one tapped, on a phone).</summary>
     [Parameter] public string? PinnedNode { get; set; }
+
+    /// <summary>The page's own controls, on the same row as the zoom.</summary>
+    [Parameter] public RenderFragment? Tools { get; set; }
 
     private ElementReference root;
     private ElementReference scroller;

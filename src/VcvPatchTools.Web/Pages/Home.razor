@@ -6,38 +6,64 @@
 
 <PageTitle>@(fileTitle is null ? "VCV Patch Tools" : $"{fileTitle} · VCV Patch Tools")</PageTitle>
 
-<div class="vpd-root" data-theme="@(theme == "auto" ? null : theme)">
-    <div class="vpd-page">
-        <h1>@(fileTitle ?? "VCV Patch Tools")</h1>
-        <p class="vpd-sub">
-            Drop a VCV Rack / Cardinal <code>.vcv</code> patch to see its diagram, what it holds, or convert it between Rack and Cardinal: it is read in your browser, nothing is uploaded.
-            @if (diagram is not null && tab == Tab.Diagram)
+<div class="vpd-root vpd-app" data-theme="@(theme == "auto" ? null : theme)">
+    @* The rail: like the metal rail a row of modules hangs from, the one piece of decoration of the page. *@
+    <header class="vpd-rail">
+        <div class="rail-title">
+            <span class="name">@(fileTitle ?? "VCV Patch Tools")</span>
+            @if (diagram is not null)
             {
-                <span class="vpd-long"> Start from the overview, click a stacked box to unfold it, click an unfolded lane to fold it back. Click a single cable to write its intent.</span>
-                <span class="vpd-short"> Tap a stacked box to unfold it, a box or a cable for its details; pinch to zoom.</span>
-            }
-        </p>
-
-        <div class="vpd-drop @(diagram is not null ? "compact" : "")">
-            <div>@(diagram is null ? "Choose a patch file" : "Another patch:")</div>
-            @* .vcv filter with a mouse only: phones filter by file type, and .vcv has none they know (its files would be greyed out). *@
-            <InputFile OnChange="LoadAsync" accept="@fileFilter" />
-            <div><button class="vpd-link" @onclick="@(() => LoadSampleAsync("AmbientJam"))">or try the sample patch</button></div>
-            @if (error is not null)
-            {
-                <p class="vpd-error">@error</p>
+                @* The file input covers the button: a click opens the file dialog, a patch dropped on it opens too. *@
+                <label class="rail-button file" title="Open another .vcv patch, or drop one here">
+                    Open patch
+                    @* .vcv filter with a mouse only: phones filter by file type, and .vcv has none they know (its files would be greyed out). *@
+                    <InputFile OnChange="LoadAsync" accept="@fileFilter" />
+                </label>
             }
         </div>
-
         @if (diagram is not null)
         {
-            <nav class="vpd-tabs" role="tablist">
+            <nav class="rail-tabs" role="tablist">
                 @foreach (Tab t in Enum.GetValues<Tab>())
                 {
                     Tab current = t;
                     <button role="tab" aria-selected="@(tab == current ? "true" : "false")" class="@(tab == current ? "active" : "")" @onclick="() => tab = current">@current</button>
                 }
             </nav>
+        }
+        <div class="rail-end">
+            @if (diagram is not null)
+            {
+                <details class="vpd-menu help">
+                    <summary class="rail-button" title="How to read and use the diagram" aria-label="Help">?</summary>
+                    <div class="menu">
+                        <p>The patch is read in your browser: nothing is uploaded.</p>
+                        <p class="vpd-long">Start from the overview. Click a stacked box to unfold it, and click an unfolded lane to fold it back. Click a module for its details, a single cable to write its intent. Drag the background to move around, Ctrl + wheel to zoom.</p>
+                        <p class="vpd-short">Tap a stacked box to unfold it, a box or a cable for its details. Drag to move around, pinch to zoom.</p>
+                        <p>The numbered layers are a reading path: audio first, then pitch, modulation, and gates.</p>
+                    </div>
+                </details>
+            }
+            <button class="rail-button" title="Theme: follow the system, light or dark" @onclick="CycleThemeAsync">@ThemeLabel</button>
+        </div>
+    </header>
+
+    <div class="vpd-page">
+        @if (error is not null)
+        {
+            <p class="vpd-error">@error</p>
+        }
+
+        @if (diagram is null)
+        {
+            <section class="vpd-empty">
+                <p class="lead">See what a VCV Rack or Cardinal patch does: its diagram, the modules it holds, and a conversion between Rack and Cardinal. The patch is read in your browser, nothing is uploaded.</p>
+                <div class="vpd-drop">
+                    <span>Drop a <code>.vcv</code> patch here, or click to choose one</span>
+                    <InputFile OnChange="LoadAsync" accept="@fileFilter" />
+                </div>
+                <button class="vpd-link" @onclick="@(() => LoadSampleAsync("AmbientJam"))">Open the sample patch</button>
+            </section>
         }
 
         @if (diagram is not null && tab == Tab.Info)
@@ -62,93 +88,108 @@
 
         @if (diagram is not null && tab == Tab.Diagram)
         {
-            <div class="vpd-toolbar">
-                <div class="group">View:
-                    <button @onclick="FoldAll">Overview</button>
-                    <button @onclick="UnfoldAll">Unfold all</button>
-                    <button class="vpd-options-toggle" aria-expanded="@(optionsOpen ? "true" : "false")" @onclick="() => optionsOpen = !optionsOpen">Options @(optionsOpen ? "▴" : "▾")</button>
-                    <button title="Theme: follow the system, light or dark" @onclick="CycleThemeAsync">@ThemeLabel</button>
-                </div>
-                @* On a phone these groups fold under "Options", leaving the screen to the diagram. *@
-                <div class="vpd-options @(optionsOpen ? "open" : "")">
-                <div class="group">Show:
-                    @for (int step = 1; step <= DiagramLayout.Layers.Count; step++)
-                    {
-                        int s = step;
-                        <button @onclick="() => ShowUpTo(s)">@s · @(s == 1 ? "" : "+ ")@DiagramLayout.LayerLabel(DiagramLayout.Layers[s - 1])</button>
-                    }
-                </div>
-                <div class="group">
-                    @foreach (string layer in DiagramLayout.Layers)
-                    {
-                        string l = layer;
-                        <label>
-                            <input type="checkbox" checked="@(!hiddenLayers.Contains(l))" @onchange="e => ToggleLayer(l, (bool)e.Value!)" />
-                            <span class="swatch" style="--c: var(--vpd-@l)"></span>@DiagramLayout.LayerLabel(l)
-                        </label>
-                    }
-                </div>
-                <div class="group"><label><input type="checkbox" checked="@showIntents" @onchange="e => ToggleIntents((bool)e.Value!)" /> intents on every cable</label></div>
-                <div class="group"><label><input type="checkbox" checked="@portTabs" @onchange="e => TogglePortTabs((bool)e.Value!)" /> port names</label></div>
-                <div class="group"><label><input type="checkbox" checked="@functionNames" @onchange="e => ToggleFunctionNames((bool)e.Value!)" /> function names</label></div>
-                <div class="group"><label title="A link to each module's VCV Library page; hover it to see the panel"><input type="checkbox" checked="@libraryLinks" @onchange="e => ToggleLibraryLinks((bool)e.Value!)" /> library links</label></div>
-                @* Only offered when the patch has scopes or displays: otherwise the box would do nothing. *@
-                @if (MonitorCount > 0)
-                {
-                    <div class="group"><label title="Scopes and displays make no sound: hidden, a 👁 badge on what they watch, or boxes in a column on the right">scopes &amp; displays (@MonitorCount):
-                        <select value="@monitors" @onchange="e => SetMonitors(Enum.Parse<MonitorView>((string)e.Value!))">
-                            <option value="@MonitorView.Hidden">hidden</option>
-                            <option value="@MonitorView.Badge">badge</option>
-                            <option value="@MonitorView.Modules">boxes</option>
-                        </select></label></div>
-                }
-                <div class="group">Export:
-                    @foreach (DiagramFormat format in Enum.GetValues<DiagramFormat>())
-                    {
-                        DiagramFormat f = format;
-                        <button @onclick="() => ExportAsync(f)">@PatchDiagram.Extension(f)</button>
-                    }
-                </div>
-                </div>
-            </div>
-
             <PatchDiagramView Layout="diagram" HiddenLayers="hiddenLayers" ShowIntents="showIntents"
                               SelectedEdge="selected?.Key" OnEdgeSelected="Select"
-                              OnNodeClicked="NodeClicked" OnBandClicked="Fold" PinnedNode="@selectedNode?.Key" />
+                              OnNodeClicked="NodeClicked" OnBandClicked="Fold" PinnedNode="@selectedNode?.Key">
+                <Tools>
+                    <div class="group">
+                        <button @onclick="FoldAll">Overview</button>
+                        <button @onclick="UnfoldAll">Unfold all</button>
+                    </div>
+                    @* The layers are a reading path, hence the numbers: a hidden layer's chip shows every layer up to it,
+                       a shown one's hides just that layer. *@
+                    <div class="group layers" role="group" aria-label="Layers">
+                        @for (int step = 1; step <= DiagramLayout.Layers.Count; step++)
+                        {
+                            int s = step;
+                            string l = DiagramLayout.Layers[s - 1];
+                            bool shown = !hiddenLayers.Contains(l);
+                            <button class="layer @(shown ? "on" : "")" style="--c: var(--vpd-@l)" aria-pressed="@(shown ? "true" : "false")"
+                                    title="@(shown ? "Hide this layer" : "Show the layers up to this one")" @onclick="() => ClickLayer(s)">
+                                <span class="num">@s</span><span class="vpd-long">@DiagramLayout.LayerLabel(l)</span><span class="vpd-short">@l</span>
+                            </button>
+                        }
+                    </div>
+                    <details class="vpd-menu">
+                        <summary>Options</summary>
+                        <div class="menu">
+                            <label><input type="checkbox" checked="@showIntents" @onchange="e => ToggleIntents((bool)e.Value!)" /> Intents on every cable</label>
+                            <label><input type="checkbox" checked="@portTabs" @onchange="e => TogglePortTabs((bool)e.Value!)" /> Port names</label>
+                            <label><input type="checkbox" checked="@functionNames" @onchange="e => ToggleFunctionNames((bool)e.Value!)" /> Function names</label>
+                            <label title="A link to each module's VCV Library page; hover it to see the panel"><input type="checkbox" checked="@libraryLinks" @onchange="e => ToggleLibraryLinks((bool)e.Value!)" /> Library links</label>
+                            @* Only offered when the patch has scopes or displays: otherwise the box would do nothing. *@
+                            @if (MonitorCount > 0)
+                            {
+                                <label title="Scopes and displays make no sound: hidden, a 👁 badge on what they watch, or boxes in a column on the right">Scopes and displays (@MonitorCount)
+                                    <select value="@monitors" @onchange="e => SetMonitors(Enum.Parse<MonitorView>((string)e.Value!))">
+                                        <option value="@MonitorView.Hidden">hidden</option>
+                                        <option value="@MonitorView.Badge">badge</option>
+                                        <option value="@MonitorView.Modules">boxes</option>
+                                    </select>
+                                </label>
+                            }
+                        </div>
+                    </details>
+                    <details class="vpd-menu">
+                        <summary>Export</summary>
+                        <div class="menu">
+                            @foreach (DiagramFormat format in Enum.GetValues<DiagramFormat>())
+                            {
+                                DiagramFormat f = format;
+                                <button @onclick="() => ExportAsync(f)">@PatchDiagram.Extension(f)</button>
+                            }
+                        </div>
+                    </details>
+                </Tools>
+            </PatchDiagramView>
 
             @if (selectedNode is not null)
             {
-                @* What hovering shows on a desktop (tooltips, the panel preview), for a finger: a tap on a module box. *@
-                @* In the module's role color, with its function drawing, like its box in the diagram. *@
+                @* What hovering shows on a desktop (tooltips, the panel preview), for a finger: a tap on a module box.
+                   Laid out like the module itself: its real panel, then its name, role color, function drawing and ports. *@
                 <div class="vpd-panel module role-@selectedNode.Role.ToString().ToLowerInvariant()">
-                    <button class="close" title="Close" @onclick="() => selectedNode = null">×</button>
                     @if (selectedNode.LibraryKey is string preview && !missingPanels.Contains(preview))
                     {
                         @* The real panel, from the VCV Library's screenshots; gone if the Library has none. *@
                         <img class="panel-shot" src="@VcvLibrary.ScreenshotUrl(preview, 200)" srcset="@($"{VcvLibrary.ScreenshotUrl(preview, 400)} 2x")"
                              alt="@selectedNode.Title panel" @onerror="() => missingPanels.Add(preview)" />
                     }
-                    <div>
-                        @if (selectedNode.Function is ModuleFunction function)
-                        {
-                            <svg class="icon" viewBox="-1 -1 18 14" width="22" height="17" aria-hidden="true"><path d="@Icons.Path(function)" /></svg>
-                        }
-                        <strong>@selectedNode.Title</strong> <span class="muted">@selectedNode.Subtitle</span>
-                    </div>
-                    @if (selectedNode.Tabs.Count > 0)
-                    {
-                        <ul>
-                            @foreach (PortTab tab in selectedNode.Tabs.OrderBy(t => t.Output).ThenBy(t => t.Y))
+                    <div class="sheet-body">
+                        <button class="close" title="Close" @onclick="() => selectedNode = null">×</button>
+                        <h2>
+                            @if (selectedNode.Function is ModuleFunction function)
                             {
-                                <li><span class="muted">@(tab.Output ? "out" : "in")</span> @tab.Tooltip</li>
+                                <svg class="icon" viewBox="-1 -1 18 14" width="22" height="17" aria-hidden="true"><path d="@Icons.Path(function)" /></svg>
                             }
-                        </ul>
-                    }
-                    <div class="muted">@string.Join(" · ", selectedNode.Details)</div>
-                    @if (selectedNode.LibraryKey is string library)
-                    {
-                        <a class="lib-link" href="@VcvLibrary.PageUrl(library)" target="_blank" rel="noopener">Open in the VCV Library ↗</a>
-                    }
+                            @selectedNode.Title <span class="muted">@selectedNode.Subtitle</span>
+                        </h2>
+                        @if (selectedNode.Tabs.Count > 0)
+                        {
+                            <div class="ports">
+                                @foreach (bool output in new[] { false, true })
+                                {
+                                    List<PortTab> side = selectedNode.Tabs.Where(t => t.Output == output).OrderBy(t => t.Y).ToList();
+                                    @if (side.Count > 0)
+                                    {
+                                        <div>
+                                            <h3>@(output ? "Outputs" : "Inputs")</h3>
+                                            <ul>
+                                                @foreach (PortTab port in side)
+                                                {
+                                                    <li><span class="sig" style="--c: var(--vpd-@SvgRenderer.SignalClass(port.Signal))"></span>@port.Tooltip</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                        <p class="muted">@string.Join(" · ", selectedNode.Details)</p>
+                        @if (selectedNode.LibraryKey is string library)
+                        {
+                            <a class="lib-link" href="@VcvLibrary.PageUrl(library)" target="_blank" rel="noopener">Open in the VCV Library ↗</a>
+                        }
+                    </div>
                 </div>
             }
 
@@ -209,7 +250,6 @@
     private bool functionNames;
     private bool portTabs = true;
     private bool libraryLinks = true;
-    private bool optionsOpen;
     private string theme = "auto";
     private DiagramNode? selectedNode;
     private readonly HashSet<string> missingPanels = new HashSet<string>();
@@ -398,23 +438,13 @@
         Relayout();
     }
 
-    private Task ShowUpTo(int step)
+    /// <summary>A hidden layer's chip steps the reading path up to it; a shown one's hides just that layer.</summary>
+    private Task ClickLayer(int step)
     {
-        hiddenLayers = DiagramLayout.Layers.Skip(step).ToHashSet();
-        return SaveOptionsAsync();
-    }
-
-    private Task ToggleLayer(string layer, bool visible)
-    {
-        if (visible)
-        {
-            hiddenLayers.Remove(layer);
-        }
-        else
-        {
-            hiddenLayers.Add(layer);
-        }
-        hiddenLayers = new HashSet<string>(hiddenLayers);
+        string layer = DiagramLayout.Layers[step - 1];
+        hiddenLayers = hiddenLayers.Contains(layer)
+            ? DiagramLayout.Layers.Skip(step).ToHashSet()
+            : new HashSet<string>(hiddenLayers) { layer };
         return SaveOptionsAsync();
     }
 

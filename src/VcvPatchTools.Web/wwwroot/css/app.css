@@ -88,70 +88,204 @@ code {
     text-align: start;
 }
 /* VCV Patch Tools app */
+/* Barlow (SIL Open Font License, see fonts/OFL.txt): a DIN-like face, as on module panels. Served with the app, so
+   opening a patch asks nothing of any other site. The diagram's own text keeps the system face of the exports. */
+@font-face { font-family: "Barlow"; font-weight: 400; font-display: swap; src: url("../fonts/barlow-400.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("../fonts/barlow-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("../fonts/barlow-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 500; font-display: swap; src: url("../fonts/barlow-semi-condensed-500.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; font-display: swap; src: url("../fonts/barlow-semi-condensed-600.woff2") format("woff2"); }
+
 /* Our own light and dark themes: "only light" keeps a phone's forced dark mode off the light one (it would darken
    the page but leave the diagram's SVG fills light); in dark mode the page is dark already. */
 :root { color-scheme: only light; }
 @media (prefers-color-scheme: dark) { :root { color-scheme: dark; } }
 html, body { margin: 0; }
-body { background: #f6f5f2; }
+body { background: #eef0f2; }
 @media (prefers-color-scheme: dark) { body { background: #16171a; } }
 /* The theme button overrides the system theme: the page around the diagram follows. */
-body:has(.vpd-root[data-theme="light"]) { background: #f6f5f2; color-scheme: light; }
+body:has(.vpd-root[data-theme="light"]) { background: #eef0f2; color-scheme: light; }
 body:has(.vpd-root[data-theme="dark"]) { background: #16171a; color-scheme: dark; }
-.vpd-drop { border: 2px dashed var(--vpd-line); border-radius: 10px; padding: 24px; text-align: center; color: var(--vpd-muted); margin-bottom: 12px; }
-.vpd-drop input { margin-top: 8px; }
-.vpd-error { color: var(--vpd-audio); }
-.vpd-panel { margin-top: 12px; padding: 12px; border: 1px solid var(--vpd-line); border-radius: 8px; background: var(--vpd-panel); font-size: 13px; }
-.vpd-panel input[type=text] { width: 100%; box-sizing: border-box; font: inherit; padding: 6px 8px; margin-top: 6px; border-radius: 6px; border: 1px solid var(--vpd-line); background: var(--vpd-bg); color: var(--vpd-ink); }
-.vpd-panel .muted { color: var(--vpd-muted); }
+
+.vpd-root.vpd-app {
+  --ui-font: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ui-condensed: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
+  /* The rail is the same metal in both themes. */
+  --rail-top: #3d4148;
+  --rail-bottom: #25282d;
+  --rail-ink: #eceef1;
+  --rail-muted: #a7acb4;
+  --rail-alu: #c9ccd1;
+  font-family: var(--ui-font);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.vpd-app .vpd-toolbar, .vpd-app .vpd-panel, .vpd-app .vpd-menu .menu { font-family: var(--ui-font); }
+.vpd-app :focus-visible { outline: 2px solid var(--vpd-gate); outline-offset: 2px; }
+.vpd-app code { color: inherit; font-size: .92em; }
+
+/* The rail */
+.vpd-rail {
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px;
+  padding: 7px 40px; min-height: 34px;
+  color: var(--rail-ink);
+  background:
+    repeating-linear-gradient(180deg, rgb(255 255 255 / 3.5%) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--rail-top), var(--rail-bottom));
+  border-top: 1px solid rgb(255 255 255 / 16%);
+  border-bottom: 1px solid #101215;
+  font-family: var(--ui-condensed);
+}
+/* The rail's mounting slots, one at each end. */
+.vpd-rail::before, .vpd-rail::after {
+  content: ""; position: absolute; top: 50%; width: 16px; height: 7px; margin-top: -4px; border-radius: 4px;
+  background: #0e1012; box-shadow: inset 0 1px 2px rgb(0 0 0 / 70%), 0 1px 0 rgb(255 255 255 / 14%);
+}
+.vpd-rail::before { left: 14px; }
+.vpd-rail::after { right: 14px; }
+.rail-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.rail-title .name { font-size: 21px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-tabs { display: flex; gap: 2px; align-self: stretch; }
+.rail-tabs button {
+  font: inherit; font-size: 16px; font-weight: 500; color: var(--rail-muted); background: none; border: none; cursor: pointer;
+  padding: 4px 12px; margin: -7px 0; border-bottom: 3px solid transparent;
+}
+.rail-tabs button:hover { color: var(--rail-ink); }
+.rail-tabs button.active { color: var(--rail-ink); border-bottom-color: var(--rail-alu); }
+.rail-end { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.rail-button {
+  position: relative; display: inline-flex; align-items: center; font: inherit; font-size: 15px; font-weight: 500;
+  color: var(--rail-ink); background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 5px; padding: 3px 11px; cursor: pointer; overflow: hidden;
+}
+.rail-button:hover { background: rgb(255 255 255 / 14%); }
+/* The file input covers its button, invisible: click to choose, or drop a patch on it. */
+.rail-button.file input, .vpd-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.rail-button.file input::file-selector-button, .vpd-drop input::file-selector-button { cursor: pointer; }
+
+/* Drop-down menus (Options, Export, help): native <details>, closed by a click elsewhere (vpd.js). */
+.vpd-menu { position: relative; }
+.vpd-menu > summary { list-style: none; cursor: pointer; }
+.vpd-menu > summary::-webkit-details-marker { display: none; }
+.vpd-toolbar .vpd-menu > summary { padding: 4px 10px; border-radius: 5px; border: 1px solid var(--vpd-line); background: var(--vpd-panel); }
+.vpd-toolbar .vpd-menu > summary::after { content: " ▾"; color: var(--vpd-muted); }
+.vpd-toolbar .vpd-menu[open] > summary { border-color: var(--vpd-muted); }
+.vpd-menu .menu {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 200px;
+  display: flex; flex-direction: column; gap: 8px; padding: 12px;
+  background: var(--vpd-panel); color: var(--vpd-ink); border: 1px solid var(--vpd-line); border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%); font-size: 14px; white-space: nowrap;
+}
+.vpd-menu .menu label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.vpd-menu .menu select { font: inherit; margin-left: 4px; }
+.vpd-menu .menu button { text-align: left; }
+.vpd-menu.help .menu { left: auto; right: 0; width: min(360px, calc(100vw - 32px)); white-space: normal; gap: 0; font-size: 14px; }
+.vpd-menu.help .menu p { margin: 0 0 8px; }
+.vpd-menu.help .menu p:last-child { margin: 0; }
+.vpd-menu.help > summary { padding: 3px 0; width: 28px; justify-content: center; font-weight: 600; }
+
+/* Page */
+.vpd-app .vpd-page { padding: 10px 12px; }
+.vpd-error { color: var(--vpd-audio); margin: 0 0 10px; }
+.vpd-link { background: none; border: none; color: var(--vpd-gate); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font: inherit; padding: 0; }
+
+/* Before a patch: what the tool does, and where to drop one. */
+.vpd-empty { max-width: 620px; margin: 9vh auto 0; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.vpd-empty .lead { font-size: 19px; line-height: 1.45; margin: 0; }
+.vpd-drop {
+  position: relative; align-self: stretch; padding: 44px 20px; text-align: center; font-size: 16px; color: var(--vpd-muted);
+  border: 2px dashed var(--vpd-line); border-radius: 10px; background: var(--vpd-panel);
+}
+.vpd-drop:hover, .vpd-drop:focus-within { border-color: var(--vpd-muted); color: var(--vpd-ink); }
+
+/* One row of tools above the diagram: groups of quiet buttons, the layers as chips in their cable color. */
+.vpd-app .vpd-toolbar { gap: 8px 18px; margin: 0 0 10px; font-size: 14px; }
+.vpd-app .vpd-toolbar button { padding: 4px 10px; border-radius: 5px; }
+.vpd-app .vpd-toolbar .group.zoom { margin-left: auto; }
+.vpd-app .vpd-toolbar .group { min-width: 0; max-width: 100%; }
+.vpd-toolbar .layers { gap: 4px; }
+.vpd-toolbar button.layer { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 14px; border-style: dashed; color: var(--vpd-muted); }
+.vpd-toolbar button.layer .num {
+  display: inline-grid; place-items: center; width: 19px; height: 19px; border-radius: 50%;
+  font-family: var(--ui-condensed); font-size: 12px; font-weight: 600; border: 1.5px solid var(--c); color: var(--c);
+}
+.vpd-toolbar button.layer.on { border-style: solid; border-color: var(--c); color: var(--vpd-ink); background: color-mix(in srgb, var(--c) 12%, var(--vpd-panel)); }
+.vpd-toolbar button.layer.on .num { background: var(--c); color: var(--vpd-panel); }
+
+/* The diagram reads better with lane titles in plain case (the exports keep theirs). */
+.vpd-app .vpd-band text { text-transform: none; letter-spacing: 0; font-size: 13px; }
 .vpd-edge { cursor: pointer; }
 .vpd-edge.selected path:not(.hit) { stroke-width: 4; }
-.vpd-link { margin-top: 8px; background: none; border: none; color: var(--vpd-time); text-decoration: underline; cursor: pointer; font: inherit; }
-.vpd-drop.compact { display: flex; gap: 10px; align-items: center; justify-content: flex-start; padding: 6px 10px; margin-bottom: 8px; }
-.vpd-drop.compact input, .vpd-drop.compact .vpd-link { margin-top: 0; }
-.vpd-drop.compact > div { display: inline; }
+
 /* Cable intent and module details: a sheet docked at the bottom of the screen, on every screen size. Under the diagram,
    it would push the page down and take the top of the diagram out of view. */
-.vpd-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; margin: 0; max-height: 45dvh; overflow: auto; border-radius: 12px 12px 0 0; box-shadow: 0 -4px 16px rgb(0 0 0 / 25%); }
-/* While the sheet is open, the diagram scrolls on past its bottom edge: every box can still be brought above the sheet. */
-.vpd-page:has(.vpd-panel) .vpd-scroll::after { content: ""; display: block; height: 45dvh; }
-.vpd-panel .close { float: right; margin: -4px -4px 0 8px; font: inherit; font-size: 18px; line-height: 1; padding: 4px 8px; border: none; background: none; color: var(--vpd-muted); cursor: pointer; }
-.vpd-panel ul { margin: 6px 0 0; padding-left: 18px; }
-.vpd-panel .lib-link { display: inline-block; margin-top: 8px; color: var(--vpd-time); }
-.vpd-panel.module { border-left: 5px solid var(--role-color); }
-.vpd-panel.module::after { content: ""; display: block; clear: both; }
-.vpd-panel .panel-shot { float: right; max-height: 190px; width: auto; margin: 0 0 8px 12px; border-radius: 4px; box-shadow: 0 1px 4px rgb(0 0 0 / 25%); }
-.vpd-panel .icon { fill: none; stroke: var(--role-color); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; margin-right: 6px; }
-.vpd-tabs { display: flex; gap: 4px; margin: 0 0 10px; border-bottom: 1px solid var(--vpd-line); }
-.vpd-tabs button { font: inherit; font-size: 14px; padding: 6px 14px; border: 1px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; background: none; color: var(--vpd-muted); cursor: pointer; margin-bottom: -1px; }
-.vpd-tabs button.active { color: var(--vpd-ink); background: var(--vpd-panel); border-color: var(--vpd-line); font-weight: 600; }
-.vpd-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 12px; font-size: 13px; }
+.vpd-panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 45dvh; overflow: auto; box-sizing: border-box;
+  padding: 14px 18px; background: var(--vpd-panel); border-top: 1px solid var(--vpd-line);
+  box-shadow: 0 -6px 20px rgb(0 0 0 / 18%); font-size: 14px;
+  animation: vpd-sheet-in .16s ease-out;
+}
+@keyframes vpd-sheet-in { from { transform: translateY(16px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .vpd-panel { animation: none; } }
+/* While the sheet is open and covers part of a diagram too tall for the room left above it, the diagram scrolls on past
+   its bottom edge by just that much: every box can still be brought above the sheet. Set by vpd.js. */
+.vpd-scroll::after { content: ""; display: block; height: var(--sheet-room, 0px); }
+.vpd-panel input[type=text] { width: 100%; box-sizing: border-box; font: inherit; padding: 6px 8px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--vpd-line); background: var(--vpd-bg); color: var(--vpd-ink); }
+.vpd-panel .muted { color: var(--vpd-muted); }
+.vpd-panel .close { float: right; margin: -6px -8px 0 8px; font: inherit; font-size: 22px; line-height: 1; padding: 4px 8px; border: none; background: none; color: var(--vpd-muted); cursor: pointer; }
+.vpd-panel .close:hover { color: var(--vpd-ink); }
+.vpd-panel .lib-link { display: inline-block; color: var(--vpd-gate); text-underline-offset: 3px; }
+/* A module: its panel on the left, as in a rack, its name and ports on the right; the role color along the top. */
+.vpd-panel.module { display: flex; align-items: flex-start; gap: 20px; border-top: 3px solid var(--role-color); }
+.vpd-panel .panel-shot { flex: none; height: 200px; width: auto; border-radius: 3px; box-shadow: 0 1px 6px rgb(0 0 0 / 30%); }
+.vpd-panel .sheet-body { flex: 1; min-width: 0; }
+.vpd-panel h2 { margin: 0 0 10px; font-family: var(--ui-condensed); font-size: 21px; font-weight: 600; line-height: 1.2; }
+.vpd-panel h2 .muted { font-family: var(--ui-font); font-size: 15px; font-weight: 400; margin-left: 4px; }
+.vpd-panel .icon { fill: none; stroke: var(--role-color); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; margin-right: 8px; }
+.vpd-panel .ports { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 320px)); gap: 4px 24px; }
+.vpd-panel h3 { margin: 0 0 4px; font-family: var(--ui-condensed); font-size: 14px; font-weight: 600; color: var(--vpd-muted); }
+.vpd-panel ul { list-style: none; margin: 0 0 10px; padding: 0; }
+.vpd-panel li { padding: 2px 0; }
+.vpd-panel .sig { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); margin-right: 8px; vertical-align: 4px; }
+.vpd-panel p { margin: 0 0 8px; }
+
+.vpd-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 12px; font-size: 14px; }
 .vpd-info dt { color: var(--vpd-muted); }
 .vpd-info dd { margin: 0; overflow-wrap: anywhere; }
-.vpd-info table { border-collapse: collapse; font-size: 13px; width: 100%; max-width: 900px; }
+.vpd-info table { border-collapse: collapse; font-size: 14px; width: 100%; max-width: 960px; }
 .vpd-info th, .vpd-info td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--vpd-line); }
 .vpd-info th { color: var(--vpd-muted); font-weight: 600; }
 .vpd-info .chip { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--role-color); margin-right: 6px; vertical-align: -1px; }
 .vpd-info a, .vpd-convert a { color: inherit; }
-.vpd-convert { font-size: 13px; }
+.vpd-convert { font-size: 14px; }
 .vpd-convert .muted { color: var(--vpd-muted); }
-.vpd-options-toggle { display: none; }
-/* Desktop: the options are simply more toolbar groups. */
-.vpd-options { display: contents; }
 
-@media (max-width: 700px), (max-height: 500px) {
-  .vpd-drop.compact { flex-wrap: wrap; gap: 4px 10px; }
-  .vpd-drop.compact input { max-width: 100%; }
-  .vpd-options-toggle { display: inline-block; }
-  .vpd-options { display: none; }
-  .vpd-options.open { display: flex; flex-wrap: wrap; gap: 8px 12px; width: 100%; padding: 8px; border: 1px solid var(--vpd-line); border-radius: 8px; background: var(--vpd-panel); }
-}
-
-/* Desktop: the Diagram tab fits the window, the diagram taking whatever height the title and toolbars leave (they wrap
-   on a narrow window). The page itself doesn't scroll, so the top of the diagram never goes out of view. */
 @media (min-width: 701px) and (min-height: 501px) {
-  .vpd-page:has(.vpd-scroll) { height: 100dvh; box-sizing: border-box; display: flex; flex-direction: column; }
-  .vpd-page:has(.vpd-scroll) > * { flex: none; }
-  .vpd-page:has(.vpd-scroll) > .vpd-root.interactive { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  .vpd-page .vpd-root.interactive > .vpd-scroll { flex: 1 1 auto; max-height: none; }
+  .vpd-short { display: none; }
+  /* Desktop: the Diagram tab fits the window under the rail, the diagram taking whatever height the toolbar leaves.
+     The page itself doesn't scroll, so the top of the diagram never goes out of view. */
+  .vpd-app:has(.vpd-scroll) { height: 100dvh; display: flex; flex-direction: column; }
+  .vpd-app:has(.vpd-scroll) > .vpd-rail { flex: none; }
+  .vpd-app:has(.vpd-scroll) > .vpd-page { flex: 1 1 auto; min-height: 0; box-sizing: border-box; display: flex; flex-direction: column; }
+  .vpd-app .vpd-page > * { flex: none; }
+  .vpd-app .vpd-page > .vpd-root.interactive { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .vpd-app .vpd-root.interactive > .vpd-scroll { flex: 1 1 auto; max-height: none; }
+}
+@media (max-width: 700px), (max-height: 500px) {
+  .vpd-long { display: none; }
+  .vpd-rail { padding: 6px 34px; gap: 4px 12px; }
+  .vpd-rail::before { left: 10px; }
+  .vpd-rail::after { right: 10px; }
+  .rail-title .name { font-size: 18px; }
+  .rail-tabs { order: 3; width: 100%; }
+  .rail-tabs button { margin: 0; padding: 4px 10px; }
+  .vpd-app .vpd-page { padding: 6px 8px; }
+  .vpd-app .vpd-toolbar .group.zoom { margin-left: 0; }
+  .vpd-app .vpd-toolbar { gap: 6px 10px; }
+  .vpd-toolbar button.layer { padding-right: 8px; gap: 4px; }
+  .vpd-empty { margin-top: 4vh; }
+  .vpd-empty .lead { font-size: 17px; }
+  .vpd-panel { padding: 12px 14px; }
+  .vpd-panel.module { gap: 12px; }
+  .vpd-panel .panel-shot { height: 140px; }
 }
