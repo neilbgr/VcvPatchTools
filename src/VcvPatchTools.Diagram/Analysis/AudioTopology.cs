@@ -1,4 +1,5 @@
 ﻿using VcvPatchTools.Core.Catalog;
+using VcvPatchTools.Core.Patch;
 
 namespace VcvPatchTools.Diagram.Analysis;
 
@@ -6,7 +7,8 @@ namespace VcvPatchTools.Diagram.Analysis;
 /// Where each audio processor sits, from the audio cables alone:
 ///   insert / send-return: fed by a module M (through a "send" output, or a loop) and feeding back into M
 ///                         (through a "return" input) → belongs to M, wherever M is;
-///   voice:                linked by audio cables to a source without going through a mixer;
+///   voice:                linked by audio cables to a source without going through a mixer, unless that mixer only
+///                         gathers sources playing the same notes (the oscillators of one keyboard zone…);
 ///   bus:                  everything else (after a mixer).
 /// </summary>
 internal sealed class AudioTopology
@@ -17,7 +19,8 @@ internal sealed class AudioTopology
     /// <summary>Each voice's modules in signal order (inserts excluded: they follow their host).</summary>
     public List<List<long>> Voices { get; } = new List<List<long>>();
 
-    public AudioTopology(IReadOnlyList<long> rackOrder, IReadOnlyList<AnalyzedCable> cables, IReadOnlyDictionary<long, Role> roleById)
+    /// <param name="pitchOrigin">Output port a source's notes come from (see <see cref="PatchAnalyzer"/>), null when it plays no notes.</param>
+    public AudioTopology(IReadOnlyList<long> rackOrder, IReadOnlyList<AnalyzedCable> cables, IReadOnlyDictionary<long, Role> roleById, Func<long, PortRef?> pitchOrigin)
     {
         List<AnalyzedCable> audio = cables.Where(c => c.Signal == SignalType.Audio && c.Cable.From.ModuleId != c.Cable.To.ModuleId).ToList();
         FindInserts(audio, roleById);
@@ -26,13 +29,46 @@ internal sealed class AudioTopology
         bool IsProcessor(long id) => roleById[id] is Role.Source or Role.Modifier or Role.Effect && !InsertHost.ContainsKey(id);
         Dictionary<long, long> parent = rackOrder.Where(IsProcessor).ToDictionary(id => id, id => id);
         long Find(long id) => parent[id] == id ? id : parent[id] = Find(parent[id]);
-        foreach (AnalyzedCable cable in audio)
+        void Union()
         {
-            long from = cable.Cable.From.ModuleId;
-            long to = cable.Cable.To.ModuleId;
-            if (parent.ContainsKey(from) && parent.ContainsKey(to))
+            foreach (AnalyzedCable cable in audio)
             {
-                parent[Find(from)] = Find(to);
+                long from = cable.Cable.From.ModuleId;
+                long to = cable.Cable.To.ModuleId;
+                if (parent.ContainsKey(from) && parent.ContainsKey(to) && Find(from) != Find(to))
+                {
+                    parent[Find(from)] = Find(to);
+                }
+            }
+        }
+        Union();
+
+        // A mixer fed only by voices playing the same notes (two oscillators on one keyboard zone) mixes one voice:
+        // the voice goes on through it, up to where different notes meet. Repeat for mixers of mixers.
+        HashSet<PortRef?> OriginsOf(long root) => parent.Keys
+            .Where(id => Find(id) == root && roleById[id] == Role.Source)
+            .Select(pitchOrigin)
+            .ToHashSet();
+        for (bool changed = true; changed;)
+        {
+            changed = false;
+            foreach (long mixer in rackOrder.Where(id => roleById[id] == Role.Mixer && !InsertHost.ContainsKey(id) && !parent.ContainsKey(id)))
+            {
+                List<long> feeders = audio.Where(c => c.Cable.To.ModuleId == mixer).Select(c => c.Cable.From.ModuleId).Distinct().ToList();
+                if (feeders.Count == 0 || !feeders.All(parent.ContainsKey))
+                {
+                    continue;
+                }
+                // At least two voices, each made of sources playing notes, all the same ones: a mixer fed by a single
+                // voice is that voice going to the bus, and one fed by a plain processor mixes something else in.
+                List<HashSet<PortRef?>> perVoice = feeders.Select(Find).Distinct().Select(OriginsOf).ToList();
+                List<PortRef?> origins = perVoice.SelectMany(o => o).Distinct().ToList();
+                if (perVoice.Count >= 2 && perVoice.All(o => o.Count > 0) && origins.Count == 1 && origins[0] is not null)
+                {
+                    parent[mixer] = mixer;
+                    Union();
+                    changed = true;
+                }
             }
         }
 

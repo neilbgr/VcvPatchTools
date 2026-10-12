@@ -65,12 +65,34 @@ public sealed class PatchAnalyzer
             }
         }
 
-        AudioTopology topology = new AudioTopology(shown.Select(m => m.Id).ToList(), cables, audioRole);
-        List<Voice> voices = topology.Voices.Select((members, index) =>
+        Dictionary<long, AnalyzedCable?> originOf = shown.Where(m => audioRole[m.Id] == Role.Source)
+            .ToDictionary(m => m.Id, m => PitchOrigin(m.Id, cables, roleById));
+        AudioTopology topology = new AudioTopology(shown.Select(m => m.Id).ToList(), cables, audioRole, id => originOf.GetValueOrDefault(id)?.Cable.From);
+
+        // A module sending notes to voices from several outputs (keyboard zones…) names the output too.
+        HashSet<long> splitOrigins = originOf.Values.OfType<AnalyzedCable>()
+            .GroupBy(c => c.Cable.From.ModuleId)
+            .Where(g => g.Select(c => c.Cable.From.PortId).Distinct().Count() > 1)
+            .Select(g => g.Key)
+            .ToHashSet();
+        string OriginName(AnalyzedCable origin) => splitOrigins.Contains(origin.Cable.From.ModuleId)
+            ? $"{titles[origin.Cable.From.ModuleId]} › {origin.FromPort}"
+            : titles[origin.Cable.From.ModuleId];
+        AnalyzedCable? OriginOfVoice(List<long> members) => members.Where(id => audioRole[id] == Role.Source)
+            .Select(id => originOf.GetValueOrDefault(id)).FirstOrDefault(o => o is not null);
+        // Voices played from the outputs of one module (keyboard zones A, B…) stay together, in output order.
+        List<List<long>> ordered = topology.Voices
+            .Select((members, position) => (Members: members, Position: position, Origin: OriginOfVoice(members)))
+            .GroupBy(v => v.Origin is AnalyzedCable o && splitOrigins.Contains(o.Cable.From.ModuleId) ? o.Cable.From.ModuleId : -1 - v.Position)
+            .OrderBy(g => g.Min(v => v.Position))
+            .SelectMany(g => g.OrderBy(v => v.Origin?.Cable.From.PortId ?? 0).ThenBy(v => v.Position))
+            .Select(v => v.Members)
+            .ToList();
+        List<Voice> voices = ordered.Select((members, index) =>
         {
             List<long> sources = members.Where(id => audioRole[id] == Role.Source).ToList();
-            string? pitchOrigin = sources.Select(id => PitchOrigin(id, cables, roleById, titles)).FirstOrDefault(o => o is not null);
-            return new Voice(index, members, string.Join(" + ", sources.Select(id => titles[id])), pitchOrigin);
+            AnalyzedCable? origin = OriginOfVoice(members);
+            return new Voice(index, members, string.Join(" + ", sources.Select(id => titles[id])), origin is null ? null : OriginName(origin));
         }).ToList();
         Dictionary<long, int> voiceById = voices.SelectMany(v => v.ModuleIds.Select(id => (id, v.Index))).ToDictionary(p => p.id, p => p.Index);
 
@@ -143,6 +165,24 @@ public sealed class PatchAnalyzer
             plugged.Add((original.To, analyzed));
         }
 
+        // A pitch processor passes on what it gets: an octave shifter fed a velocity outputs a velocity, whatever its
+        // output is called. Only when the cable color doesn't already say so.
+        for (int i = 0; i < cables.Count; i++)
+        {
+            AnalyzedCable cable = cables[i];
+            long from = cable.Cable.From.ModuleId;
+            List<AnalyzedCable> fed = cables.Where(c => c.Cable.To.ModuleId == from).ToList();
+            if (cable.Signal == SignalType.Pitch && roleById[from] == Role.Pitch && !classifier.KnowsColor(cable.Cable.Color)
+                && fed.Count > 0 && fed.All(c => c.Signal == SignalType.Cv))
+            {
+                cables[i] = cable with
+                {
+                    Signal = SignalType.Cv,
+                    SuggestedIntent = IntentSuggester.Suggest(SignalType.Cv, titles[from], cable.FromPort.Split(" › ")[^1], titles[cable.Cable.To.ModuleId], cable.ToPort.Split(" › ")[^1], roleById[from], roleById[cable.Cable.To.ModuleId]),
+                };
+            }
+        }
+
         foreach (IGrouping<PortRef, (PortRef Plugged, AnalyzedCable Cable)> stacked in plugged.GroupBy(p => p.Plugged).Where(g => g.Count() > 1))
         {
             AnalyzedCable first = stacked.First().Cable;
@@ -208,6 +248,8 @@ public sealed class PatchAnalyzer
     {
         Role.Time => Band.Time,
         Role.Pitch => Band.Pitch,
+        // A VCA or a filter that only handles CV (scaling an envelope by the velocity…) is modulation.
+        Role.Effect or Role.Modifier when !cables.Any(c => c.Signal == SignalType.Audio && (c.Cable.From.ModuleId == moduleId || c.Cable.To.ModuleId == moduleId)) => Band.Modulation,
         // Audio processing outside any voice is fed by a mixer (or by nothing): it's bus processing.
         Role.Mixer or Role.Effect or Role.Modifier => Band.Bus,
         // Inputs from the outside world get their own band on top; outputs to the outside close the bus.
@@ -242,12 +284,15 @@ public sealed class PatchAnalyzer
         return routes;
     }
 
-    /// <summary>Walks back the pitch cable into a source, through pitch processors (quantizers…), to where the notes come from.</summary>
-    private static string? PitchOrigin(long sourceId, List<AnalyzedCable> cables, Dictionary<long, Role> roleById, Dictionary<long, string> titles)
+    /// <summary>
+    /// Walks back the pitch cable into a source, through pitch processors (quantizers…), to where the notes come from:
+    /// the cable leaving that module, so its output port is known too.
+    /// </summary>
+    private static AnalyzedCable? PitchOrigin(long sourceId, List<AnalyzedCable> cables, Dictionary<long, Role> roleById)
     {
         long current = sourceId;
         HashSet<long> seen = new HashSet<long> { current };
-        string? origin = null;
+        AnalyzedCable? origin = null;
         while (true)
         {
             AnalyzedCable? pitchIn = cables.FirstOrDefault(c => c.Cable.To.ModuleId == current && c.Signal == SignalType.Pitch);
@@ -256,7 +301,7 @@ public sealed class PatchAnalyzer
                 return origin;
             }
             current = pitchIn.Cable.From.ModuleId;
-            origin = titles[current];
+            origin = pitchIn;
             if (roleById[current] != Role.Pitch)
             {
                 return origin;

@@ -44,6 +44,7 @@
   "Core/MIDITriggerToCVInterface": "Io",
   "Fundamental/8vert": "Controller",
   "Fundamental/ADSR": "Controller",
+  "Fundamental/Octave": "Pitch",
   "Fundamental/Quantizer": "Pitch",
   "Fundamental/Random": "Controller",
   "Fundamental/Scope": "Monitor",

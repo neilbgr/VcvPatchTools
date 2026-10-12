@@ -261,7 +261,8 @@ public class AnalyzerTests
         Assert.Equal(Owner("PULSE"), Owner("LLFO"));
         Assert.Equal(Owner("PULSE"), Owner("SLEW"));
         Assert.Equal(Owner("LVCO"), Owner("Quantizer"));
-        Assert.Equal(Owner("MIX4"), Owner("Random"));
+        // Random pans MIX4's channel 2, which only carries the LVCO voice.
+        Assert.Equal(Owner("LVCO"), Owner("Random"));
         Assert.Equal("time", Owner("ADDR-SEQ").Key);
         Assert.Equal("external", Owner("Host MIDI").Key);
     }
@@ -382,5 +383,68 @@ public class AnalyzerTests
         List<long> order = GraphOrder.Topological(new long[] { 1, 2, 3 }, new[] { (1L, 2L), (2L, 3L), (3L, 2L) });
 
         Assert.Equal(new long[] { 1, 2, 3 }, order);
+    }
+
+    [Fact]
+    public void KeyboardZonesMakeOneVoicePerZoneThroughTheirOwnMixer()
+    {
+        PatchAnalysis zones = Fixtures.Zones;
+        List<string> Titles(Voice voice) => voice.ModuleIds.Select(id => zones.Module(id).Title).ToList();
+
+        Assert.Equal(2, zones.Voices.Count);
+        Assert.Equal("Zones › Pitch Zone A", zones.Voices[0].PitchOrigin);
+        Assert.Equal("Zones › Pitch Zone B", zones.Voices[1].PitchOrigin);
+        Assert.Equal(new[] { "Mix #1", "VCF #1" }, Titles(zones.Voices[0]).TakeLast(2));
+        Assert.Equal(new[] { "Mix #2", "VCF #2" }, Titles(zones.Voices[1]).TakeLast(2));
+        Assert.Equal(Band.Bus, zones.Modules.Single(m => m.Title == "VCA Mix").Band);
+    }
+
+    [Fact]
+    public void KeyboardZoneLanesTakeTheirEnvelopesAndVelocity()
+    {
+        PatchAnalysis zones = Fixtures.Zones;
+        IReadOnlyList<PatchGroup> groups = PatchGrouping.Build(zones);
+        List<string> Members(string key) => groups.Single(g => g.Key == key).Members.Select(id => zones.Module(id).Title).ToList();
+
+        Assert.Contains("ADSR #1", Members("voice-1"));
+        Assert.Equal(new[] { "ADSR #2", "Octave", "VCA" }, Members("voice-2").Intersect(new[] { "ADSR #2", "Octave", "VCA" }).Order());
+        Assert.Equal(new[] { "Audio 2", "VCA Mix" }, Members("bus").Order());
+    }
+
+    [Fact]
+    public void VelocityStaysCvThroughAnOctaveShifter()
+    {
+        PatchAnalysis zones = Fixtures.Zones;
+        string Title(long id) => zones.Module(id).Title;
+
+        Assert.Equal(SignalType.Cv, zones.Cables.Single(c => c.FromPort == "Velocity Zone B").Signal);
+        Assert.Equal(SignalType.Cv, zones.Cables.Single(c => Title(c.Cable.From.ModuleId) == "Octave").Signal);
+    }
+
+    [Fact]
+    public void AMixerFedByASingleVoiceStaysOnTheBus()
+    {
+        string json = """
+            {
+              "modules": [
+                { "id": 1, "plugin": "Core", "model": "MIDIToCVInterface", "pos": [0, 0] },
+                { "id": 2, "plugin": "Fundamental", "model": "VCO", "pos": [10, 0] },
+                { "id": 3, "plugin": "Fundamental", "model": "VCF", "pos": [20, 0] },
+                { "id": 4, "plugin": "Fundamental", "model": "Mixer", "pos": [30, 0] },
+                { "id": 5, "plugin": "Core", "model": "AudioInterface2", "pos": [40, 0] }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 0, "inputModuleId": 2, "inputId": 0, "color": "#ffd452" },
+                { "id": 2, "outputModuleId": 2, "outputId": 2, "inputModuleId": 3, "inputId": 3, "color": "#ff5252" },
+                { "id": 3, "outputModuleId": 3, "outputId": 0, "inputModuleId": 4, "inputId": 0, "color": "#ff5252" },
+                { "id": 4, "outputModuleId": 4, "outputId": 0, "inputModuleId": 5, "inputId": 0, "color": "#ff5252" }
+              ]
+            }
+            """;
+
+        PatchAnalysis single = PatchDiagram.Analyze(Encoding.UTF8.GetBytes(json));
+
+        Assert.Equal(Band.Bus, single.Modules.Single(m => m.Module.Model == "Mixer").Band);
+        Assert.Equal(Band.Voice, single.Modules.Single(m => m.Module.Model == "VCF").Band);
     }
 }

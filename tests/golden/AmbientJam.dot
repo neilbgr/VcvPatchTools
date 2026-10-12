@@ -15,6 +15,7 @@ digraph "Ambient Jam" {
   }
   subgraph cluster_2 {
     label="Voice 1: LVCO ← ADDR-SEQ"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
+    n_m2629565538426473 [label="Random\nFundamental · random", color="#2c9457", penwidth=2, URL="https://library.vcvrack.com/Fundamental/Random", target="_blank", tooltip="Open in the VCV Library"];
     n_m8599156609620611 [label="ADSR #3\nBogaudio · envelope", color="#2c9457", penwidth=2, URL="https://library.vcvrack.com/Bogaudio/Bogaudio-ADSR", target="_blank", tooltip="Open in the VCV Library"];
     n_m2846238014348274 [label="Quantizer\nFundamental · quantizer", color="#b97d00", penwidth=2, URL="https://library.vcvrack.com/Fundamental/Quantizer", target="_blank", tooltip="Open in the VCV Library"];
     n_m7521774204900965 [label="LVCO\nBogaudio · oscillator", color="#d64545", penwidth=2, URL="https://library.vcvrack.com/Bogaudio/Bogaudio-LVCO", target="_blank", tooltip="Open in the VCV Library"];
@@ -33,7 +34,6 @@ digraph "Ambient Jam" {
   }
   subgraph cluster_4 {
     label="Mix & effects"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
-    n_m2629565538426473 [label="Random\nFundamental · random", color="#2c9457", penwidth=2, URL="https://library.vcvrack.com/Fundamental/Random", target="_blank", tooltip="Open in the VCV Library"];
     n_m1105006806367356 [label="MIX4\nBogaudio · mixer", color="#7a52b3", penwidth=2, URL="https://library.vcvrack.com/Bogaudio/Bogaudio-Mix4", target="_blank", tooltip="Open in the VCV Library"];
     n_m3951164105101658 [label="Plateau\nValley · reverb", color="#b0479a", penwidth=2, URL="https://library.vcvrack.com/Valley/Plateau", target="_blank", tooltip="Open in the VCV Library"];
     n_m2112618335105631 [label="Delay Plus Stereo Fx\nAS · delay", color="#b0479a", penwidth=2, URL="https://library.vcvrack.com/AS/DelayPlusStereoFx", target="_blank", tooltip="Open in the VCV Library"];

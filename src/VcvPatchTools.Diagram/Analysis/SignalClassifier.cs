@@ -21,11 +21,17 @@ public sealed class SignalClassifier
 
     private static readonly string[] pitchWords = { "v/oct", "1v/octave", "pitch", "v/o", "voct" };
     private static readonly string[] cvWords = { "env", "envelope", "lfo", "cv", "phase", "mod", "modulation", "s&h", "sample", "random", "level" };
-    private static readonly string[] gateWords = { "gate", "trig", "clock", "clk", "reset", "run", "start", "stop", "continue" };
+    private static readonly string[] gateWords = { "gate", "trig", "retrig", "clock", "clk", "reset", "run", "start", "stop", "continue" };
+    // What a keyboard sends besides pitch and gate: these outputs are CV, wherever they're patched.
+    private static readonly string[] expressionWords = { "velocity", "vel", "aftertouch", "aft", "pressure", "expression", "mod wheel", "modwheel" };
+    private static readonly string[] cvInputWords = { "cv" };
 
     private readonly IReadOnlyDictionary<string, SignalType> palette;
 
     public SignalClassifier(IReadOnlyDictionary<string, SignalType>? palette = null) => this.palette = palette ?? DefaultPalette;
+
+    /// <summary>Whether this cable color is part of the palette (then it decides the signal type).</summary>
+    public bool KnowsColor(string? color) => color is not null && palette.ContainsKey(color);
 
     public (SignalType Type, string? Mismatch) Classify(string? color, string fromPort, string toPort, Role fromRole, Role toRole)
     {
@@ -55,13 +61,19 @@ public sealed class SignalClassifier
         {
             return (fromType, null);
         }
+        // A velocity patched into a pitch input (to scale it with an octave shifter…) is still velocity.
+        if (HasWord(fromPort, expressionWords))
+        {
+            return (SignalType.Cv, null);
+        }
         if (byToPort is SignalType toType)
         {
             return (toType, null);
         }
 
+        // An input named "CV" (a mixer's channel level CV…) takes a modulation, even from an audio processor.
         bool audioFrom = fromRole is Role.Source or Role.Modifier or Role.Effect or Role.Mixer;
-        bool audioTo = toRole is Role.Modifier or Role.Effect or Role.Mixer or Role.Io;
+        bool audioTo = (toRole is Role.Modifier or Role.Effect or Role.Mixer or Role.Io) && !HasWord(toPort, cvInputWords);
         return (audioFrom && audioTo ? SignalType.Audio : SignalType.Cv, null);
     }
 
@@ -80,10 +92,12 @@ public sealed class SignalClassifier
     }
 
     /// <summary>Whole words only: "Envelope" is CV, "VCO (enveloped)" is not.</summary>
-    private static bool IsCvName(string portName)
+    private static bool IsCvName(string portName) => HasWord(portName, cvWords);
+
+    private static bool HasWord(string portName, string[] words)
     {
         string lower = portName.ToLowerInvariant();
-        return cvWords.Any(w => System.Text.RegularExpressions.Regex.IsMatch(lower, $@"(^|[^a-z]){System.Text.RegularExpressions.Regex.Escape(w)}([^a-z]|$)"));
+        return words.Any(w => System.Text.RegularExpressions.Regex.IsMatch(lower, $@"(^|[^a-z]){System.Text.RegularExpressions.Regex.Escape(w)}([^a-z]|$)"));
     }
 
     private static bool ContainsWord(string text, string word)

@@ -9,6 +9,7 @@ flowchart LR
     n_m5442970283678664["ADDR-SEQ<br/>Bogaudio + ASX · sequencer"]:::time
   end
   subgraph b2["Voice 1: LVCO ← ADDR-SEQ"]
+    n_m2629565538426473["Random<br/>Fundamental · random"]:::controller
     n_m8599156609620611["ADSR #3<br/>Bogaudio · envelope"]:::controller
     n_m2846238014348274["Quantizer<br/>Fundamental · quantizer"]:::pitch
     n_m7521774204900965["LVCO<br/>Bogaudio · oscillator"]:::source
@@ -25,7 +26,6 @@ flowchart LR
     n_m4817828098405391["EQ<br/>Bogaudio · EQ"]:::modifier
   end
   subgraph b4["Mix & effects"]
-    n_m2629565538426473["Random<br/>Fundamental · random"]:::controller
     n_m1105006806367356["MIX4<br/>Bogaudio · mixer"]:::mixer
     n_m3951164105101658["Plateau<br/>Valley · reverb"]:::effect
     n_m2112618335105631["Delay Plus Stereo Fx<br/>AS · delay"]:::effect
@@ -95,6 +95,7 @@ flowchart LR
   linkStyle 30 stroke:#d64545
   click n_m1647006434782107 href "https://library.vcvrack.com/ImpromptuModular/Clocked-Clkd" _blank
   click n_m5442970283678664 href "https://library.vcvrack.com/Bogaudio/Bogaudio-AddrSeq" _blank
+  click n_m2629565538426473 href "https://library.vcvrack.com/Fundamental/Random" _blank
   click n_m8599156609620611 href "https://library.vcvrack.com/Bogaudio/Bogaudio-ADSR" _blank
   click n_m2846238014348274 href "https://library.vcvrack.com/Fundamental/Quantizer" _blank
   click n_m7521774204900965 href "https://library.vcvrack.com/Bogaudio/Bogaudio-LVCO" _blank
@@ -107,7 +108,6 @@ flowchart LR
   click n_m6452162562716294 href "https://library.vcvrack.com/SurgeXTRack/SurgeXTVCF" _blank
   click n_m8188053117264690 href "https://library.vcvrack.com/SurgeXTRack/SurgeXTWaveshaper" _blank
   click n_m4817828098405391 href "https://library.vcvrack.com/Bogaudio/Bogaudio-EQ" _blank
-  click n_m2629565538426473 href "https://library.vcvrack.com/Fundamental/Random" _blank
   click n_m1105006806367356 href "https://library.vcvrack.com/Bogaudio/Bogaudio-Mix4" _blank
   click n_m3951164105101658 href "https://library.vcvrack.com/Valley/Plateau" _blank
   click n_m2112618335105631 href "https://library.vcvrack.com/AS/DelayPlusStereoFx" _blank

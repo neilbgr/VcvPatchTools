@@ -12,20 +12,20 @@ digraph "Ambient Jam" {
   }
   subgraph cluster_2 {
     label="Voices"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
-    n_g_voice_1 [label="LVCO ← ADDR-SEQ\nVCF #2 · +2 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
+    n_g_voice_1 [label="LVCO ← ADDR-SEQ\nVCF #2 · +3 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
     n_g_voice_2 [label="PULSE ← Host MIDI\nVCF #1 → Waveshaper → EQ · +4 mod", color="#d64545", penwidth=2, style="rounded,filled,bold", peripheries=2];
   }
   subgraph cluster_3 {
     label="Mix & effects"; style="rounded,filled"; color="#e6e4de"; fillcolor="#f4f3ef";
-    n_g_bus [label="Mix & effects\nRandom, MIX4, Plateau, Delay Plus Stereo Fx, Audio 2", color="#7a52b3", penwidth=2, style="rounded,filled,bold", peripheries=2];
+    n_g_bus [label="Mix & effects\nMIX4, Plateau, Delay Plus Stereo Fx, Audio 2", color="#7a52b3", penwidth=2, style="rounded,filled,bold", peripheries=2];
   }
   n_g_voice_1 -> n_g_bus [color="#d64545", penwidth=3, label="into MIX4", tooltip="Left → Channel 2"];
   n_g_external -> n_g_voice_2 [color="#2f74c4", style=dashed, label="4 × gate / trig / clock", tooltip="Retrigger, Gate → ADSR #1 'Retrigger', ADSR #2 'Retrigger', ADSR #1 'Gate', ADSR #2 'Gate'"];
   n_g_external -> n_g_voice_2 [color="#2c9457", penwidth=1, label="2 × modulation", tooltip="Aftertouch, Cell 1 · CC 61 → SLEW 'Signal', VCF #1 'Mod 3 → Frequency +32%'"];
   n_g_time -> n_g_voice_1 [color="#b97d00", penwidth=2, label="plays the notes", tooltip="Sequence → 1V/octave pitch"];
-  n_g_time -> n_g_voice_1 [color="#2f74c4", style=dashed, label="fires the envelope / new value", tooltip="Clock 1 → Gate"];
+  n_g_time -> n_g_voice_1 [color="#2f74c4", style=dashed, label="2 × gate / trig / clock", tooltip="Clock 1 → ADSR #3 'Gate', Random 'Trigger'"];
   n_g_external -> n_g_voice_1 [color="#2c9457", penwidth=1, label="hand control of frequency & pre-filter gain", tooltip="Cell 4 · CC 60 → Mod 3 → Frequency +40%, Pre-Filter Gain +7%"];
-  n_g_time -> n_g_bus [color="#2f74c4", style=dashed, label="fires the envelope / new value", tooltip="Clock 1 → Trigger"];
+  n_g_voice_1 -> n_g_bus [color="#2c9457", penwidth=1, label="Random moves channel 2 pan cv", tooltip="Smooth → Channel 2 pan CV"];
   n_g_external -> n_g_time [color="#2f74c4", style=dashed, label="3 × gate / trig / clock", tooltip="Gate 13 · A2, Gate 7 · G#2 → Clkd 'Run', Clkd 'Reset', ADDR-SEQ 'Reset'"];
   n_g_external -> n_g_voice_2 [color="#b97d00", penwidth=2, label="3 × pitch", tooltip="1V/octave pitch → PULSE 'Pitch (1V/octave)', ADSR #2 'Attack', ADSR #2 'Sustain'"];
   n_g_voice_2 -> n_g_bus [color="#d64545", penwidth=3, label="into MIX4", tooltip="Signal → Channel 1"];

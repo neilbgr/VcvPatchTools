@@ -50,7 +50,7 @@ public static class PatchGrouping
                 // Cables to scopes don't count: watching a signal doesn't make it shared.
                 List<string?> targets = analysis.Cables
                     .Where(c => c.Cable.From.ModuleId == candidate.Module.Id && analysis.Module(c.Cable.To.ModuleId).Band != Band.Monitor)
-                    .Select(c => groupOf.TryGetValue(c.Cable.To.ModuleId, out string? g) ? g : null)
+                    .Select(c => ChannelOwner(analysis, c, groupOf) ?? (groupOf.TryGetValue(c.Cable.To.ModuleId, out string? g) ? g : null))
                     .Distinct()
                     .ToList();
                 if (targets.Count == 1 && targets[0] is string owner)
@@ -83,6 +83,32 @@ public static class PatchGrouping
                 analysis.Modules.Where(m => groupOf[m.Module.Id] == g.Key).Select(m => m.Module.Id).ToList(),
                 g.Voices, Math.Max(1, g.Voices.Count), g.Role))
             .ToList();
+    }
+
+    /// <summary>
+    /// A modulation into one channel of a bus mixer ("Channel 2 CV", the channel's level) serves the voice patched into
+    /// that channel's audio input ("Channel 2"), not the whole bus. Null when it isn't such a channel input.
+    /// </summary>
+    private static string? ChannelOwner(PatchAnalysis analysis, AnalyzedCable cable, Dictionary<long, string> groupOf)
+    {
+        long mixer = cable.Cable.To.ModuleId;
+        if (cable.Signal == SignalType.Audio || analysis.Module(mixer).Role != Role.Mixer || ChannelNumber(cable.ToPort) is not string channel)
+        {
+            return null;
+        }
+        List<string> owners = analysis.Cables
+            .Where(c => c.Cable.To.ModuleId == mixer && c.Signal == SignalType.Audio && ChannelNumber(c.ToPort) == channel)
+            .Select(c => groupOf.GetValueOrDefault(c.Cable.From.ModuleId))
+            .OfType<string>()
+            .Distinct()
+            .ToList();
+        return owners.Count == 1 && owners[0].StartsWith("voice-", StringComparison.Ordinal) ? owners[0] : null;
+    }
+
+    private static string? ChannelNumber(string port)
+    {
+        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(port, @"\b(?:channel|ch|input|in)\s*(\d+)\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return match.Success ? match.Groups[1].Value : null;
     }
 
     /// <summary>Short name for a folded box.</summary>

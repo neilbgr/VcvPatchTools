@@ -38,19 +38,19 @@ flowchart LR
     n_g_time["Sequencing<br/>Clkd, ADDR-SEQ"]:::time
   end
   subgraph b2["Voices"]
-    n_g_voice_1["LVCO ← ADDR-SEQ<br/>VCF #2 · +2 mod"]:::source
+    n_g_voice_1["LVCO ← ADDR-SEQ<br/>VCF #2 · +3 mod"]:::source
     n_g_voice_2["PULSE ← Host MIDI<br/>VCF #1 → Waveshaper → EQ · +4 mod"]:::source
   end
   subgraph b3["Mix & effects"]
-    n_g_bus["Mix & effects<br/>Random, MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
+    n_g_bus["Mix & effects<br/>MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
   end
   n_g_voice_1 ==>|"into MIX4"| n_g_bus
   n_g_external -.->|"4 × gate / trig / clock"| n_g_voice_2
   n_g_external -->|"2 × modulation"| n_g_voice_2
   n_g_time -->|"plays the notes"| n_g_voice_1
-  n_g_time -.->|"fires the envelope / new value"| n_g_voice_1
+  n_g_time -.->|"2 × gate / trig / clock"| n_g_voice_1
   n_g_external -->|"hand control of frequency & pre-filter gain"| n_g_voice_1
-  n_g_time -.->|"fires the envelope / new value"| n_g_bus
+  n_g_voice_1 -->|"Random moves channel 2 pan cv"| n_g_bus
   n_g_external -.->|"3 × gate / trig / clock"| n_g_time
   n_g_external -->|"3 × pitch"| n_g_voice_2
   n_g_voice_2 ==>|"into MIX4"| n_g_bus
@@ -60,7 +60,7 @@ flowchart LR
   linkStyle 3 stroke:#b97d00
   linkStyle 4 stroke:#2f74c4
   linkStyle 5 stroke:#2c9457
-  linkStyle 6 stroke:#2f74c4
+  linkStyle 6 stroke:#2c9457
   linkStyle 7 stroke:#2f74c4
   linkStyle 8 stroke:#b97d00
   linkStyle 9 stroke:#d64545
@@ -88,7 +88,7 @@ From top to bottom:
 | Time & sequencing | clocks, sequencers, gate/trigger logic |
 | Pitch | quantizers, pitch processing |
 | Modulation | LFOs, envelopes, random, slew… shared by several voices |
-| Voices | one lane per voice: a sound source and what shapes it before the mixer |
+| Voices | one lane per voice: a sound source and what shapes it before the mixer. Sources playing the same notes (two oscillators on one keyboard zone) mixed together stay one voice, up to the mixer where different notes meet |
 | Mix & effects | mixers, bus effects, audio out |
 
 ### Columns, by signal path
@@ -127,7 +127,7 @@ The toolbar shows the patch step by step: **1 · audio** (where the sound goes),
 A complex patch gives a complex diagram, which defeats the purpose. So the first view is **folded**:
 
 - each **voice** is one box (`PULSE ← Host MIDI`, with its chain `VCF #1 → Waveshaper → EQ · +4 mod`); identical voices merge (`LVCO ×3`);
-- a modulator whose cables all go to one voice is folded into that voice;
+- a modulator whose cables all go to one voice is folded into that voice (a mixer channel's CV input counts for the voice patched into that channel);
 - shared modulators, time, performance and the mix bus are one box each.
 
 Click a box (web app) to unfold it into its modules, in a lane of its own. The CLI does the same with `--unfold`.

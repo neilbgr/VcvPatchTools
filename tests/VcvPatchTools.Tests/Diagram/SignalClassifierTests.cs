@@ -36,4 +36,18 @@ public class SignalClassifierTests
     [Fact]
     public void UnknownColorBetweenAudioRolesIsAudio() =>
         Assert.Equal(SignalType.Audio, classifier.Classify(null, "Out", "In", Role.Source, Role.Modifier).Type);
+
+    [Theory]
+    [InlineData("Velocity Zone B", "1V/octave pitch")]
+    [InlineData("Aftertouch", "Pitch")]
+    public void ExpressionOutputsAreCvWhereverTheyGo(string fromPort, string toPort) =>
+        Assert.Equal(SignalType.Cv, classifier.Classify("#00b56e", fromPort, toPort, Role.Io, Role.Pitch).Type);
+
+    [Fact]
+    public void RetriggerIsAGate() =>
+        Assert.Equal(SignalType.Gate, classifier.Classify(null, "Retrigger", "Retrigger (poly)", Role.Io, Role.Io).Type);
+
+    [Fact]
+    public void AnInputNamedCvTakesAModulationEvenFromAProcessor() =>
+        Assert.Equal(SignalType.Cv, classifier.Classify(null, "Channel", "Channel 2 CV", Role.Modifier, Role.Mixer).Type);
 }
