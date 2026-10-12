@@ -101,6 +101,32 @@
       "From device in 2"
     ]
   },
+  "Fundamental/SequentialSwitch1": {
+    "inputs": [
+      "Clock",
+      "Reset",
+      "Main"
+    ],
+    "outputs": [
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4"
+    ]
+  },
+  "Fundamental/SequentialSwitch2": {
+    "inputs": [
+      "Clock",
+      "Reset",
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4"
+    ],
+    "outputs": [
+      "Main"
+    ]
+  },
   "MindMeldModular/AuxExpanderJr": {
     "inputs": [
       "Return A L",

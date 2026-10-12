@@ -24,4 +24,7 @@ public enum Role
     Performance,
     /// <summary>Scopes, meters, displays: they watch signals but make no sound.</summary>
     Monitor,
+    /// <summary>Switches and multiples: they pass signals on, so they take the role of what a patch routes through them
+    /// (a switch picking between pitches is a pitch processor, one muting an oscillator is part of its voice).</summary>
+    Router,
 }

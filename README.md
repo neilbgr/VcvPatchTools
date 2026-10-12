@@ -128,6 +128,7 @@ A complex patch gives a complex diagram, which defeats the purpose. So the first
 
 - each **voice** is one box (`PULSE ← Host MIDI`, with its chain `VCF #1 → Waveshaper → EQ · +4 mod`); identical voices merge (`LVCO ×3`);
 - a modulator whose cables all go to one voice is folded into that voice (a mixer channel's CV input counts for the voice patched into that channel);
+- a switch takes the role of what it routes: one picking between pitches (an octave switch) is pitch processing, one muting an oscillator is part of that oscillator's voice, and its output carries the same signal as its inputs;
 - shared modulators, time, performance and the mix bus are one box each.
 
 Click a box (web app) to unfold it into its modules, in a lane of its own. The CLI does the same with `--unfold`.

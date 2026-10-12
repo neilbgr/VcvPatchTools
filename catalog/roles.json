@@ -48,6 +48,8 @@
   "Fundamental/Quantizer": "Pitch",
   "Fundamental/Random": "Controller",
   "Fundamental/Scope": "Monitor",
+  "Fundamental/SequentialSwitch1": "Router",
+  "Fundamental/SequentialSwitch2": "Router",
   "HetrickCV/MinMax": "Controller",
   "ImpromptuModular/Clocked": "Time",
   "ImpromptuModular/Clocked-Clkd": "Time",

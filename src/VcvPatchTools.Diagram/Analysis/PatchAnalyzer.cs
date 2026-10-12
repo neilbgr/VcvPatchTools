@@ -165,21 +165,26 @@ public sealed class PatchAnalyzer
             plugged.Add((original.To, analyzed));
         }
 
-        // A pitch processor passes on what it gets: an octave shifter fed a velocity outputs a velocity, whatever its
-        // output is called. Only when the cable color doesn't already say so.
-        for (int i = 0; i < cables.Count; i++)
+        // Some modules pass on what they get, whatever their output is called: an octave shifter fed a velocity outputs a
+        // velocity, a switch routing oscillators outputs audio. Only when the cable color doesn't already say so; repeat
+        // for chains of them.
+        for (bool changed = true; changed;)
         {
-            AnalyzedCable cable = cables[i];
-            long from = cable.Cable.From.ModuleId;
-            List<AnalyzedCable> fed = cables.Where(c => c.Cable.To.ModuleId == from).ToList();
-            if (cable.Signal == SignalType.Pitch && roleById[from] == Role.Pitch && !classifier.KnowsColor(cable.Cable.Color)
-                && fed.Count > 0 && fed.All(c => c.Signal == SignalType.Cv))
+            changed = false;
+            for (int i = 0; i < cables.Count; i++)
             {
+                AnalyzedCable cable = cables[i];
+                long from = cable.Cable.From.ModuleId;
+                if (classifier.KnowsColor(cable.Cable.Color) || PassedOn(from, cables, roleById) is not SignalType passed || passed == cable.Signal)
+                {
+                    continue;
+                }
                 cables[i] = cable with
                 {
-                    Signal = SignalType.Cv,
-                    SuggestedIntent = IntentSuggester.Suggest(SignalType.Cv, titles[from], cable.FromPort.Split(" › ")[^1], titles[cable.Cable.To.ModuleId], cable.ToPort.Split(" › ")[^1], roleById[from], roleById[cable.Cable.To.ModuleId]),
+                    Signal = passed,
+                    SuggestedIntent = IntentSuggester.Suggest(passed, titles[from], cable.FromPort.Split(" › ")[^1], titles[cable.Cable.To.ModuleId], cable.ToPort.Split(" › ")[^1], roleById[from], roleById[cable.Cable.To.ModuleId]),
                 };
+                changed = true;
             }
         }
 
@@ -192,19 +197,52 @@ public sealed class PatchAnalyzer
     }
 
     /// <summary>
+    /// What a pass-through module sends out, from what it gets: a pitch processor fed only CV sends CV; a switch sends
+    /// the one signal type of everything it routes (its clock, reset and select inputs left aside). Null otherwise.
+    /// </summary>
+    private static SignalType? PassedOn(long moduleId, List<AnalyzedCable> cables, Dictionary<long, Role> roleById)
+    {
+        List<AnalyzedCable> fed = cables.Where(c => c.Cable.To.ModuleId == moduleId).ToList();
+        if (roleById[moduleId] == Role.Pitch)
+        {
+            return fed.Count > 0 && fed.All(c => c.Signal == SignalType.Cv) ? SignalType.Cv : null;
+        }
+        if (roleById[moduleId] == Role.Router)
+        {
+            List<SignalType> routed = fed.Where(c => !SignalClassifier.IsControlPort(c.ToPort)).Select(c => c.Signal).Distinct().ToList();
+            return routed.Count == 1 ? routed[0] : null;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Roles that depend on the patch:
     ///  - a performance module that sends nothing out only shows what it receives (a piano keyboard lighting the notes
     ///    played): it's a display;
     ///  - an I/O or performance module with inputs and outputs (keyboard zones, MIDI pads, on-screen pads, joystick…) relays
     ///    the outside world only when everything it receives comes from the outside (Host MIDI, the musician or another
     ///    relay); otherwise another module plays it and it's a pitch/time/control utility;
-    ///  - a "visual" module that also sends signals out (a piano display with outputs) is a controller, not a monitor.
+    ///  - a "visual" module that also sends signals out (a piano display with outputs) is a controller, not a monitor;
+    ///  - a switch takes the role of what it routes: audio makes it part of the sound path (a modifier), pitch a pitch
+    ///    processor, gates a time utility, CV a controller.
     /// </summary>
     private static void ResolveContextualRoles(List<PatchModule> shown, List<AnalyzedCable> cables, Dictionary<long, Role> roleById)
     {
         bool HasOutputs(long id) => cables.Any(c => c.Cable.From.ModuleId == id);
         List<AnalyzedCable> Inputs(long id) => cables.Where(c => c.Cable.To.ModuleId == id).ToList();
 
+        foreach (PatchModule module in shown.Where(m => roleById[m.Id] == Role.Router))
+        {
+            SignalType? routed = cables.Where(c => c.Cable.To.ModuleId == module.Id && !SignalClassifier.IsControlPort(c.ToPort))
+                .GroupBy(c => c.Signal).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).Select(g => (SignalType?)g.Key).FirstOrDefault();
+            roleById[module.Id] = routed switch
+            {
+                SignalType.Audio => Role.Modifier,
+                SignalType.Pitch => Role.Pitch,
+                SignalType.Gate => Role.Time,
+                _ => Role.Controller,
+            };
+        }
         foreach (PatchModule module in shown.Where(m => roleById[m.Id] == Role.Monitor && HasOutputs(m.Id)))
         {
             roleById[module.Id] = Role.Controller;

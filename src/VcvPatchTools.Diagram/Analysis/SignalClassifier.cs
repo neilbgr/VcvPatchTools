@@ -25,6 +25,7 @@ public sealed class SignalClassifier
     // What a keyboard sends besides pitch and gate: these outputs are CV, wherever they're patched.
     private static readonly string[] expressionWords = { "velocity", "vel", "aftertouch", "aft", "pressure", "expression", "mod wheel", "modwheel" };
     private static readonly string[] cvInputWords = { "cv" };
+    private static readonly string[] controlWords = { "cv", "select", "index", "step", "steps" };
 
     private readonly IReadOnlyDictionary<string, SignalType> palette;
 
@@ -73,9 +74,12 @@ public sealed class SignalClassifier
 
         // An input named "CV" (a mixer's channel level CV…) takes a modulation, even from an audio processor.
         bool audioFrom = fromRole is Role.Source or Role.Modifier or Role.Effect or Role.Mixer;
-        bool audioTo = (toRole is Role.Modifier or Role.Effect or Role.Mixer or Role.Io) && !HasWord(toPort, cvInputWords);
+        bool audioTo = (toRole is Role.Modifier or Role.Effect or Role.Mixer or Role.Io or Role.Router) && !HasWord(toPort, cvInputWords);
         return (audioFrom && audioTo ? SignalType.Audio : SignalType.Cv, null);
     }
+
+    /// <summary>A switch's control input (clock, reset, select…), as opposed to a signal it routes.</summary>
+    public static bool IsControlPort(string portName) => FromPortName(portName) == SignalType.Gate || HasWord(portName, controlWords);
 
     public static SignalType? FromPortName(string portName)
     {

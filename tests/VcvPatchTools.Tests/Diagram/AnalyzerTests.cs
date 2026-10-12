@@ -447,4 +447,29 @@ public class AnalyzerTests
         Assert.Equal(Band.Bus, single.Modules.Single(m => m.Module.Model == "Mixer").Band);
         Assert.Equal(Band.Voice, single.Modules.Single(m => m.Module.Model == "VCF").Band);
     }
+
+    [Fact]
+    public void ASwitchTakesTheRoleOfWhatItRoutes()
+    {
+        PatchAnalysis sub37 = PatchDiagram.Analyze(File.ReadAllBytes(Fixtures.Path("Subsequent37.vcv")));
+        AnalyzedModule Module(string title) => sub37.Modules.Single(m => m.Title == title);
+
+        // Picks the octave of a voice's pitch: a pitch processor.
+        Assert.Equal(Role.Pitch, Module("Sequential Switch 4 to 1 #1").Role);
+        // Mutes the sub oscillator: part of its voice, and what comes out of it is still audio.
+        Assert.Equal(Role.Modifier, Module("Sequential Switch 4 to 1 #2").Role);
+        Assert.Equal(SignalType.Audio, sub37.Cables.Single(c => c.FromPort == "Square").Signal);
+        Assert.Equal(SignalType.Audio, sub37.Cables.Single(c => sub37.Module(c.Cable.From.ModuleId).Title == "Sequential Switch 4 to 1 #2").Signal);
+    }
+
+    [Fact]
+    public void AnOscillatorAndItsMutableSubMakeOneVoice()
+    {
+        PatchAnalysis sub37 = PatchDiagram.Analyze(File.ReadAllBytes(Fixtures.Path("Subsequent37.vcv")));
+        Voice zoneA = sub37.Voices.Single(v => v.PitchOrigin == "Zones › Pitch Zone A");
+
+        Assert.Equal(
+            new[] { "Mix #2", "Sequential Switch 4 to 1 #2", "VCA #3", "VCO #2", "VCO #3" },
+            zoneA.ModuleIds.Select(id => sub37.Module(id).Title).Order());
+    }
 }
