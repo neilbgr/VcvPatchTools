@@ -10,6 +10,7 @@
     <EmbeddedResource Include="Render\diagram.js" LogicalName="render.diagram.js" />
     <EmbeddedResource Include="Render\panzoom.js" LogicalName="render.panzoom.js" />
     <EmbeddedResource Include="Render\library.js" LogicalName="render.library.js" />
+    <EmbeddedResource Include="Render\highlight.js" LogicalName="render.highlight.js" />
   </ItemGroup>
 
 </Project>

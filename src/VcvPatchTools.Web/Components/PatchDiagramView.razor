@@ -1,10 +1,13 @@
 ﻿@using System.Globalization
 @using VcvPatchTools.Diagram.Render
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IJSRuntime JS
 
-@* Renders a DiagramLayout as native SVG so folding, hover and cable selection are handled in C#.
-   Same classes as SvgRenderer, so diagram.css styles both identically. *@
+@* Renders a DiagramLayout as native SVG so folding, the pinned module and cable selection are handled in C#; hovering
+   a box is left to highlight.js (shared with the static export), so it doesn't re-render the diagram.
+   Same elements, classes and attributes as SvgRenderer (PatchDiagramViewTests checks it), so diagram.css and the shared
+   scripts work on both. On purpose, the app alone has: lane titles drawn on top of everything (they follow the scroll,
+   see vpd.js) instead of in the bands, click hints in the tooltips, and the selected / pinned state classes. *@
 
 <div class="@RootClass" @ref="root">
     <div class="vpd-toolbar">
@@ -47,7 +50,7 @@
                 @foreach (DiagramEdge edge in Layout.Edges)
                 {
                     string key = SvgRenderer.SignalClass(edge.Signal);
-                    <g class="@SvgRenderer.EdgeClass(edge) @EdgeState(edge)" @onclick="() => OnEdgeSelected.InvokeAsync(edge)">
+                    <g class="@SvgRenderer.EdgeClass(edge) @EdgeState(edge)" data-from="@edge.From" data-to="@edge.To" @onclick="() => OnEdgeSelected.InvokeAsync(edge)">
                         <title>@SvgRenderer.EdgeTooltip(edge)</title>
                         <path class="hit" d="@edge.Path" />
                         <path d="@edge.Path" marker-end="url(#vpd-arrow-@key)" />
@@ -58,8 +61,7 @@
             <g class="vpd-nodes">
                 @foreach (DiagramNode node in Layout.Nodes)
                 {
-                    <g class="@SvgRenderer.NodeClass(node) @(highlighted.Contains(node.Key) ? "hl" : "")"
-                       @onmouseenter="() => Highlight(node.Key)" @onmouseleave="() => Highlight(null)"
+                    <g class="@SvgRenderer.NodeClass(node) @(highlighted.Contains(node.Key) ? "hl" : "")" data-id="@node.Key"
                        @onclick="() => NodeClickedAsync(node)">
                         <title>@string.Join("\n", node.Details)@(node.IsFolded ? "\n\nClick to unfold" : "")</title>
                         @if (node.IsFolded)
@@ -113,7 +115,7 @@
             <g class="vpd-labels">
                 @foreach (DiagramEdge edge in Layout.Edges.Where(e => e.Intent.Length > 0 || e.IsFeedback))
                 {
-                    <g class="@SvgRenderer.EdgeClass(edge) @EdgeState(edge)">
+                    <g class="@SvgRenderer.EdgeClass(edge) @EdgeState(edge)" data-from="@edge.From" data-to="@edge.To">
                         @if (edge.Intent.Length > 0)
                         {
                             @Text(edge.LabelX, SvgRenderer.IntentY(edge), "label", edge.Label, "middle")
@@ -165,9 +167,14 @@
 
     private ElementReference root;
     private ElementReference scroller;
-    private string? hovered;
     private double minZoom = Resources.MinZoom;
     private DotNetObjectReference<PatchDiagramView>? selfReference;
+    // The scripts wired to the scroll box (panzoom.js, library.js, highlight.js), each undone when the view goes away.
+    private IJSObjectReference? panZoom;
+    private IJSObjectReference? libraryPreview;
+    private IJSObjectReference? hover;
+    // The layout the hover highlight last looked at: a new one is redrawn, and may no longer have the hovered box.
+    private DiagramLayout? hoverLayout;
     private double zoom = 1;
     private HashSet<string> highlighted = new HashSet<string>();
     private HashSet<string> highlightedEdges = new HashSet<string>();
@@ -198,8 +205,10 @@
         if (firstRender)
         {
             selfReference = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("vpdPanZoomDotNet", scroller, selfReference);
-            await JS.InvokeVoidAsync("vpdLibraryPreview", scroller);
+            panZoom = await JS.InvokeAsync<IJSObjectReference>("vpdPanZoomDotNet", scroller, selfReference);
+            libraryPreview = await JS.InvokeAsync<IJSObjectReference>("vpdLibraryPreview", scroller);
+            hover = await JS.InvokeAsync<IJSObjectReference>("vpdHoverHighlight", scroller);
+            hoverLayout = Layout;
             // A phone: the diagram fills the screen, fitted to its width; zoomed out further than on a desktop.
             if (await JS.InvokeAsync<bool>("vpdCompact"))
             {
@@ -208,6 +217,11 @@
                 await JS.InvokeVoidAsync("vpdScrollIntoView", root);
                 StateHasChanged();
             }
+        }
+        else if (hover is not null && !ReferenceEquals(Layout, hoverLayout))
+        {
+            hoverLayout = Layout;
+            await hover.InvokeVoidAsync("refresh");
         }
     }
 
@@ -266,7 +280,31 @@
     private async Task FitAsync() =>
         SetZoom(await JS.InvokeAsync<double>("vpdFitZoom", scroller, Layout.Width, minZoom, Resources.MaxZoom));
 
-    public void Dispose() => selfReference?.Dispose();
+    public async ValueTask DisposeAsync()
+    {
+        // The listeners go first, so nothing calls back into this view once its reference is disposed.
+        foreach (IJSObjectReference? handle in new[] { hover, libraryPreview, panZoom })
+        {
+            if (handle is null)
+            {
+                continue;
+            }
+            try
+            {
+                await handle.InvokeVoidAsync("dispose");
+                await handle.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // The page is going away: nothing left to undo.
+            }
+            catch (JSException)
+            {
+                // Already gone on the page's side: nothing left to undo.
+            }
+        }
+        selfReference?.Dispose();
+    }
 
     private string RootClass =>
         string.Join(" ", new[] { "vpd-root", "interactive" }
@@ -277,16 +315,10 @@
     private string EdgeState(DiagramEdge edge) =>
         (highlightedEdges.Contains(edge.Key) ? "hl " : "") + (edge.Key == SelectedEdge ? "selected hl" : "");
 
-    private void Highlight(string? nodeKey)
-    {
-        hovered = nodeKey;
-        ApplyHighlight();
-    }
-
-    /// <summary>The hovered module's cables, or else the pinned one's.</summary>
+    /// <summary>The pinned module's cables (a hovered one's are highlight.js's, shown over these).</summary>
     private void ApplyHighlight()
     {
-        string? nodeKey = hovered ?? PinnedNode;
+        string? nodeKey = PinnedNode;
         if (nodeKey is null)
         {
             highlighted = new HashSet<string>();

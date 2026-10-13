@@ -114,11 +114,12 @@ public static class TarEntries
 
     private static int Digits(int value) => value.ToString(System.Globalization.CultureInfo.InvariantCulture).Length;
 
+    /// <summary>Keeps the end of the name (the file name matters most), never splitting a surrogate pair.</summary>
     private static string Truncate(string name, int maxBytes)
     {
         while (Encoding.UTF8.GetByteCount(name) > maxBytes)
         {
-            name = name[1..];
+            name = name[(char.IsSurrogatePair(name, 0) ? 2 : 1)..];
         }
         return name;
     }
@@ -150,19 +151,27 @@ public static class TarEntries
         return Encoding.UTF8.GetString(end < 0 ? field : field[..end]);
     }
 
+    /// <summary>
+    /// Octal digits, optionally padded with leading spaces and ended by a space or NUL (an all-NUL field is 0).
+    /// Anything else, including GNU's base-256 encoding of sizes over 8 GB, is not something a .vcv holds.
+    /// </summary>
     private static long Octal(ReadOnlySpan<byte> field)
     {
-        long value = 0;
-        foreach (byte b in field)
+        ReadOnlySpan<byte> digits = field.TrimStart((byte)' ');
+        int end = digits.IndexOfAnyExcept("01234567"u8);
+        if (end < 0)
         {
-            if (b is >= (byte)'0' and <= (byte)'7')
-            {
-                value = (value * 8) + (b - '0');
-            }
-            else if (b is 0 or (byte)' ' && value > 0)
-            {
-                break;
-            }
+            end = digits.Length;
+        }
+        if (digits[end..].IndexOfAnyExcept((byte)0, (byte)' ') >= 0)
+        {
+            throw new InvalidDataException($"Corrupted tar archive: invalid entry size \"{Encoding.ASCII.GetString(field).TrimEnd('\0')}\".");
+        }
+
+        long value = 0;
+        foreach (byte b in digits[..end])
+        {
+            value = (value * 8) + (b - '0');
         }
         return value;
     }

@@ -28,7 +28,7 @@ public sealed class PatchAnalyzer
     public PatchAnalysis Analyze(PatchDocument patch)
     {
         List<string> diagnostics = new List<string>();
-        Dictionary<long, PatchModule> byId = patch.Modules.ToDictionary(m => m.Id);
+        Dictionary<long, PatchModule> byId = ById(patch.Modules);
         Dictionary<long, long> baseOf = ExpanderChains.BaseOf(patch.Modules, ports);
         HashSet<long> cabled = patch.Cables.SelectMany(c => new[] { c.From.ModuleId, c.To.ModuleId }).Where(byId.ContainsKey)
             .Select(id => baseOf.GetValueOrDefault(id, id)).ToHashSet();
@@ -118,6 +118,23 @@ public sealed class PatchAnalyzer
             shown.Select(m => m.Id).ToList(),
             cables.Where(c => LoopHost(c.Cable.From.ModuleId) != LoopHost(c.Cable.To.ModuleId)).Select(c => (c.Cable.From.ModuleId, c.Cable.To.ModuleId)).ToList());
         return new PatchAnalysis(patch, modules, cables, voices, diagnostics) { Loops = loops };
+    }
+
+    /// <summary>
+    /// Modules by id. Rack never saves two modules with one id: cables name modules by id, so with two of them there is no
+    /// telling which one a cable plugs into. Such a file was edited by hand or by a faulty tool: refused rather than guessed.
+    /// </summary>
+    private static Dictionary<long, PatchModule> ById(IReadOnlyList<PatchModule> modules)
+    {
+        Dictionary<long, PatchModule> byId = new Dictionary<long, PatchModule>(modules.Count);
+        foreach (PatchModule module in modules)
+        {
+            if (!byId.TryAdd(module.Id, module))
+            {
+                throw new InvalidDataException($"The patch has more than one module with id {module.Id} ({byId[module.Id].CatalogKey} and {module.CatalogKey}), so its cables can't be told apart.");
+            }
+        }
+        return byId;
     }
 
     private List<AnalyzedCable> TypeCables(PatchDocument patch, Dictionary<long, PatchModule> byId, Dictionary<long, long> baseOf, Dictionary<long, string> titles, Dictionary<long, Role> roleById, List<string> diagnostics)

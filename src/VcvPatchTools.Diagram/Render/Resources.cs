@@ -7,8 +7,8 @@ public static class Resources
 {
     public static string Css { get; } = Read("render.diagram.css") ?? "";
 
-    /// <summary>Static HTML script: pan/zoom and library preview helpers first, then the page wiring that uses them.</summary>
-    public static string Script { get; } = (Read("render.panzoom.js") ?? "") + "\n" + (Read("render.library.js") ?? "") + "\n" + (Read("render.diagram.js") ?? "");
+    /// <summary>Static HTML script: pan/zoom, library preview and hover helpers first, then the page wiring that uses them.</summary>
+    public static string Script { get; } = string.Join("\n", new[] { "render.panzoom.js", "render.library.js", "render.highlight.js", "render.diagram.js" }.Select(name => Read(name) ?? ""));
 
     /// <summary>Readable zoom range: below 70 % box titles get too small, so you pan instead.</summary>
     public const double MinZoom = 0.7;

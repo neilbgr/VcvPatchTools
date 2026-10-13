@@ -14,9 +14,9 @@
     <ProjectReference Include="..\VcvPatchTools.Diagram\VcvPatchTools.Diagram.csproj" />
   </ItemGroup>
 
-  <!-- One pan/zoom and one library preview script for both the static export and the app: copied from Core before each build. -->
+  <!-- One pan/zoom, one library preview and one hover script for both the static export and the app: copied from Diagram before each build. -->
   <Target Name="CopySharedScripts" BeforeTargets="BeforeBuild">
-    <Copy SourceFiles="..\VcvPatchTools.Diagram\Render\panzoom.js;..\VcvPatchTools.Diagram\Render\library.js" DestinationFolder="wwwroot\js" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\VcvPatchTools.Diagram\Render\panzoom.js;..\VcvPatchTools.Diagram\Render\library.js;..\VcvPatchTools.Diagram\Render\highlight.js" DestinationFolder="wwwroot\js" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>

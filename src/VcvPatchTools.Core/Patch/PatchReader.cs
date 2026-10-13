@@ -21,36 +21,37 @@ public static class PatchReader
 
     public static JsonObject ReadJson(byte[] bytes) => PatchArchive.Read(bytes).Root;
 
+    /// <exception cref="InvalidDataException">
+    /// The patch is malformed: "modules" or "cables" is not an array, or a module has no id, a non-string plugin/model or an invalid position.
+    /// A cable missing one of its ends is skipped, as Rack does.
+    /// </exception>
     public static PatchDocument Parse(JsonObject root)
     {
         List<PatchModule> modules = new List<PatchModule>();
-        foreach (JsonNode? node in root["modules"]?.AsArray() ?? new JsonArray())
+        foreach (JsonNode? node in Array(root, "modules"))
         {
             if (node is not JsonObject module)
             {
                 continue;
             }
 
-            JsonArray? pos = module["pos"]?.AsArray();
+            long id = PatchJson.Long(module["id"])
+                ?? throw new InvalidDataException($"A module has no valid \"id\": {Abbreviate(module)}.");
+            (int column, int row) = PatchJson.Position(module);
             Dictionary<int, double> parameters = new Dictionary<int, double>();
-            foreach (JsonNode? param in module["params"]?.AsArray() ?? new JsonArray())
+            foreach (JsonNode? param in module["params"] as JsonArray ?? new JsonArray())
             {
-                if (param?["id"] is JsonNode id && param["value"] is JsonNode value)
+                if (param is JsonObject p && PatchJson.Int(p["id"]) is int paramId && PatchJson.Double(p["value"]) is double value)
                 {
-                    parameters[id.GetValue<int>()] = value.GetValue<double>();
+                    parameters[paramId] = value;
                 }
             }
 
-            modules.Add(new PatchModule(
-                module["id"]!.GetValue<long>(),
-                module["plugin"]?.GetValue<string>() ?? "",
-                module["model"]?.GetValue<string>() ?? "",
-                pos?[0]?.GetValue<int>() ?? 0,
-                pos?[1]?.GetValue<int>() ?? 0)
+            modules.Add(new PatchModule(id, Text(module, "plugin"), Text(module, "model"), column, row)
             {
                 Params = parameters,
-                LeftModuleId = module["leftModuleId"]?.GetValue<long>(),
-                RightModuleId = module["rightModuleId"]?.GetValue<long>(),
+                LeftModuleId = PatchJson.Long(module["leftModuleId"]),
+                RightModuleId = PatchJson.Long(module["rightModuleId"]),
                 // A module's data is its own: an object for most, a string for some (Ildaeil keeps a Carla XML project).
                 LearnedNotes = Integers((module["data"] as JsonObject)?["notes"]),
                 LearnedCcs = Integers((module["data"] as JsonObject)?["ccs"]),
@@ -59,7 +60,7 @@ public static class PatchReader
 
         List<PatchCable> cables = new List<PatchCable>();
         long fallbackId = 0;
-        foreach (JsonNode? node in root["cables"]?.AsArray() ?? new JsonArray())
+        foreach (JsonNode? node in Array(root, "cables"))
         {
             if (node is not JsonObject cable)
             {
@@ -67,16 +68,44 @@ public static class PatchReader
             }
 
             fallbackId++;
+            if (PatchJson.Long(cable["outputModuleId"]) is not long outputModuleId || PatchJson.Int(cable["outputId"]) is not int outputId
+                || PatchJson.Long(cable["inputModuleId"]) is not long inputModuleId || PatchJson.Int(cable["inputId"]) is not int inputId)
+            {
+                continue;
+            }
             cables.Add(new PatchCable(
-                cable["id"]?.GetValue<long>() ?? fallbackId,
-                new PortRef(cable["outputModuleId"]!.GetValue<long>(), cable["outputId"]!.GetValue<int>()),
-                new PortRef(cable["inputModuleId"]!.GetValue<long>(), cable["inputId"]!.GetValue<int>()),
-                cable["color"]?.GetValue<string>()));
+                PatchJson.Long(cable["id"]) ?? fallbackId,
+                new PortRef(outputModuleId, outputId),
+                new PortRef(inputModuleId, inputId),
+                PatchJson.String(cable["color"])));
         }
 
-        return new PatchDocument(root["version"]?.GetValue<string>(), modules, cables);
+        JsonNode? version = root["version"];
+        return version is null || PatchJson.String(version) is not null
+            ? new PatchDocument(PatchJson.String(version), modules, cables)
+            : throw new InvalidDataException($"The patch \"version\" is not a string: {version.ToJsonString()}.");
+    }
+
+    private static JsonArray Array(JsonObject root, string key) => root[key] switch
+    {
+        null => new JsonArray(),
+        JsonArray array => array,
+        JsonNode other => throw new InvalidDataException($"The patch \"{key}\" is not an array: {Abbreviate(other)}."),
+    };
+
+    private static string Text(JsonObject module, string key) => module[key] switch
+    {
+        null => "",
+        JsonNode value => PatchJson.String(value)
+            ?? throw new InvalidDataException($"Module {PatchJson.Describe(module)} has a \"{key}\" that is not a string: {Abbreviate(value)}."),
+    };
+
+    private static string Abbreviate(JsonNode node)
+    {
+        string json = node.ToJsonString();
+        return json.Length <= 80 ? json : json[..77] + "...";
     }
 
     private static List<int> Integers(JsonNode? node) =>
-        node is JsonArray array ? array.Select(n => n is JsonValue v && v.TryGetValue(out int i) ? i : -1).ToList() : new List<int>();
+        node is JsonArray array ? array.Select(n => PatchJson.Int(n) ?? -1).ToList() : new List<int>();
 }

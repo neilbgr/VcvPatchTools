@@ -38,25 +38,8 @@
   window.vpdPanZoom(scroller, factor => setZoom(zoom * factor));
   setZoom(compact ? window.vpdFitZoom(scroller, width, minZoom, maxZoom) : 1);
 
-  const edges = [...root.querySelectorAll('.vpd-edge')];
-  const nodes = [...root.querySelectorAll('.vpd-node')];
-
-  function highlight(ids) {
-    if (!ids) { root.classList.remove('focus'); nodes.concat(edges).forEach(e => e.classList.remove('hl')); return; }
-    const linked = new Set(ids);
-    edges.forEach(e => {
-      const hit = ids.has(e.dataset.from) || ids.has(e.dataset.to);
-      e.classList.toggle('hl', hit);
-      if (hit) { linked.add(e.dataset.from); linked.add(e.dataset.to); }
-    });
-    nodes.forEach(n => n.classList.toggle('hl', linked.has(n.dataset.id)));
-    root.classList.add('focus');
-  }
-
-  nodes.forEach(n => {
-    n.addEventListener('mouseenter', () => { highlight(new Set([n.dataset.id])); });
-    n.addEventListener('mouseleave', () => { highlight(null); });
-  });
+  // Hovering a box follows its cables (shared with the app).
+  window.vpdHoverHighlight(root);
 
   // Library links: the panel screenshot is fetched only when a link is hovered, then kept (and missing ones remembered).
   window.vpdLibraryPreview(root);

@@ -63,7 +63,8 @@ public static class DotExporter
         _ => "#6b6b70",
     };
 
-    private static string Quote(string text) => text.Replace("\\", "\\\\").Replace("\"", "\\\"");
+    /// <summary>Text inside a quoted DOT string, on one line (the exporter puts its own \n line breaks between parts).</summary>
+    private static string Quote(string text) => MermaidExporter.OneLine(text).Replace("\\", "\\\\").Replace("\"", "\\\"");
 
     /// <summary>"m123" / "g:voice-1" → a valid identifier.</summary>
     private static string Id(string key) => "n_" + new string(key.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());

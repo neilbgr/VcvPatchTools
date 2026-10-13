@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\src\VcvPatchTools.Diagram\VcvPatchTools.Diagram.csproj" />
     <ProjectReference Include="..\..\src\VcvPatchTools.Bridge\VcvPatchTools.Bridge.csproj" />
     <ProjectReference Include="..\..\src\VcvPatchTools.Cli\VcvPatchTools.Cli.csproj" />
+    <ProjectReference Include="..\..\src\VcvPatchTools.Web\VcvPatchTools.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

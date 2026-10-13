@@ -8,18 +8,18 @@ internal static class ConvertCommand
 {
     public const string Usage = "vcvpatch convert <input.vcv> [output.vcv] [--to cardinal|rack] [--force] [--no-cable-colors]";
 
-    public static int Run(string[] args)
+    public static int Run(string[] args, TextWriter output, TextWriter error)
     {
         if (args.Length < 2)
         {
-            Console.Error.WriteLine($"Usage: {Usage}");
+            error.WriteLine($"Usage: {Usage}");
             return 1;
         }
 
         string inputPath = InputPath.Resolve(args[1]);
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            error.WriteLine($"File not found: {inputPath}");
             return 1;
         }
 
@@ -29,14 +29,14 @@ internal static class ConvertCommand
         bool noCableColors = false;
         for (int i = 2; i < args.Length; i++)
         {
-            if (args[i] == "--to" && i + 1 < args.Length)
+            if (args[i] == "--to")
             {
-                explicitTarget = args[i + 1].ToLowerInvariant() switch
+                explicitTarget = i + 1 < args.Length ? ParseTarget(args[i + 1]) : null;
+                if (explicitTarget is null)
                 {
-                    "cardinal" => PatchOrigin.Cardinal,
-                    "rack" => PatchOrigin.Rack,
-                    _ => throw new ArgumentException($"--to must be \"cardinal\" or \"rack\", got \"{args[i + 1]}\"."),
-                };
+                    error.WriteLine($"--to must be followed by \"cardinal\" or \"rack\"{(i + 1 < args.Length ? $", got \"{args[i + 1]}\"" : "")}. Usage: {Usage}");
+                    return 1;
+                }
                 i++;
             }
             else if (args[i] == "--force")
@@ -47,50 +47,72 @@ internal static class ConvertCommand
             {
                 noCableColors = true;
             }
+            else if (args[i].StartsWith("--", StringComparison.Ordinal))
+            {
+                error.WriteLine($"Unknown option: \"{args[i]}\". Usage: {Usage}");
+                return 1;
+            }
             else if (outputPath is null)
             {
                 outputPath = InputPath.Resolve(args[i]);
             }
             else
             {
-                Console.Error.WriteLine($"Unexpected argument: \"{args[i]}\"");
+                error.WriteLine($"Unexpected argument: \"{args[i]}\"");
                 return 1;
             }
         }
 
-        PatchArchive patch = PatchArchive.Read(File.ReadAllBytes(inputPath));
-        DetectionResult detection = PatchDetector.Detect(patch);
-
-        PatchOrigin? target = explicitTarget ?? ConvertedName.OppositeOf(detection.Origin);
-        if (target is null)
+        PatchArchive patch;
+        ConversionResult result;
+        PatchOrigin? target;
+        try
         {
-            Console.Error.WriteLine("Cannot infer the conversion direction (no Cardinal- or Rack-specific module found): specify --to cardinal|rack.");
+            patch = PatchArchive.Read(File.ReadAllBytes(inputPath));
+            DetectionResult detection = PatchDetector.Detect(patch);
+
+            target = explicitTarget ?? ConvertedName.OppositeOf(detection.Origin);
+            if (target is null)
+            {
+                error.WriteLine("Cannot infer the conversion direction (no Cardinal- or Rack-specific module found): specify --to cardinal|rack.");
+                return 1;
+            }
+
+            output.WriteLine($"Detected origin : {ConvertedName.Describe(detection.Origin)}");
+            output.WriteLine($"Converting to   : {ConvertedName.Describe(target.Value)}");
+            result = PatchConverter.Convert(patch, target.Value, remapCableColors: !noCableColors);
+        }
+        catch (InvalidDataException e)
+        {
+            error.WriteLine($"Invalid patch {inputPath}: {e.Message}");
             return 1;
         }
 
         outputPath ??= OutputPathResolver.Resolve(inputPath, target.Value, force);
-
-        Console.WriteLine($"Detected origin : {ConvertedName.Describe(detection.Origin)}");
-        Console.WriteLine($"Converting to   : {ConvertedName.Describe(target.Value)}");
-
-        ConversionResult result = PatchConverter.Convert(patch, target.Value, remapCableColors: !noCableColors);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
         File.WriteAllBytes(outputPath, patch.Write());
 
-        Console.WriteLine($"Written: {outputPath}");
+        output.WriteLine($"Written: {outputPath}");
 
         if (result.Warnings.Count > 0)
         {
-            Console.WriteLine();
-            Console.WriteLine($"Warnings ({result.Warnings.Count}):");
+            output.WriteLine();
+            output.WriteLine($"Warnings ({result.Warnings.Count}):");
             foreach (string w in result.Warnings)
             {
-                Console.WriteLine($"  - {w}");
+                output.WriteLine($"  - {w}");
             }
         }
 
         return 0;
     }
+
+    private static PatchOrigin? ParseTarget(string value) => value.ToLowerInvariant() switch
+    {
+        "cardinal" => PatchOrigin.Cardinal,
+        "rack" => PatchOrigin.Rack,
+        _ => null,
+    };
 
     /// <summary>The "detect" part of vcvpatch info: file format and Rack/Cardinal origin, with the modules that tell.</summary>
     public static void WriteOrigin(PatchArchive patch, TextWriter output)

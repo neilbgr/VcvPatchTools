@@ -3,9 +3,15 @@
 // Shared: embedded in the static HTML export, and copied to the Blazor app's wwwroot/js at build time.
 // Nothing is fetched until an icon is hovered; a loaded image is kept for the page's life (and the browser's HTTP cache
 // keeps it longer), and a module the Library doesn't have is remembered, so it is never asked for again.
+// Returns a handle whose dispose() removes the preview card and the listeners (the app calls it when the diagram goes away).
 window.vpdLibraryPreview = function (container) {
-  if (!container || container.dataset.vpdLibrary) return;
+  if (!container || container.dataset.vpdLibrary) return { dispose() { } };
   container.dataset.vpdLibrary = '1';
+  const listeners = [];
+  const on = (type, handler, options) => {
+    container.addEventListener(type, handler, options);
+    listeners.push([type, handler, options]);
+  };
   const site = 'https://library.vcvrack.com/screenshots/';
   const missingKey = 'vpd-library-missing';
   const groupLimit = 12;
@@ -147,13 +153,13 @@ window.vpdLibraryPreview = function (container) {
 
   // Delegated, so it keeps working when the app re-renders the diagram. A short delay: sweeping the mouse across
   // the diagram doesn't fetch every panel it crosses.
-  container.addEventListener('pointerover', e => {
+  on('pointerover', e => {
     const target = iconOf(e);
     if (e.pointerType !== 'mouse' || !target || target === link) return;
     clearTimeout(timer);
     timer = setTimeout(() => { if (target.isConnected) show(target); }, 250);
   });
-  container.addEventListener('pointerout', e => {
+  on('pointerout', e => {
     const target = iconOf(e);
     // A finger "leaves" right after every tap: only the mouse hides the preview this way.
     if (e.pointerType !== 'mouse' || !target || (e.relatedTarget && target.contains(e.relatedTarget))) return;
@@ -161,15 +167,15 @@ window.vpdLibraryPreview = function (container) {
   });
   // A click (which may unfold or fold the box), a pan or a zoom: the preview no longer belongs where it is.
   // Except a second tap on the icon whose preview is shown: that one goes on (below).
-  container.addEventListener('pointerdown', e => {
+  on('pointerdown', e => {
     lastPointer = e.pointerType;
     if (!(e.pointerType !== 'mouse' && link && iconOf(e) === link)) hide();
   }, { capture: true, passive: true });
-  ['wheel', 'scroll'].forEach(type => container.addEventListener(type, hide, { capture: true, passive: true }));
+  ['wheel', 'scroll'].forEach(type => on(type, hide, { capture: true, passive: true }));
 
   // No hover with a finger: the first tap on an icon shows its preview (and opens nothing), the second one opens the
   // Library page, or unfolds the group for a group's icon.
-  container.addEventListener('click', e => {
+  on('click', e => {
     const target = iconOf(e);
     if (lastPointer === 'mouse' || !target) return;
     if (target === link && !card.hidden) {
@@ -180,4 +186,14 @@ window.vpdLibraryPreview = function (container) {
     e.stopPropagation();
     show(target);
   }, true);
+
+  return {
+    dispose() {
+      hide();
+      listeners.forEach(([type, handler, options]) => container.removeEventListener(type, handler, options));
+      listeners.length = 0;
+      card.remove();
+      delete container.dataset.vpdLibrary;
+    },
+  };
 };

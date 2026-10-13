@@ -162,7 +162,7 @@ public class PatchConverterTests
         JsonObject neighbour = modules.Single(m => m["id"]!.GetValue<long>() == 2);
         JsonObject otherRow = modules.Single(m => m["id"]!.GetValue<long>() == 3);
 
-        double InX(JsonObject m) => m["pos"]![0]!.GetValue<double>();
+        int InX(JsonObject m) => m["pos"]![0]!.GetValue<int>();
 
         Assert.Equal(44, InX(midiCcToCv));
         Assert.Equal(54, InX(cvToMidiCc)); // touches midiCcToCv's right edge (44 + 10 HP)
@@ -192,9 +192,9 @@ public class PatchConverterTests
         JsonObject midiToCv = modules.Single(m => m["model"]!.GetValue<string>() == "MIDIToCVInterface");
         JsonObject sinkAfter = modules.Single(m => m["id"]!.GetValue<long>() == 2);
 
-        Assert.Equal(0, midiToCv["pos"]![0]!.GetValue<double>());
+        Assert.Equal(0, midiToCv["pos"]![0]!.GetValue<int>());
         // MIDIToCVInterface alone is 8 HP (< HostMIDI's 9 HP), so the row shrinks: the sink moves left.
-        Assert.Equal(8, sinkAfter["pos"]![0]!.GetValue<double>());
+        Assert.Equal(8, sinkAfter["pos"]![0]!.GetValue<int>());
     }
 
     [Fact]
@@ -253,6 +253,197 @@ public class PatchConverterTests
         Assert.True(gateIn["data"]!["velocity"]!.GetValue<bool>());
         Assert.Equal(-1, gateIn["data"]!["midi"]!["channel"]!.GetValue<int>()); // inputChannel 0 ("All") -> Rack channel -1
         Assert.Equal(0, gateOut["data"]!["midi"]!["channel"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Split_carries_over_HostMIDI_pitch_wheel_range_and_poly_settings()
+    {
+        JsonObject hostMidi = TestPatchBuilder.Module(1, "Cardinal", "HostMIDI");
+        hostMidi["data"] = new JsonObject
+        {
+            ["pwRange"] = 12.0,
+            ["smooth"] = true,
+            ["channels"] = 4,
+            ["polyMode"] = 2,
+            ["lastPitch"] = 9000,
+            ["lastMod"] = 64,
+            ["inputChannel"] = 0,
+            ["outputChannel"] = 0,
+        };
+        JsonObject root = TestPatchBuilder.Root(
+            modules: new[] { hostMidi, TestPatchBuilder.Module(2, "Fundamental", "VCA") },
+            cables: new[] { TestPatchBuilder.Cable(1, 1, 0, 2, 0) });
+        PatchArchive patch = TestPatchBuilder.ToPatchArchive(root);
+
+        PatchConverter.Convert(patch, PatchOrigin.Rack);
+
+        JsonObject midiToCv = patch.Root["modules"]!.AsArray().Cast<JsonObject>().Single(m => m["model"]!.GetValue<string>() == "MIDIToCVInterface");
+        JsonObject data = midiToCv["data"]!.AsObject();
+        Assert.Equal(12.0, data["pwRange"]!.GetValue<double>());
+        Assert.True(data["smooth"]!.GetValue<bool>());
+        Assert.Equal(4, data["channels"]!.GetValue<int>());
+        Assert.Equal(2, data["polyMode"]!.GetValue<int>());
+        Assert.Equal(9000, data["lastPitch"]!.GetValue<int>());
+        Assert.Equal(64, data["lastMod"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Merge_carries_over_MIDI_channel_CC_numbers_and_gate_notes()
+    {
+        JsonObject ccIn = TestPatchBuilder.Module(10, "Core", "MIDICCToCVInterface", right: 11);
+        ccIn["data"] = JsonNode.Parse("""
+            { "ccs": [10, 20, 30, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "values": [0, 64],
+              "midi": { "driver": 1, "deviceName": "Keystep", "channel": 4 }, "smooth": true, "mpeMode": false, "lsbMode": true }
+            """)!.AsObject();
+        JsonObject ccOut = TestPatchBuilder.Module(11, "Core", "CV-CC", left: 10);
+        ccOut["pos"] = new JsonArray { 10, 0 };
+        ccOut["data"] = JsonNode.Parse("""
+            { "ccs": [10, 20, 30, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "midi": { "driver": 1, "channel": 3 } }
+            """)!.AsObject();
+
+        JsonObject gateIn = TestPatchBuilder.Module(20, "Core", "MIDITriggerToCVInterface");
+        gateIn["pos"] = new JsonArray { 0, 1 };
+        gateIn["data"] = JsonNode.Parse("""
+            { "notes": [36, 37, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 51], "velocity": true,
+              "midi": { "driver": 1, "channel": -1 }, "mpeMode": true }
+            """)!.AsObject();
+
+        JsonObject hostMidiOut = TestPatchBuilder.Module(30, "Core", "CV-MIDI");
+        hostMidiOut["pos"] = new JsonArray { 0, 2 };
+        hostMidiOut["data"] = JsonNode.Parse("""{ "midi": { "driver": 1, "channel": 7 } }""")!.AsObject();
+
+        JsonObject hostMidiIn = TestPatchBuilder.Module(40, "Core", "MIDIToCVInterface");
+        hostMidiIn["pos"] = new JsonArray { 0, 3 };
+        hostMidiIn["data"] = JsonNode.Parse("""
+            { "pwRange": 2.0, "smooth": false, "channels": 8, "polyMode": 1, "clockDivision": 24, "lastPitch": 8192, "lastMod": 3,
+              "midi": { "driver": 1, "channel": 0 } }
+            """)!.AsObject();
+
+        PatchArchive patch = TestPatchBuilder.ToPatchArchive(TestPatchBuilder.Root(new[] { ccIn, ccOut, gateIn, hostMidiOut, hostMidiIn }));
+
+        ConversionResult result = PatchConverter.Convert(patch, PatchOrigin.Cardinal);
+
+        List<JsonObject> modules = patch.Root["modules"]!.AsArray().Cast<JsonObject>().ToList();
+        JsonObject cc = modules.Single(m => m["model"]!.GetValue<string>() == "HostMIDICC")["data"]!.AsObject();
+        Assert.Equal(5, cc["inputChannel"]!.GetValue<int>());  // Rack channel 4 (0-based) -> Cardinal 5 (1-based)
+        Assert.Equal(3, cc["outputChannel"]!.GetValue<int>()); // 0-based on both sides
+        Assert.Equal(new[] { 10, 20, 30 }, cc["ccs"]!.AsArray().Take(3).Select(n => n!.GetValue<int>()));
+        Assert.Equal(new[] { 0, 64 }, cc["values"]!.AsArray().Select(n => n!.GetValue<int>()));
+        Assert.True(cc["smooth"]!.GetValue<bool>());
+        Assert.False(cc["mpeMode"]!.GetValue<bool>());
+        Assert.True(cc["lsbMode"]!.GetValue<bool>());
+        Assert.Null(cc["midi"]);
+
+        JsonObject gate = modules.Single(m => m["model"]!.GetValue<string>() == "HostMIDIGate")["data"]!.AsObject();
+        Assert.Equal(0, gate["inputChannel"]!.GetValue<int>()); // Rack -1 ("All") -> Cardinal 0 ("All")
+        List<int> notes = gate["notes"]!.AsArray().Select(n => n!.GetValue<int>()).ToList();
+        Assert.Equal(18, notes.Count); // Cardinal's gate has 18 cells, the last two unassigned
+        Assert.Equal(new[] { 36, 37 }, notes.Take(2));
+        Assert.Equal(51, notes[15]);
+        Assert.Equal(new[] { -1, -1 }, notes.Skip(16));
+        Assert.True(gate["velocity"]!.GetValue<bool>());
+        Assert.True(gate["mpeMode"]!.GetValue<bool>());
+
+        JsonObject loneOut = modules.Single(m => m["model"]!.GetValue<string>() == "HostMIDI" && m["pos"]![1]!.GetValue<int>() == 2)["data"]!.AsObject();
+        Assert.Equal(7, loneOut["outputChannel"]!.GetValue<int>());
+        Assert.Null(loneOut["inputChannel"]);
+
+        JsonObject loneIn = modules.Single(m => m["model"]!.GetValue<string>() == "HostMIDI" && m["pos"]![1]!.GetValue<int>() == 3)["data"]!.AsObject();
+        Assert.Equal(1, loneIn["inputChannel"]!.GetValue<int>());
+        Assert.Equal(2.0, loneIn["pwRange"]!.GetValue<double>());
+        Assert.False(loneIn["smooth"]!.GetValue<bool>());
+        Assert.Equal(8, loneIn["channels"]!.GetValue<int>());
+        Assert.Equal(1, loneIn["polyMode"]!.GetValue<int>());
+        Assert.Equal(8192, loneIn["lastPitch"]!.GetValue<int>());
+        Assert.Equal(3, loneIn["lastMod"]!.GetValue<int>());
+        Assert.Null(loneIn["clockDivision"]); // Cardinal's HostMIDI has no clock divider setting
+
+        Assert.DoesNotContain(result.Warnings, w => w.Contains("disagree"));
+    }
+
+    [Fact]
+    public void Merge_warns_when_the_two_halves_learned_different_CCs_and_keeps_the_MIDI_in_ones()
+    {
+        JsonObject ccIn = TestPatchBuilder.Module(10, "Core", "MIDICCToCVInterface", right: 11);
+        ccIn["data"] = new JsonObject { ["ccs"] = new JsonArray { 1, 2 } };
+        JsonObject ccOut = TestPatchBuilder.Module(11, "Core", "CV-CC", left: 10);
+        ccOut["pos"] = new JsonArray { 10, 0 };
+        ccOut["data"] = new JsonObject { ["ccs"] = new JsonArray { 7, 2 } };
+        PatchArchive patch = TestPatchBuilder.ToPatchArchive(TestPatchBuilder.Root(new[] { ccIn, ccOut }));
+
+        ConversionResult result = PatchConverter.Convert(patch, PatchOrigin.Cardinal);
+
+        JsonObject merged = Assert.Single(patch.Root["modules"]!.AsArray().Cast<JsonObject>());
+        Assert.Equal(new[] { 1, 2 }, merged["data"]!["ccs"]!.AsArray().Select(n => n!.GetValue<int>()));
+        Assert.Contains(result.Warnings, w => w.Contains("disagree") && w.Contains("CC"));
+    }
+
+    [Fact]
+    public void Merge_takes_CCs_from_the_MIDI_out_half_when_it_is_alone()
+    {
+        JsonObject ccOut = TestPatchBuilder.Module(11, "Core", "CV-CC");
+        ccOut["data"] = new JsonObject { ["ccs"] = new JsonArray { 7, 8 }, ["midi"] = new JsonObject { ["channel"] = 2 } };
+        PatchArchive patch = TestPatchBuilder.ToPatchArchive(TestPatchBuilder.Root(new[] { ccOut }));
+
+        PatchConverter.Convert(patch, PatchOrigin.Cardinal);
+
+        JsonObject merged = Assert.Single(patch.Root["modules"]!.AsArray().Cast<JsonObject>());
+        Assert.Equal(new[] { 7, 8 }, merged["data"]!["ccs"]!.AsArray().Select(n => n!.GetValue<int>()));
+        Assert.Equal(2, merged["data"]!["outputChannel"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void MIDI_settings_survive_a_Cardinal_to_Rack_to_Cardinal_round_trip()
+    {
+        JsonObject hostMidiGate = TestPatchBuilder.Module(1, "Cardinal", "HostMIDIGate");
+        hostMidiGate["data"] = JsonNode.Parse("""
+            { "notes": [36, 37, 38, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1],
+              "velocity": true, "mpeMode": false, "inputChannel": 10, "outputChannel": 9 }
+            """)!.AsObject();
+        JsonObject hostMidiCc = TestPatchBuilder.Module(2, "Cardinal", "HostMIDICC");
+        hostMidiCc["pos"] = new JsonArray { 0, 1 };
+        hostMidiCc["data"] = JsonNode.Parse("""
+            { "ccs": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "values": [1, 2, 3],
+              "smooth": false, "mpeMode": true, "lsbMode": true, "inputChannel": 0, "outputChannel": 15 }
+            """)!.AsObject();
+        JsonObject hostMidi = TestPatchBuilder.Module(3, "Cardinal", "HostMIDI");
+        hostMidi["pos"] = new JsonArray { 0, 2 };
+        hostMidi["data"] = JsonNode.Parse("""
+            { "pwRange": 7.0, "smooth": true, "channels": 3, "polyMode": 1, "lastPitch": 100, "lastMod": 5, "inputChannel": 16, "outputChannel": 2 }
+            """)!.AsObject();
+        JsonObject vca = TestPatchBuilder.Module(4, "Fundamental", "VCA");
+        vca["pos"] = new JsonArray { 30, 0 };
+        JsonObject lfo = TestPatchBuilder.Module(5, "Fundamental", "LFO");
+        lfo["pos"] = new JsonArray { 40, 0 };
+
+        JsonObject root = TestPatchBuilder.Root(
+            modules: new[] { hostMidiGate, hostMidiCc, hostMidi, vca, lfo },
+            cables: new[]
+            {
+                // Both halves of each Cardinal module in use, so each splits into a Rack pair and merges back.
+                TestPatchBuilder.Cable(1, 1, 0, 4, 0),
+                TestPatchBuilder.Cable(2, 5, 0, 1, 0),
+                TestPatchBuilder.Cable(3, 2, 0, 4, 1),
+                TestPatchBuilder.Cable(4, 5, 1, 2, 0),
+                TestPatchBuilder.Cable(5, 3, 0, 4, 2),
+                TestPatchBuilder.Cable(6, 5, 2, 3, 0),
+            });
+        Dictionary<string, JsonObject> before = root["modules"]!.AsArray().Cast<JsonObject>()
+            .Where(m => m["plugin"]!.GetValue<string>() == "Cardinal")
+            .ToDictionary(m => m["model"]!.GetValue<string>(), m => (JsonObject)m["data"]!.DeepClone());
+        PatchArchive patch = TestPatchBuilder.ToPatchArchive(root);
+
+        PatchConverter.Convert(patch, PatchOrigin.Rack);
+        PatchArchive rack = PatchArchive.Read(patch.Write());
+        ConversionResult back = PatchConverter.Convert(rack, PatchOrigin.Cardinal);
+
+        Assert.Empty(back.Warnings);
+        foreach (JsonObject module in rack.Root["modules"]!.AsArray().Cast<JsonObject>().Where(m => m["plugin"]!.GetValue<string>() == "Cardinal"))
+        {
+            string model = module["model"]!.GetValue<string>();
+            Assert.True(JsonNode.DeepEquals(before[model], module["data"]), $"{model}: {before[model].ToJsonString()} became {module["data"]!.ToJsonString()}");
+        }
+        Assert.Equal(3, rack.Root["modules"]!.AsArray().Cast<JsonObject>().Count(m => m["plugin"]!.GetValue<string>() == "Cardinal"));
     }
 
     [Fact]

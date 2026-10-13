@@ -10,28 +10,44 @@ public static class GraphOrder
     /// </summary>
     public static List<long> Topological(IReadOnlyList<long> nodes, IReadOnlyList<(long From, long To)> edges)
     {
-        Dictionary<long, int> inDegree = nodes.ToDictionary(n => n, n => 0);
+        // Nodes by index in the input order; the degrees count the edges from and to the nodes not placed yet.
+        Dictionary<long, int> indexOf = Index(nodes);
+        int count = nodes.Count;
+        List<int>[] outgoing = Enumerable.Range(0, count).Select(_ => new List<int>()).ToArray();
+        List<int>[] incoming = Enumerable.Range(0, count).Select(_ => new List<int>()).ToArray();
+        int[] inDegree = new int[count];
+        int[] outDegree = new int[count];
         foreach ((long from, long to) in edges)
         {
-            if (inDegree.ContainsKey(from) && inDegree.ContainsKey(to) && from != to)
+            if (from != to && indexOf.TryGetValue(from, out int f) && indexOf.TryGetValue(to, out int t))
             {
-                inDegree[to]++;
+                outgoing[f].Add(t);
+                incoming[t].Add(f);
+                inDegree[t]++;
+                outDegree[f]++;
             }
         }
 
-        List<long> remaining = nodes.ToList();
-        List<long> result = new List<long>();
-        while (remaining.Count > 0)
+        bool[] placed = new bool[count];
+        SortedSet<int> free = new SortedSet<int>(Enumerable.Range(0, count).Where(i => inDegree[i] == 0));
+        List<long> result = new List<long>(count);
+        while (result.Count < count)
         {
-            long next = remaining.FirstOrDefault(n => inDegree[n] == 0, Greediest(remaining, edges));
-            remaining.Remove(next);
-            result.Add(next);
-            foreach ((long from, long to) in edges)
+            // The greedy rule only when no node is free.
+            int next = free.Count > 0 ? free.Min : Greediest(placed, inDegree, outDegree);
+            free.Remove(next);
+            placed[next] = true;
+            result.Add(nodes[next]);
+            foreach (int to in outgoing[next].Where(to => !placed[to]))
             {
-                if (from == next && from != to && remaining.Contains(to))
+                if (--inDegree[to] == 0)
                 {
-                    inDegree[to]--;
+                    free.Add(to);
                 }
+            }
+            foreach (int from in incoming[next].Where(from => !placed[from]))
+            {
+                outDegree[from]--;
             }
         }
         return result;
@@ -43,7 +59,15 @@ public static class GraphOrder
     /// </summary>
     public static List<List<long>> Loops(IReadOnlyList<long> nodes, IReadOnlyList<(long From, long To)> edges)
     {
-        Dictionary<long, List<long>> next = nodes.ToDictionary(n => n, n => edges.Where(e => e.From == n && e.To != n).Select(e => e.To).Distinct().ToList());
+        Dictionary<long, int> inputIndex = Index(nodes);
+        Dictionary<long, List<long>> next = nodes.ToDictionary(n => n, n => new List<long>());
+        foreach ((long from, long to) in edges)
+        {
+            if (from != to && next.TryGetValue(from, out List<long>? targets) && !targets.Contains(to))
+            {
+                targets.Add(to);
+            }
+        }
         Dictionary<long, int> index = new Dictionary<long, int>();
         Dictionary<long, int> low = new Dictionary<long, int>();
         Stack<long> stack = new Stack<long>();
@@ -82,7 +106,7 @@ public static class GraphOrder
             while (member != node);
             if (component.Count > 1)
             {
-                loops.Add(nodes.Where(component.Contains).ToList());
+                loops.Add(component.OrderBy(m => inputIndex[m]).ToList());
             }
         }
 
@@ -90,14 +114,31 @@ public static class GraphOrder
         {
             Visit(node);
         }
-        return loops.OrderBy(l => nodes.ToList().IndexOf(l[0])).ToList();
+        return loops.OrderBy(l => inputIndex[l[0]]).ToList();
     }
 
-    private static long Greediest(List<long> remaining, IReadOnlyList<(long From, long To)> edges)
+    /// <summary>The node not placed yet with the most outgoing minus incoming edges, the earliest on a tie.</summary>
+    private static int Greediest(bool[] placed, int[] inDegree, int[] outDegree)
     {
-        HashSet<long> left = remaining.ToHashSet();
-        int Balance(long n) => edges.Count(e => e.From == n && e.To != n && left.Contains(e.To)) - edges.Count(e => e.To == n && e.From != n && left.Contains(e.From));
-        return remaining.Select((n, i) => (n, i)).OrderByDescending(p => Balance(p.n)).ThenBy(p => p.i).First().n;
+        int best = -1;
+        for (int i = 0; i < placed.Length; i++)
+        {
+            if (!placed[i] && (best < 0 || outDegree[i] - inDegree[i] > outDegree[best] - inDegree[best]))
+            {
+                best = i;
+            }
+        }
+        return best;
+    }
+
+    private static Dictionary<long, int> Index(IReadOnlyList<long> nodes)
+    {
+        Dictionary<long, int> index = new Dictionary<long, int>(nodes.Count);
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            index.Add(nodes[i], i);
+        }
+        return index;
     }
 
     /// <summary>Longest-path depth of each node (sources at 0), loops broken the same way as <see cref="Topological"/>.</summary>
@@ -106,12 +147,13 @@ public static class GraphOrder
         List<long> order = Topological(nodes, edges);
         Dictionary<long, int> position = order.Select((n, i) => (n, i)).ToDictionary(p => p.n, p => p.i);
         Dictionary<long, int> depth = nodes.ToDictionary(n => n, n => 0);
+        ILookup<long, long> targets = edges.ToLookup(e => e.From, e => e.To);
         foreach (long node in order)
         {
-            foreach ((long from, long to) in edges)
+            foreach (long to in targets[node])
             {
                 // Only forward edges in the chosen order count, so loops can't grow depths forever.
-                if (from == node && position.TryGetValue(to, out int toPos) && toPos > position[node])
+                if (position.TryGetValue(to, out int toPos) && toPos > position[node])
                 {
                     depth[to] = Math.Max(depth[to], depth[node] + 1);
                 }

@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="VcvPatchTools.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\VcvPatchTools.Bridge\VcvPatchTools.Bridge.csproj" />
     <ProjectReference Include="..\VcvPatchTools.Diagram\VcvPatchTools.Diagram.csproj" />
   </ItemGroup>

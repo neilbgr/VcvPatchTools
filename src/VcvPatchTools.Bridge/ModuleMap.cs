@@ -14,7 +14,7 @@ public readonly record struct ModuleSlug(string Plugin, string Model);
 /// A pair of matching Rack ports (used to remap cables when splitting/merging a module).
 /// Index i on the Cardinal side maps to index i on the Rack side.
 /// </summary>
-public sealed record PortRange(int Count, int CardinalStart = 0, int RackStart = 0);
+public sealed record PortRange(int Count);
 
 /// <summary>
 /// Describes how one Cardinal MIDI module (combining MIDI-in and MIDI-out in one instance)
@@ -60,7 +60,7 @@ public static class ModuleMap
         "AudioInterface16",
     };
 
-    /// <summary>Cardinal modules with no Rack equivalent at all.</summary>
+    /// <summary>Cardinal modules with no Rack equivalent at all (any other Cardinal model is one this tool does not know).</summary>
     public static readonly HashSet<string> CardinalNoEquivalent = new()
     {
         "HostCV",
@@ -79,13 +79,6 @@ public static class ModuleMap
         "ExpanderInputMIDI",
         "ExpanderOutputMIDI",
     };
-
-    /// <summary>All Cardinal-plugin model slugs used for detection (superset of every table above).</summary>
-    public static readonly HashSet<string> AllCardinalModels = new(
-        CoreToCardinalSimple.Values
-            .Concat(new[] { CardinalTextEditorModel })
-            .Concat(CardinalNoEquivalent)
-            .Concat(new[] { "HostMIDI", "HostMIDICC", "HostMIDIGate" }));
 
     /// <summary>All Core-plugin model slugs used for detection (superset of every table above).</summary>
     public static readonly HashSet<string> AllCoreModels = new(
@@ -137,7 +130,4 @@ public static class ModuleMap
 
     public static MidiSplitMapping? FindByCardinalModel(string model) =>
         MidiSplits.FirstOrDefault(m => m.CardinalModel == model);
-
-    public static MidiSplitMapping? FindByRackModel(string model) =>
-        MidiSplits.FirstOrDefault(m => m.RackInModel == model || m.RackOutModel == model);
 }

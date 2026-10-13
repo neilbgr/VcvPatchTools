@@ -25,14 +25,19 @@ public static class Barycenter
             bool forward = sweep % 2 == 0;
             Dictionary<string, List<string>> neighbours = forward ? left : right;
             IEnumerable<int> order = forward ? Enumerable.Range(1, current.Count - 1) : Enumerable.Range(0, current.Count - 1).Reverse();
+            // Positions as they are when each column is sorted: only the column just sorted changes.
+            Dictionary<string, int> at = Positions(current);
             foreach (int col in order)
             {
-                Dictionary<string, int> at = Positions(current);
                 current[col] = current[col]
                     .OrderBy(laneOf)
                     .ThenBy(e => neighbours.TryGetValue(e, out List<string>? next) ? next.Average(n => at[n]) : at[e])
                     .ThenBy(e => at[e])
                     .ToList();
+                for (int i = 0; i < current[col].Count; i++)
+                {
+                    at[current[col][i]] = i;
+                }
             }
             int crossings = Crossings(current, segments);
             if (crossings < fewest)

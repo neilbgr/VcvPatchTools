@@ -71,3 +71,4 @@ out/
 # Copied from src/VcvPatchTools.Diagram/Render at build time (single source of truth in Diagram)
 src/VcvPatchTools.Web/wwwroot/js/panzoom.js
 src/VcvPatchTools.Web/wwwroot/js/library.js
+src/VcvPatchTools.Web/wwwroot/js/highlight.js

@@ -51,16 +51,35 @@ public static class LabelPlacement
         foreach (DiagramEdge edge in edges.Where(e => Movable(e, runs)).OrderByDescending(e => e.Label.Length))
         {
             List<Box> candidates = Candidates(edge, runs[edge.Key]).Select(c => LabelBox(edge.Label, c.X, c.Y)).ToList();
-            double Covered(Box candidate, List<Box> others) => others.Sum(o => o.Overlap(candidate));
-            // Free of everything, else at least of other labels (a label over a box still reads, two labels don't),
-            // else the least overlap, labels counting most.
-            Box spot = candidates.FirstOrDefault(c => Covered(c, labels) == 0 && Covered(c, boxes) == 0)
-                ?? candidates.FirstOrDefault(c => Covered(c, labels) == 0)
-                ?? candidates.MinBy(c => (3 * Covered(c, labels)) + Covered(c, boxes))!;
+            // Only what lies where the candidates are can overlap them (the others add nothing to the sums).
+            Box area = new Box(candidates.Min(c => c.Left), candidates.Min(c => c.Top), candidates.Max(c => c.Right), candidates.Max(c => c.Bottom));
+            Box spot = Best(candidates, labels.Where(l => l.Overlap(area) > 0).ToList(), boxes.Where(b => b.Overlap(area) > 0).ToList());
             labels.Add(spot);
             spots[edge.Key] = ((spot.Left + spot.Right) / 2, spot.Bottom);
         }
         return edges.Select(e => spots.TryGetValue(e.Key, out (double X, double Y) s) ? e with { LabelX = s.X, LabelY = s.Y } : e).ToList();
+    }
+
+    /// <summary>
+    /// Free of everything, else at least of other labels (a label over a box still reads, two labels don't), else the
+    /// least overlap, labels counting most. The first such candidate; each overlap is measured once, and only when needed.
+    /// </summary>
+    private static Box Best(List<Box> candidates, List<Box> labels, List<Box> boxes)
+    {
+        static double Covered(Box candidate, List<Box> others) => others.Sum(o => o.Overlap(candidate));
+        double[] onLabels = new double[candidates.Count];
+        double?[] onBoxes = new double?[candidates.Count];
+        double OnBoxes(int i) => onBoxes[i] ??= Covered(candidates[i], boxes);
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            onLabels[i] = Covered(candidates[i], labels);
+            if (onLabels[i] == 0 && OnBoxes(i) == 0)
+            {
+                return candidates[i];
+            }
+        }
+        int freeOfLabels = Array.IndexOf(onLabels, 0d);
+        return freeOfLabels >= 0 ? candidates[freeOfLabels] : candidates[Enumerable.Range(0, candidates.Count).MinBy(i => (3 * onLabels[i]) + OnBoxes(i))];
     }
 
     private static bool Movable(DiagramEdge edge, Dictionary<string, List<Run>> runs) => edge.Intent.Length > 0 && runs.ContainsKey(edge.Key);

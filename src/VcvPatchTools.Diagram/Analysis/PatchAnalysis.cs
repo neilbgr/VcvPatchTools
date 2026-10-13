@@ -1,4 +1,5 @@
-﻿using VcvPatchTools.Core.Catalog;
+﻿using System.Runtime.CompilerServices;
+using VcvPatchTools.Core.Catalog;
 using VcvPatchTools.Core.Patch;
 
 namespace VcvPatchTools.Diagram.Analysis;
@@ -65,7 +66,21 @@ public sealed record PatchAnalysis(
     IReadOnlyList<Voice> Voices,
     IReadOnlyList<string> Diagnostics)
 {
-    public AnalyzedModule Module(long id) => Modules.First(m => m.Module.Id == id);
+    // Built once per module list, outside the record so equality and "with" copies are unaffected.
+    private static readonly ConditionalWeakTable<IReadOnlyList<AnalyzedModule>, Dictionary<long, AnalyzedModule>> indexes = new ConditionalWeakTable<IReadOnlyList<AnalyzedModule>, Dictionary<long, AnalyzedModule>>();
+
+    public AnalyzedModule Module(long id) =>
+        indexes.GetValue(Modules, Index).TryGetValue(id, out AnalyzedModule? module) ? module : throw new KeyNotFoundException($"No module {id} in the analysis");
+
+    private static Dictionary<long, AnalyzedModule> Index(IReadOnlyList<AnalyzedModule> modules)
+    {
+        Dictionary<long, AnalyzedModule> index = new Dictionary<long, AnalyzedModule>(modules.Count);
+        foreach (AnalyzedModule module in modules)
+        {
+            index.TryAdd(module.Module.Id, module);
+        }
+        return index;
+    }
 
     /// <summary>Feedback loops (cross-modulation, audio feedback…): modules that all feed each other, in rack order.</summary>
     public IReadOnlyList<IReadOnlyList<long>> Loops { get; init; } = Array.Empty<IReadOnlyList<long>>();

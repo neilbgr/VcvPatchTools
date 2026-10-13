@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using System.Text.Json
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -73,7 +72,7 @@
 
         @if (diagram is not null && tab == Tab.Convert)
         {
-            <ConvertView Bytes="patchBytes!" FileName="@(fileName!)" OnOpen="OpenConvertedAsync" />
+            <ConvertView Bytes="patchBytes!" Archive="archive!" FileName="@(fileName!)" OnOpen="OpenConvertedAsync" />
         }
 
         @if (diagram is not null && tab == Tab.Info && diagram.Diagnostics.Count > 0)
@@ -224,8 +223,6 @@
 </div>
 
 @code {
-    private const long MaxPatchBytes = 50 * 1024 * 1024;
-
     private PatchAnalysis? analysis;
     private PatchArchive? archive;
     private byte[]? patchBytes;
@@ -254,8 +251,8 @@
     private DiagramNode? selectedNode;
     private readonly HashSet<string> missingPanels = new HashSet<string>();
     private string? fileFilter;
-
-    private string StorageKey => $"vpd-intents:{fileTitle}";
+    // Where this patch's intents are kept (see StoredState.IntentsKey).
+    private string? intentsKey;
 
     protected override async Task OnInitializedAsync()
     {
@@ -277,7 +274,8 @@
         {
             fileFilter = null;
         }
-        // ?sample=AmbientJam loads the bundled sample, &tab=info|convert opens that tab.
+        // ?sample=AmbientJam loads the bundled sample, ?url=https://… a patch published elsewhere,
+        // &tab=info|convert opens that tab.
         Dictionary<string, string> query = new Uri(Navigation.Uri).Query.TrimStart('?')
             .Split('&', StringSplitOptions.RemoveEmptyEntries)
             .Select(p => p.Split('=', 2))
@@ -290,20 +288,33 @@
         {
             await LoadSampleAsync(sample);
         }
+        else if (query.TryGetValue("url", out string? url))
+        {
+            await LoadUrlAsync(url);
+        }
     }
 
     private async Task LoadAsync(InputFileChangeEventArgs e)
     {
+        if (e.File.Size > PatchLoadError.MaxPatchBytes)
+        {
+            error = PatchLoadError.TooBig(e.File.Name, e.File.Size);
+            return;
+        }
+        byte[] bytes;
         try
         {
-            using MemoryStream buffer = new MemoryStream();
-            await e.File.OpenReadStream(MaxPatchBytes).CopyToAsync(buffer);
-            await ShowAsync(e.File.Name, buffer.ToArray());
+            // Read straight into an array of the file's size: no growing buffer, no copy.
+            bytes = new byte[e.File.Size];
+            await using Stream stream = e.File.OpenReadStream(PatchLoadError.MaxPatchBytes);
+            await stream.ReadExactlyAsync(bytes);
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
-            error = $"Could not read {e.File.Name}: {ex.Message}";
+            error = PatchLoadError.Describe(e.File.Name, ex);
+            return;
         }
+        await ShowAsync(e.File.Name, bytes);
     }
 
     private async Task LoadSampleAsync(string name)
@@ -315,6 +326,38 @@
         catch (HttpRequestException ex)
         {
             error = $"Sample {name} not found: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            error = PatchLoadError.Describe(name + ".vcv", ex);
+        }
+    }
+
+    private async Task LoadUrlAsync(string text)
+    {
+        if (!PatchUrl.TryResolve(text, out Uri? uri, out string? fileName))
+        {
+            error = $"{text} can't be opened: the url parameter must be an https:// link to a .vcv file.";
+            return;
+        }
+        try
+        {
+            using HttpResponseMessage response = await Http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+            if (response.Content.Headers.ContentLength is long size && size > PatchLoadError.MaxPatchBytes)
+            {
+                error = PatchLoadError.TooBig(fileName!, size);
+                return;
+            }
+            await ShowAsync(fileName!, await response.Content.ReadAsByteArrayAsync());
+        }
+        catch (HttpRequestException ex)
+        {
+            error = $"{fileName} couldn't be downloaded from {uri!.Host}: {ex.Message}. The site has to let other sites fetch the file, as GitHub does for raw files.";
+        }
+        catch (Exception ex)
+        {
+            error = PatchLoadError.Describe(fileName!, ex);
         }
     }
 
@@ -330,22 +373,29 @@
         selected = null;
         try
         {
-            analysis = PatchDiagram.Analyze(bytes);
-            archive = PatchArchive.Read(bytes);
+            // Decompressed once, for the diagram and the Info and Convert tabs alike.
+            PatchArchive read = PatchArchive.Read(bytes);
+            analysis = PatchDiagram.Analyze(read);
+            archive = read;
             patchBytes = bytes;
             this.fileName = fileName;
             fileTitle = Path.GetFileNameWithoutExtension(fileName);
+            intentsKey = StoredState.IntentsKey(bytes);
             intents = await LoadIntentsAsync();
             unfolded = new HashSet<string>();
             Relayout();
         }
-        catch (Exception ex) when (ex is InvalidDataException or JsonException or InvalidOperationException or KeyNotFoundException)
+        catch (Exception ex)
         {
-            error = $"Could not read {fileName}: {ex.Message}";
+            // Whatever the file holds, the app says what went wrong and stays usable.
+            error = PatchLoadError.Describe(fileName, ex);
             analysis = null;
             archive = null;
             patchBytes = null;
             diagram = null;
+            selectedNode = null;
+            fileTitle = null;
+            intentsKey = null;
         }
     }
 
@@ -448,43 +498,43 @@
         return SaveOptionsAsync();
     }
 
-    private const string optionsKey = "vpd-options";
-
-    /// <summary>The display options, remembered in this browser from one visit (and one patch) to the next.</summary>
-    private sealed record DisplayOptions(string[] HiddenLayers, bool ShowIntents, bool PortTabs, bool FunctionNames, bool LibraryLinks, MonitorView Monitors);
-
-    private async Task SaveOptionsAsync()
+    // Storage blocked (private browsing, quotas…): what isn't kept lasts for this visit only.
+    private async Task StoreAsync(string key, string value)
     {
-        DisplayOptions options = new DisplayOptions(hiddenLayers.ToArray(), showIntents, portTabs, functionNames, libraryLinks, monitors);
         try
         {
-            await JS.InvokeVoidAsync("localStorage.setItem", optionsKey, JsonSerializer.Serialize(options));
+            await JS.InvokeVoidAsync("localStorage.setItem", key, value);
         }
         catch (JSException)
         {
-            // Storage blocked: the options last for this visit only.
         }
     }
 
-    private async Task LoadOptionsAsync()
+    private async Task<string?> ReadStoredAsync(string key)
     {
         try
         {
-            string? json = await JS.InvokeAsync<string?>("localStorage.getItem", optionsKey);
-            if (json is not null && JsonSerializer.Deserialize<DisplayOptions>(json) is DisplayOptions options)
-            {
-                hiddenLayers = options.HiddenLayers.Where(DiagramLayout.Layers.Contains).ToHashSet();
-                showIntents = options.ShowIntents;
-                portTabs = options.PortTabs;
-                functionNames = options.FunctionNames;
-                libraryLinks = options.LibraryLinks;
-                monitors = Enum.IsDefined(options.Monitors) ? options.Monitors : MonitorView.Hidden;
-            }
+            return await JS.InvokeAsync<string?>("localStorage.getItem", key);
         }
-        catch (Exception ex) when (ex is JSException or JsonException)
+        catch (JSException)
         {
-            // Storage blocked or corrupted: the defaults.
+            return null;
         }
+    }
+
+    private Task SaveOptionsAsync() =>
+        StoreAsync(StoredState.OptionsKey, StoredState.SerializeOptions(new StoredState.Options(hiddenLayers, showIntents, portTabs, functionNames, libraryLinks, monitors)));
+
+    /// <summary>The display options remembered in this browser; whatever is damaged or from an older version, the defaults.</summary>
+    private async Task LoadOptionsAsync()
+    {
+        StoredState.Options options = StoredState.ParseOptions(await ReadStoredAsync(StoredState.OptionsKey));
+        hiddenLayers = options.HiddenLayers.ToHashSet();
+        showIntents = options.ShowIntents;
+        portTabs = options.PortTabs;
+        functionNames = options.FunctionNames;
+        libraryLinks = options.LibraryLinks;
+        monitors = options.Monitors;
     }
 
     private void Select(DiagramEdge edge)
@@ -526,21 +576,38 @@
         intents[selected.CableIds[0]] = text?.Trim() ?? "";
         Relayout();
         selected = diagram!.Edges.First(e => e.Key == selected.Key);
-        await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, JsonSerializer.Serialize(intents));
+        if (intentsKey is not null)
+        {
+            await StoreAsync(intentsKey, StoredState.SerializeIntents(intents));
+        }
     }
 
+    /// <summary>This patch's intents; damaged entries dropped, none when storage is blocked (the suggestions then).</summary>
     private async Task<Dictionary<long, string>> LoadIntentsAsync()
     {
-        try
+        if (intentsKey is null)
         {
-            string? json = await JS.InvokeAsync<string?>("localStorage.getItem", StorageKey);
-            return json is null ? new Dictionary<long, string>() : JsonSerializer.Deserialize<Dictionary<long, string>>(json) ?? new Dictionary<long, string>();
-        }
-        catch (Exception ex) when (ex is JSException or JsonException)
-        {
-            // Storage blocked or corrupted: start from the suggestions.
             return new Dictionary<long, string>();
         }
+        string? json = await ReadStoredAsync(intentsKey);
+        if (json is null && fileTitle is not null)
+        {
+            // Intents used to be kept by file name: moved over once, the first time this patch is opened.
+            string legacyKey = StoredState.LegacyIntentsKey(fileTitle);
+            json = await ReadStoredAsync(legacyKey);
+            if (json is not null)
+            {
+                await StoreAsync(intentsKey, json);
+                try
+                {
+                    await JS.InvokeVoidAsync("localStorage.removeItem", legacyKey);
+                }
+                catch (JSException)
+                {
+                }
+            }
+        }
+        return StoredState.ParseIntents(json);
     }
 
     private async Task ExportAsync(DiagramFormat format)

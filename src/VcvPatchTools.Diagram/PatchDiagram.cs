@@ -23,6 +23,9 @@ public static class PatchDiagram
 
     public static PatchAnalysis Analyze(byte[] patchBytes) => analyzer.Value.Analyze(PatchReader.Read(patchBytes));
 
+    /// <summary>A patch already read (decompressed once, e.g. to also show its files).</summary>
+    public static PatchAnalysis Analyze(PatchArchive archive) => analyzer.Value.Analyze(PatchReader.Parse(archive.Root));
+
     /// <param name="unfolded">Groups to show in detail (see <see cref="GroupKeys"/>); none by default: the overview.</param>
     /// <param name="monitors">How to show scopes and displays (hidden by default).</param>
     /// <param name="functionNames">Title boxes by function ("FILTER #1") rather than by module name.</param>

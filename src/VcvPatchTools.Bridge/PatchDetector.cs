@@ -14,8 +14,8 @@ public static class PatchDetector
 
         foreach (JsonObject module in EnumerateModules(patch.Root))
         {
-            string? plugin = module["plugin"]?.GetValue<string>();
-            string? model = module["model"]?.GetValue<string>();
+            string? plugin = PatchJson.String(module["plugin"]);
+            string? model = PatchJson.String(module["model"]);
             if (plugin is null || model is null)
             {
                 continue;

@@ -4,7 +4,7 @@ flowchart LR
     n_m6218505374262194["Host MIDI CC<br/>Cardinal · MIDI"]:::io
     n_m3225582266994716["Host MIDI Gate<br/>Cardinal · MIDI"]:::io
   end
-  subgraph b1["Time & sequencing"]
+  subgraph b1["Time #amp; sequencing"]
     n_m1647006434782107["Clkd<br/>ImpromptuModular · clock"]:::time
     n_m5442970283678664["ADDR-SEQ<br/>Bogaudio + ASX · sequencer"]:::time
   end
@@ -25,13 +25,13 @@ flowchart LR
     n_m8188053117264690["Waveshaper<br/>SurgeXTRack · waveshaper"]:::modifier
     n_m4817828098405391["EQ<br/>Bogaudio · EQ"]:::modifier
   end
-  subgraph b4["Mix & effects"]
+  subgraph b4["Mix #amp; effects"]
     n_m1105006806367356["MIX4<br/>Bogaudio · mixer"]:::mixer
     n_m3951164105101658["Plateau<br/>Valley · reverb"]:::effect
     n_m2112618335105631["Delay Plus Stereo Fx<br/>AS · delay"]:::effect
     n_m1["Audio 2<br/>Cardinal · audio I/O"]:::io
   end
-  n_m8599156609620611 -->|"ADSR moves pre-filter gain & frequency"| n_m7411897278716254
+  n_m8599156609620611 -->|"ADSR moves pre-filter gain #amp; frequency"| n_m7411897278716254
   n_m7521774204900965 ==>|"audio"| n_m7411897278716254
   n_m7411897278716254 ==>|"into MIX4"| n_m1105006806367356
   n_m2 -.->|"2 × gate / trig / clock"| n_m2208446996781428
@@ -41,7 +41,7 @@ flowchart LR
   n_m5152299461796515 -->|"LLFO moves pulse width cv"| n_m4235470771947441
   n_m6452162562716294 ==>|"audio"| n_m8188053117264690
   n_m6726411345220971 -->|"ADSR moves drive"| n_m8188053117264690
-  n_m3898654702126135 -->|"SLEW moves gain & frequency"| n_m6452162562716294
+  n_m3898654702126135 -->|"SLEW moves gain #amp; frequency"| n_m6452162562716294
   n_m4235470771947441 ==>|"audio"| n_m6452162562716294
   n_m2208446996781428 -->|"ADSR moves pre-filter gain"| n_m6452162562716294
   n_m3898654702126135 -->|"SLEW moves drive"| n_m8188053117264690
@@ -49,7 +49,7 @@ flowchart LR
   n_m1647006434782107 -.->|"sets the tempo"| n_m5442970283678664
   n_m2846238014348274 -->|"plays the notes"| n_m7521774204900965
   n_m1647006434782107 -.->|"fires the envelope / new value"| n_m8599156609620611
-  n_m6218505374262194 -->|"hand control of frequency & pre-filter gain"| n_m7411897278716254
+  n_m6218505374262194 -->|"hand control of frequency #amp; pre-filter gain"| n_m7411897278716254
   n_m1647006434782107 -.->|"fires the envelope / new value"| n_m2629565538426473
   n_m2629565538426473 -->|"Random moves channel 2 pan cv"| n_m1105006806367356
   n_m3225582266994716 -.->|"2 × gate / trig / clock"| n_m1647006434782107

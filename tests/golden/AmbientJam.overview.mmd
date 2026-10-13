@@ -2,7 +2,7 @@ flowchart LR
   subgraph b0["Performance (MIDI, host, played live)"]
     n_g_external["Played live<br/>Host MIDI, Host MIDI CC, Host MIDI Gate"]:::performance
   end
-  subgraph b1["Time & sequencing"]
+  subgraph b1["Time #amp; sequencing"]
     n_g_time["Sequencing<br/>Clkd, ADDR-SEQ"]:::time
   end
   subgraph b2["Voice 1"]
@@ -11,15 +11,15 @@ flowchart LR
   subgraph b3["Voice 2"]
     n_g_voice_2["PULSE ← Host MIDI<br/>VCF #1 → Waveshaper → EQ · +4 mod"]:::source
   end
-  subgraph b4["Mix & effects"]
-    n_g_bus["Mix & effects<br/>MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
+  subgraph b4["Mix #amp; effects"]
+    n_g_bus["Mix #amp; effects<br/>MIX4, Plateau, Delay Plus Stereo Fx, Audio 2"]:::mixer
   end
   n_g_voice_1 ==>|"into MIX4"| n_g_bus
   n_g_external -.->|"4 × gate / trig / clock"| n_g_voice_2
   n_g_external -->|"2 × modulation"| n_g_voice_2
   n_g_time -->|"plays the notes"| n_g_voice_1
   n_g_time -.->|"2 × gate / trig / clock"| n_g_voice_1
-  n_g_external -->|"hand control of frequency & pre-filter gain"| n_g_voice_1
+  n_g_external -->|"hand control of frequency #amp; pre-filter gain"| n_g_voice_1
   n_g_voice_1 -->|"Random moves channel 2 pan cv"| n_g_bus
   n_g_external -.->|"3 × gate / trig / clock"| n_g_time
   n_g_external -->|"3 × pitch"| n_g_voice_2

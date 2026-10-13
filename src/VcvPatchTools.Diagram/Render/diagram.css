@@ -164,9 +164,13 @@
 .vpd-root.hide-modulation .layer-modulation,
 .vpd-root.hide-gate .layer-gate { display: none; }
 .vpd-root.show-intents .vpd-edge .label { display: inline; }
-.vpd-root.focus .vpd-node:not(.hl) { opacity: .25; }
-.vpd-root.focus .vpd-edge:not(.hl) { opacity: .08; }
-.vpd-root.focus .vpd-edge.hl .label { display: inline; }
+.vpd-root.focus:not([data-hover]) .vpd-node:not(.hl) { opacity: .25; }
+.vpd-root.focus:not([data-hover]) .vpd-edge:not(.hl) { opacity: .08; }
+.vpd-root.focus:not([data-hover]) .vpd-edge.hl .label { display: inline; }
+/* A hovered box (highlight.js) takes over from the focus above, with the same look; a selected cable stays highlighted. */
+.vpd-root[data-hover] .vpd-node:not([data-hv]) { opacity: .25; }
+.vpd-root[data-hover] .vpd-edge:not([data-hv], .selected) { opacity: .08; }
+.vpd-root[data-hover] .vpd-edge:is([data-hv], .selected) .label { display: inline; }
 .vpd-node, .vpd-edge { transition: opacity .15s; }
 
 /* Page chrome (static HTML and Blazor) */

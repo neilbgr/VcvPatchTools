@@ -4,7 +4,16 @@ using VcvPatchTools.Diagram;
 using VcvPatchTools.Diagram.Analysis;
 using VcvPatchTools.Diagram.Layout;
 
-return Run(args);
+try
+{
+    return Run(args);
+}
+catch (InvalidDataException e)
+{
+    // A broken or foreign file: one readable line, not a stack trace.
+    Console.Error.WriteLine($"Invalid patch: {e.Message}");
+    return 1;
+}
 
 static int Run(string[] args)
 {
@@ -27,7 +36,7 @@ static int Run(string[] args)
 
     if (args.Length >= 1 && args[0] == "convert")
     {
-        return ConvertCommand.Run(args);
+        return ConvertCommand.Run(args, Console.Out, Console.Error);
     }
 
     if (args.Length >= 2 && args[0] is "diagram" or "render")

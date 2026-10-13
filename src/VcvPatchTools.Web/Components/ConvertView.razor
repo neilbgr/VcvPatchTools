@@ -19,6 +19,10 @@
             <button disabled="@(target is null)" @onclick="ConvertAsync">Convert and download</button>
         </div>
     </div>
+    @if (error is not null)
+    {
+        <p class="vpd-error">@error</p>
+    }
     @if (converted is not null)
     {
         <p>Downloaded <strong>@convertedName</strong>.
@@ -40,6 +44,9 @@
 @code {
     [Parameter, EditorRequired] public byte[] Bytes { get; set; } = default!;
 
+    /// <summary>The patch as already read by the page, to tell where it comes from (converting reads a fresh copy).</summary>
+    [Parameter, EditorRequired] public PatchArchive Archive { get; set; } = default!;
+
     [Parameter, EditorRequired] public string FileName { get; set; } = default!;
 
     /// <summary>Shows the converted patch in the app (its diagram, its info).</summary>
@@ -52,6 +59,7 @@
     private string? convertedName;
     private List<string> warnings = new List<string>();
     private byte[]? shownBytes;
+    private string? error;
 
     protected override void OnParametersSet()
     {
@@ -61,9 +69,10 @@
         }
         // Another patch: start over.
         shownBytes = Bytes;
-        detection = PatchDetector.Detect(PatchArchive.Read(Bytes));
+        detection = PatchDetector.Detect(Archive);
         target = ConvertedName.OppositeOf(detection.Origin);
         converted = null;
+        error = null;
         warnings = new List<string>();
     }
 
@@ -73,12 +82,22 @@
         {
             return;
         }
-        // A fresh copy each time: the converter edits the patch in place.
-        PatchArchive patch = PatchArchive.Read(Bytes);
-        ConversionResult result = PatchConverter.Convert(patch, to, remapCableColors);
-        converted = patch.Write();
-        convertedName = ConvertedName.For(FileName, to);
-        warnings = result.Warnings;
-        await JS.InvokeVoidAsync("vpdDownloadBytes", convertedName, "application/octet-stream", converted);
+        error = null;
+        try
+        {
+            // A fresh copy each time: the converter edits the patch in place.
+            PatchArchive patch = PatchArchive.Read(Bytes);
+            ConversionResult result = PatchConverter.Convert(patch, to, remapCableColors);
+            converted = patch.Write();
+            convertedName = ConvertedName.For(FileName, to);
+            warnings = result.Warnings;
+            await JS.InvokeVoidAsync("vpdDownloadBytes", convertedName, "application/octet-stream", converted);
+        }
+        catch (Exception ex)
+        {
+            converted = null;
+            warnings = new List<string>();
+            error = $"{FileName} couldn't be converted: {ex.Message}";
+        }
     }
 }

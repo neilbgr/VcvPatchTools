@@ -65,7 +65,18 @@ public static class MermaidExporter
         return mmd.ToString();
     }
 
-    private static string Label(string text) => text.Replace("\"", "#quot;");
+    /// <summary>
+    /// Text inside a quoted Mermaid label: markup characters as entity codes (Mermaid renders labels as HTML), and on
+    /// one line (a line break would end the statement).
+    /// </summary>
+    private static string Label(string text) => OneLine(text)
+        .Replace("&", "#amp;")
+        .Replace("<", "#lt;")
+        .Replace(">", "#gt;")
+        .Replace("\"", "#quot;");
+
+    /// <summary>Line breaks (CR, LF or both) as spaces.</summary>
+    internal static string OneLine(string text) => text.Replace("\r\n", " ").Replace('\r', ' ').Replace('\n', ' ');
 
     /// <summary>"m123" / "g:voice-1" → a valid identifier.</summary>
     private static string Id(string key) => "n_" + new string(key.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());

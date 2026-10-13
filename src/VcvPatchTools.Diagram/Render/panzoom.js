@@ -1,8 +1,15 @@
 // Pan (drag the background, or anywhere with a finger), Ctrl+wheel and two-finger pinch zoom for a diagram's scroll box.
 // Shared: embedded in the static HTML export, and copied to the Blazor app's wwwroot/js at build time.
+// Returns a handle whose dispose() removes it all (the app calls it when the diagram goes away).
 window.vpdPanZoom = function (scroller, onZoom) {
-  if (!scroller || scroller.dataset.vpdPan) return;
+  if (!scroller || scroller.dataset.vpdPan) return { dispose() { } };
   scroller.dataset.vpdPan = '1';
+  const listeners = [];
+  const on = (type, handler, options) => {
+    scroller.addEventListener(type, handler, options);
+    listeners.push([type, handler, options]);
+  };
+  let disposed = false;
   let drag = null;
   let suppressClick = false;
   // Fingers on the scroll box, for the pinch: pointerId → last position.
@@ -11,7 +18,7 @@ window.vpdPanZoom = function (scroller, onZoom) {
 
   // Zooms by factor keeping the point (clientX, clientY) where it is on screen.
   function zoomAt(clientX, clientY, factor) {
-    if (!onZoom) return;
+    if (!onZoom || disposed) return;
     const rect = scroller.getBoundingClientRect();
     const px = clientX - rect.left + scroller.scrollLeft;
     const py = clientY - rect.top + scroller.scrollTop;
@@ -28,7 +35,7 @@ window.vpdPanZoom = function (scroller, onZoom) {
     return { distance: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   };
 
-  scroller.addEventListener('pointerdown', e => {
+  on('pointerdown', e => {
     // A new gesture: a click swallowed after the previous drag or pinch may never have come.
     if (touches.size === 0) suppressClick = false;
     if (e.pointerType === 'touch') {
@@ -46,7 +53,7 @@ window.vpdPanZoom = function (scroller, onZoom) {
     if (e.button !== 0 || (e.pointerType === 'mouse' && e.target.closest('.vpd-node, .vpd-edge'))) return;
     drag = { x: e.clientX, y: e.clientY, left: scroller.scrollLeft, top: scroller.scrollTop, moved: false, id: e.pointerId };
   });
-  scroller.addEventListener('pointermove', e => {
+  on('pointermove', e => {
     if (touches.has(e.pointerId)) touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pinch && touches.size === 2) {
       // One zoom step at a time: the app re-renders between steps.
@@ -78,18 +85,28 @@ window.vpdPanZoom = function (scroller, onZoom) {
     drag = null;
     scroller.classList.remove('panning');
   };
-  scroller.addEventListener('pointerup', end);
-  scroller.addEventListener('pointercancel', end);
+  on('pointerup', end);
+  on('pointercancel', end);
   // A drag or a pinch must not also count as a click (which would fold the lane under the pointer).
-  scroller.addEventListener('click', e => {
+  on('click', e => {
     if (suppressClick) { e.stopPropagation(); e.preventDefault(); suppressClick = false; }
   }, true);
 
-  scroller.addEventListener('wheel', e => {
+  on('wheel', e => {
     if (!e.ctrlKey || !onZoom) return;
     e.preventDefault();
     zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.15 : 1 / 1.15);
   }, { passive: false });
+
+  return {
+    dispose() {
+      disposed = true;
+      listeners.forEach(([type, handler, options]) => scroller.removeEventListener(type, handler, options));
+      listeners.length = 0;
+      delete scroller.dataset.vpdPan;
+      scroller.classList.remove('panning');
+    },
+  };
 };
 
 // Zoom that fits the diagram's width in the scroll box, never below the readable minimum.
