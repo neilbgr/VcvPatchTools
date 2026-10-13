@@ -95,3 +95,36 @@ document.addEventListener('keydown', e => {
   }).observe(document.body, { childList: true, subtree: true });
   window.addEventListener('resize', schedule);
 })();
+
+// Lane titles stay in sight (see .vpd-band-titles in PatchDiagramView.razor): each one slides with the scroll, within its
+// lane, and gets a plate behind it once it has left its place, as it then passes over boxes and cables.
+(() => {
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    document.querySelectorAll('.vpd-scroll').forEach(scroller => {
+      const svg = scroller.querySelector('svg');
+      if (!svg || !svg.viewBox.baseVal.width) return;
+      const scale = svg.viewBox.baseVal.width / svg.getBoundingClientRect().width;
+      const left = scroller.scrollLeft * scale;
+      const top = scroller.scrollTop * scale;
+      svg.querySelectorAll('.vpd-band-title').forEach(title => {
+        const [x, y, w, h] = ['x', 'y', 'w', 'h'].map(k => parseFloat(title.dataset[k]));
+        const text = title.querySelector('text');
+        const plate = title.querySelector('.plate');
+        const width = text.getComputedTextLength() + 16;
+        // Only when it changes: the observer below watches widths too.
+        if (plate.getAttribute('width') !== width.toFixed(1)) plate.setAttribute('width', width.toFixed(1));
+        // Same margins from the edge of the view as from the edge of the lane.
+        const dx = Math.max(0, Math.min(left + 8 - x, w - width - 8));
+        const dy = Math.max(0, Math.min(top + 4 - y, h - 30));
+        title.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : '';
+        title.classList.toggle('stuck', dx > 0 || dy > 0);
+      });
+    });
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  document.addEventListener('scroll', schedule, true);
+  window.addEventListener('resize', schedule);
+  new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-x', 'data-y', 'data-w', 'data-h', 'width'] });
+})();

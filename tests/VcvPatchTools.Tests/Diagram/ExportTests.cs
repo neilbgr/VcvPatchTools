@@ -340,6 +340,34 @@ public class ExportTests
         }
     }
 
+    [Theory]
+    [InlineData("Subsequent37.vcv", "external", MonitorView.Modules)]
+    [InlineData("Subsequent37.vcv", null, MonitorView.Hidden)]
+    [InlineData("AmbientJam.vcv", null, MonitorView.Hidden)]
+    [InlineData("Zones.vcv", null, MonitorView.Modules)]
+    [InlineData("NotBoringDrone3.vcv", null, MonitorView.Modules)]
+    [InlineData("MeditationsOnDeathRack.vcv", null, MonitorView.Hidden)]
+    public void CablesDontRunAlongsideEachOther(string fixture, string? unfold, MonitorView monitors)
+    {
+        PatchAnalysis patch = PatchDiagram.Analyze(File.ReadAllBytes(Fixtures.Path(fixture)));
+        IReadOnlySet<string> unfolded = unfold is null ? PatchDiagram.GroupKeys(patch) : new HashSet<string> { unfold };
+        DiagramLayout diagram = PatchDiagram.Layout(patch, fixture, unfolded, monitors: monitors);
+        List<(string Edge, double Y, double FromX, double ToX)> runs = diagram.Edges
+            .SelectMany(e => HorizontalRuns(e.Path).Select(r => (e.Key, r.Y, Math.Min(r.FromX, r.ToX), Math.Max(r.FromX, r.ToX))))
+            .ToList();
+
+        // Two cables a few pixels apart over some length read as one: either they share a height, or they keep apart.
+        foreach ((string Edge, double Y, double FromX, double ToX) a in runs)
+        {
+            foreach ((string Edge, double Y, double FromX, double ToX) b in runs.Where(b => b.Edge != a.Edge))
+            {
+                double gap = Math.Abs(a.Y - b.Y);
+                double alongside = Math.Min(a.ToX, b.ToX) - Math.Max(a.FromX, b.FromX);
+                Assert.False(gap is > 0.5 and < 8 && alongside > 12, $"{a.Edge} at y={a.Y} and {b.Edge} at y={b.Y} run alongside over {alongside:0}px");
+            }
+        }
+    }
+
     /// <summary>x of every vertical run ("… Q x y x y V y …") of a path.</summary>
     private static IEnumerable<double> VerticalChannels(string path)
     {

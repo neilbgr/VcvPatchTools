@@ -32,6 +32,8 @@ public static class LayeredLayout
     private const double gapPadding = 32;
     private const double rowSpacing = 16;
     private const double trackSpacing = 16;
+    // Closer than this, two parallel cables read as one.
+    private const double minRunSpacing = 8;
     private const double portSpacing = 14;
 
     /// <summary>Length of the arrowhead drawn past the end of every cable (renderers draw it from the line's end), so thick lines never show past its tip.</summary>
@@ -332,7 +334,7 @@ public static class LayeredLayout
                 bool uTurn = plan.Feedback && (i == 0 || i == plan.Gaps.Count - 1);
                 if (uTurn || Math.Abs(ys[i + 1] - ys[i]) >= 1)
                 {
-                    turns.Add(new Turn(plan.Gaps[i], key, i, ys[i], ys[i + 1]));
+                    turns.Add(new Turn(plan.Gaps[i], key, i, ys[i], ys[i + 1], plan.Feedback));
                 }
             }
         }
@@ -535,7 +537,7 @@ public static class LayeredLayout
     private sealed record Plan(List<string> Tracks, List<int> Gaps, bool Feedback);
 
     /// <summary>A vertical run in a gap, from one height to the next; Part is its index along the cable.</summary>
-    private sealed record Turn(int Gap, EdgeKey Key, int Part, double YFrom, double YTo);
+    private sealed record Turn(int Gap, EdgeKey Key, int Part, double YFrom, double YTo, bool Feedback);
 
     /// <summary>
     /// Cables leave from the right edge and arrive on the left edge of boxes. Along their tracks they're horizontal,
@@ -656,6 +658,7 @@ public static class LayeredLayout
                 .OrderBy(b => Down(b) ? 0 : 1)
                 .ThenBy(b => Down(b) ? -b.Max(t => t.YTo) : b.Min(t => t.YTo))
                 .ToList();
+            TurnFirstWhenAlongside(ordered);
             double left = gapLeft(gap.Key) + 14;
             double right = gapRight(gap.Key) - ArrowLength - 12;
             double step = (right - left) / ordered.Count;
@@ -668,6 +671,33 @@ public static class LayeredLayout
             }
         }
         return channelX;
+    }
+
+    /// <summary>
+    /// A cable leaving its channel rightwards a few pixels from the height another one comes in at from the left would
+    /// run alongside it between their two channels, the two reading as one: the one coming in turns first (it then
+    /// crosses the other at a right angle, which reads).
+    /// </summary>
+    private static void TurnFirstWhenAlongside(List<List<Turn>> ordered)
+    {
+        static bool Alongside(List<Turn> leaving, List<Turn> entering) => leaving.Any(l => !l.Feedback
+            && entering.Any(e => !e.Feedback && Math.Abs(l.YTo - e.YFrom) is > 0.5 and < minRunSpacing));
+        // Bounded: two runs each alongside the other would swap forever.
+        for (int pass = 0; pass < ordered.Count; pass++)
+        {
+            (int Leaving, int Entering)? swap = Enumerable.Range(0, ordered.Count)
+                .SelectMany(i => Enumerable.Range(i + 1, ordered.Count - i - 1).Select(j => (i, j)))
+                .Where(p => Alongside(ordered[p.i], ordered[p.j]))
+                .Select(p => ((int, int)?)p)
+                .FirstOrDefault();
+            if (swap is not (int leaving, int entering))
+            {
+                return;
+            }
+            List<Turn> bundle = ordered[entering];
+            ordered.RemoveAt(entering);
+            ordered.Insert(leaving, bundle);
+        }
     }
 
     /// <summary>Vertical runs drawn as one: a trunk's turns going the same way; every other turn on its own.</summary>

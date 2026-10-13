@@ -1,4 +1,4 @@
-# VcvPatchTools
+﻿# VcvPatchTools
 
 Tools for [VCV Rack](https://vcvrack.com/) / [Cardinal](https://github.com/DISTRHO/Cardinal) `.vcv` patches:
 
@@ -133,7 +133,7 @@ A complex patch gives a complex diagram, which defeats the purpose. So the first
 - a switch takes the role of what it routes: one picking between pitches (an octave switch) is pitch processing, one muting an oscillator is part of that oscillator's voice, and its output carries the same signal as its inputs;
 - shared modulators, time, performance and the mix bus are one box each.
 
-Click a box (web app) to unfold it into its modules, in a lane of its own. The CLI does the same with `--unfold`.
+Click a box (web app) to unfold it into its modules, in a lane of its own. The CLI does the same with `--unfold`. In the web app, the lanes' names stay in sight as you scroll a large diagram.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/unfolded-dark.png">

@@ -39,7 +39,6 @@
                             <title>Click to fold this group back</title>
                         }
                         <rect x="@F(bandX)" y="@F(band.Y)" width="@F(bandWidth)" height="@F(band.Height)" rx="8" />
-                        @Text(bandX + 12, band.Y + 19, null, band.Group is null ? band.Title : $"{band.Title}  ⊟")
                     </g>
                 }
             </g>
@@ -123,6 +122,19 @@
                         {
                             @Text(edge.LabelX, edge.LabelY + SvgRenderer.FeedbackTagOffset, "feedback-tag", SvgRenderer.FeedbackTag, "middle")
                         }
+                    </g>
+                }
+            </g>
+
+            @* The lanes' titles on top of everything: they follow the scroll (vpd.js) so a lane's name stays in sight. *@
+            <g class="vpd-band-titles">
+                @foreach (DiagramBand band in Layout.Bands)
+                {
+                    (double bandX, double bandWidth) = Layout.Extent(band);
+                    <g class="@SvgRenderer.BandClass(band) vpd-band-title" data-x="@F(bandX)" data-y="@F(band.Y)" data-w="@F(bandWidth)" data-h="@F(band.Height)"
+                       @onclick="() => BandClickedAsync(band)">
+                        <rect class="plate" x="@F(bandX + 4)" y="@F(band.Y + 4)" height="22" rx="5" />
+                        @Text(bandX + 12, band.Y + 19, null, band.Group is null ? band.Title : $"{band.Title}  ⊟")
                     </g>
                 }
             </g>

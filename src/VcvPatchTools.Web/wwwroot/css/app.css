@@ -214,6 +214,13 @@ body:has(.vpd-root[data-theme="dark"]) { background: #16171a; color-scheme: dark
 
 /* The diagram reads better with lane titles in plain case (the exports keep theirs). */
 .vpd-app .vpd-band text { text-transform: none; letter-spacing: 0; font-size: 13px; }
+/* Lane titles follow the scroll (vpd.js). Away from their place they pass over boxes and cables: a plate keeps them
+   readable there, and lets clicks through to the boxes unless the title folds its lane back. */
+.vpd-band-title { pointer-events: none; }
+.vpd-band-title.unfolded { pointer-events: auto; }
+.vpd-band.vpd-band-title .plate { stroke: var(--vpd-line); stroke-dasharray: none; opacity: 0; transition: opacity .12s; }
+.vpd-band.vpd-band-title.stuck .plate { opacity: .94; }
+@media (prefers-reduced-motion: reduce) { .vpd-band.vpd-band-title .plate { transition: none; } }
 .vpd-edge { cursor: pointer; }
 .vpd-edge.selected path:not(.hit) { stroke-width: 4; }
 
