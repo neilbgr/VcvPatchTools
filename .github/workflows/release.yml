@@ -1,0 +1,172 @@
+# Builds the vcvpatch command line for every platform, the static web app and a source archive, the way Cardinal does:
+# every push and pull request leaves them as workflow artifacts (named after the commit), and pushing a tag v<Version>
+# publishes them as a GitHub release (named after the version).
+# Releasing: bump <Version> in Directory.Build.props, commit, then  git tag v1.0.0 && git push origin v1.0.0
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    # Path filters only apply to branch pushes: a tag always builds.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      label: ${{ steps.version.outputs.label }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # A release is named after the version, any other build after the version and the commit (1.0.0-d6a0afb1).
+      - id: version
+        name: Read the version
+        run: |
+          version=$(dotnet msbuild src/VcvPatchTools.Core -getProperty:Version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
+              echo "::error::Tag $GITHUB_REF_NAME doesn't match the version in Directory.Build.props (v$version)"
+              exit 1
+            fi
+            echo "label=$version" >> "$GITHUB_OUTPUT"
+          else
+            echo "label=$version-${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - run: dotnet test
+
+  cli:
+    needs: [version, test]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { rid: linux-x64, os: ubuntu-latest }
+          - { rid: linux-arm64, os: ubuntu-latest }
+          # On Windows, so the .exe carries its version in its file properties.
+          - { rid: win-x64, os: windows-latest }
+          - { rid: win-arm64, os: windows-latest }
+          # On macOS, so the executable is signed (ad hoc): Apple silicon refuses to run an unsigned one.
+          - { rid: osx-x64, os: macos-latest }
+          - { rid: osx-arm64, os: macos-latest }
+    runs-on: ${{ matrix.os }}
+    env:
+      NAME: VcvPatchTools-${{ needs.version.outputs.label }}-${{ matrix.rid }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish
+        shell: bash
+        run: >
+          dotnet publish src/VcvPatchTools.Cli -c Release -r ${{ matrix.rid }} --self-contained
+          -p:PublishSingleFile=true -p:ContinuousIntegrationBuild=true -o "dist/$NAME"
+
+      - name: Pack
+        shell: bash
+        run: |
+          cp LICENSE README.md "dist/$NAME/"
+          rm -f dist/"$NAME"/*.pdb
+          cd dist
+          if [[ "${{ matrix.rid }}" == win-* ]]; then
+            7z a "$NAME.zip" "$NAME"
+          else
+            tar -czf "$NAME.tar.gz" "$NAME"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: dist/${{ env.NAME }}.*
+
+  web:
+    needs: [version, test]
+    runs-on: ubuntu-latest
+    env:
+      NAME: VcvPatchTools-${{ needs.version.outputs.label }}-web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # Served from the root of any static file server (GitHub Pages' /VcvPatchTools/ base is set by pages.yml only).
+      - name: Publish
+        run: |
+          dotnet publish src/VcvPatchTools.Web -c Release -p:ContinuousIntegrationBuild=true -o publish/web
+          mv publish/web/wwwroot "$NAME"
+          cp LICENSE "$NAME/"
+          zip -qr "$NAME.zip" "$NAME"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: ${{ env.NAME }}.zip
+
+  source:
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      NAME: VcvPatchTools-${{ needs.version.outputs.label }}-src
+    steps:
+      - uses: actions/checkout@v4
+
+      # The generated catalogs are committed: the archive builds as is, without the Cardinal sources.
+      - name: Archive
+        run: git archive --format=tar.gz --prefix="VcvPatchTools-${{ needs.version.outputs.label }}/" -o "$NAME.tar.gz" HEAD
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: ${{ env.NAME }}.tar.gz
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [version, cli, web, source]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt
+
+      # A version with a suffix (1.1.0-rc1) is published as a pre-release.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: VCV Patch Tools ${{ needs.version.outputs.version }}
+          prerelease: ${{ contains(needs.version.outputs.version, '-') }}
+          generate_release_notes: true
+          files: dist/*

@@ -182,6 +182,8 @@ body:has(.vpd-root[data-theme="dark"]) { background: #16171a; color-scheme: dark
 .vpd-menu.help .menu { left: auto; right: 0; width: min(360px, calc(100vw - 32px)); white-space: normal; gap: 0; font-size: 14px; }
 .vpd-menu.help .menu p { margin: 0 0 8px; }
 .vpd-menu.help .menu p:last-child { margin: 0; }
+.vpd-menu.help .menu .vpd-version { font-size: 13px; }
+.vpd-menu.help .menu .vpd-version a { color: var(--vpd-muted); }
 .vpd-menu.help > summary { padding: 3px 0; width: 28px; justify-content: center; font-weight: 600; }
 
 /* Page */

@@ -1,4 +1,5 @@
 ﻿using VcvPatchTools.Cli;
+using VcvPatchTools.Core;
 using VcvPatchTools.Core.Patch;
 using VcvPatchTools.Diagram;
 using VcvPatchTools.Diagram.Analysis;
@@ -17,6 +18,12 @@ catch (InvalidDataException e)
 
 static int Run(string[] args)
 {
+    if (args.Length == 1 && args[0] is "--version" or "version")
+    {
+        Console.WriteLine($"vcvpatch {ProductVersion.Display}");
+        return 0;
+    }
+
     if (args.Length >= 2 && args[0] == "catalog" && args[1] == "build")
     {
         string? src = Option(args, "--src");
@@ -129,6 +136,7 @@ static string? Option(string[] args, string name)
 
 static void PrintUsage()
 {
+    Console.Error.WriteLine($"vcvpatch {ProductVersion.Display}");
     Console.Error.WriteLine("Usage:");
     Console.Error.WriteLine("  vcvpatch info <patch.vcv>");
     Console.Error.WriteLine("    (format, Rack or Cardinal origin, modules by band, voices, groups, typed cables, diagnostics)");
@@ -139,4 +147,5 @@ static void PrintUsage()
     Console.Error.WriteLine("    (default: folded overview; group keys are listed by \"info\")");
     Console.Error.WriteLine("  vcvpatch catalog build --src <Cardinal/plugins> [--out catalog/ports.json] [--report catalog/scan-report.txt]");
     Console.Error.WriteLine("  vcvpatch catalog cardinal --upstream <Cardinal tree> --fork <Cardinal tree> [--out catalog/cardinal.json]");
+    Console.Error.WriteLine("  vcvpatch --version");
 }

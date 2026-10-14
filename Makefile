@@ -3,7 +3,11 @@ WEB     := src/VcvPatchTools.Web
 CONFIG  := Release
 PLUGINS ?= ../Cardinal/plugins
 
-.PHONY: build test format catalog cardinal-catalog web publish-linux publish-win publish-osx publish-web publish-all clean
+.PHONY: version build test format catalog cardinal-catalog web publish-linux publish-win publish-osx publish-web publish-all clean
+
+# The version every binary is built with (Directory.Build.props); a release is the tag v<version>.
+version:
+	@dotnet msbuild src/VcvPatchTools.Core -getProperty:Version
 
 build:
 	dotnet build

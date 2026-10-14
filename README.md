@@ -364,6 +364,8 @@ The **Info** tab tells what the patch is (format, Rack or Cardinal, the Rack ver
 
 ### Command line
 
+Ready-made `vcvpatch` executables for Linux, Windows and macOS (x64 and arm64, no .NET needed) are attached to each [release](https://github.com/neilbgr/VcvPatchTools/releases), next to the static web app and the sources. From the sources:
+
 ```bash
 dotnet run --project src/VcvPatchTools.Cli -- <command>
 # or build a single-file executable: make publish-linux / make publish-win (output in publish/<runtime>/vcvpatch)
@@ -383,6 +385,7 @@ dotnet run --project src/VcvPatchTools.Cli -- <command>
 | `… --no-links` | No VCV Library links on the module boxes |
 | `vcvpatch catalog build --src <Cardinal/plugins>` | Regenerate the port catalog (see below) |
 | `vcvpatch catalog cardinal --upstream <dir> --fork <dir>` | Regenerate the list of modules Cardinal loads (see below) |
+| `vcvpatch --version` | The version and the commit it was built from |
 
 Windows paths are accepted under WSL (`"C:\Users\me\Documents\patch.vcv"` is read from `/mnt/c/...`). Patch files are only read, never modified: a conversion writes a new file. `inspect` and `render`, the commands' former names, still work.
 
@@ -434,4 +437,5 @@ catalog/                     port catalog and roles
 - Style: `make format` (`dotnet format`, rules in `.editorconfig`; explicit types, no `var`).
 - Screenshots (`docs/screenshots`, light and dark): rendered pages captured with a headless browser, e.g. `msedge --headless=new --blink-settings=preferredColorScheme=1 --window-size=W,H --screenshot=out.png page.html` (`=0` for dark).
 - Web app online: every push to `main` runs the tests and publishes it to GitHub Pages (`.github/workflows/pages.yml`).
+- Builds and releases: every push to `main` and every pull request builds the executables, the web app and a source archive as workflow artifacts (`.github/workflows/release.yml`). To release, bump `<Version>` in `Directory.Build.props` (`make version` prints it), commit, then push the tag `v<version>` (`git tag v1.0.0 && git push origin v1.0.0`): the workflow checks the tag matches, and publishes everything with checksums as a GitHub release (a pre-release for a version like `1.1.0-rc1`). The web app's **?** menu and `vcvpatch --version` show the version.
 - Contributions welcome, especially entries for `catalog/roles.json` and `catalog/ports.overrides.json` for the modules you use.
