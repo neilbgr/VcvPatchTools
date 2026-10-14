@@ -149,9 +149,11 @@
                 <div class="vpd-panel module role-@selectedNode.Role.ToString().ToLowerInvariant()">
                     @if (selectedNode.LibraryKey is string preview && !missingPanels.Contains(preview))
                     {
-                        @* The real panel, from the VCV Library's screenshots; gone if the Library has none. *@
-                        <img class="panel-shot" src="@VcvLibrary.ScreenshotUrl(preview, 200)" srcset="@($"{VcvLibrary.ScreenshotUrl(preview, 400)} 2x")"
-                             alt="@selectedNode.Title panel" @onerror="() => missingPanels.Add(preview)" />
+                        @* The real panel, from the VCV Library's screenshots; gone if the Library has none. A click shows it full height. *@
+                        <button class="panel-zoom" title="Show the panel larger" @onclick="() => ZoomPanelAsync(preview)">
+                            <img class="panel-shot" src="@VcvLibrary.ScreenshotUrl(preview, 200)" srcset="@($"{VcvLibrary.ScreenshotUrl(preview, 400)} 2x")"
+                                 alt="@selectedNode.Title panel" @onerror="() => missingPanels.Add(preview)" />
+                        </button>
                     }
                     <div class="sheet-body">
                         <button class="close" title="Close" @onclick="() => selectedNode = null">×</button>
@@ -183,6 +185,20 @@
                                 }
                             </div>
                         }
+                        @if (SelectedCardinalSupport is CardinalSupport { Availability: not CardinalAvailability.Official } support)
+                        {
+                            @* Converting to Cardinal, or opening the patch there, would lose this module. *@
+                            <p class="cardinal-note @(support.Availability == CardinalAvailability.Missing ? "missing" : "neilbgr")">
+                                @if (support.Availability == CardinalAvailability.Missing)
+                                {
+                                    <span>Not bundled with Cardinal: Cardinal drops this module when it opens the patch.</span>
+                                }
+                                else
+                                {
+                                    <span>Only the <a href="@CardinalModules.NeilbgrEditionUrl" target="_blank" rel="noopener">neilbgr edition of Cardinal</a> bundles this module: official Cardinal drops it when it opens the patch.</span>
+                                }
+                            </p>
+                        }
                         <p class="muted">@string.Join(" · ", selectedNode.Details)</p>
                         @if (selectedNode.LibraryKey is string library)
                         {
@@ -191,6 +207,18 @@
                     </div>
                 </div>
             }
+
+            @* The panel at full height, over everything (native modal dialog: Escape and a click outside close it). *@
+            <dialog class="vpd-zoom" @ref="zoomDialog" aria-label="@zoomTitle panel">
+                @if (zoomKey is not null)
+                {
+                    <img src="@VcvLibrary.ScreenshotUrl(zoomKey, 400)" alt="@zoomTitle panel" />
+                    <form method="dialog" class="caption">
+                        <span>@zoomTitle</span>
+                        <button class="close" title="Close">×</button>
+                    </form>
+                }
+            </dialog>
 
             @if (selected is not null)
             {
@@ -455,6 +483,24 @@
         selected = null;
         selectedNode = selectedNode?.Key == node.Key ? null : node;
     }
+
+    private ElementReference zoomDialog;
+    private string? zoomKey;
+    private string? zoomTitle;
+
+    private async Task ZoomPanelAsync(string libraryKey)
+    {
+        zoomKey = libraryKey;
+        zoomTitle = selectedNode?.Title;
+        StateHasChanged();
+        await JS.InvokeVoidAsync("vpdShowModal", zoomDialog);
+    }
+
+    /// <summary>What Cardinal does with the selected module; null when nothing (or no single module) is selected.</summary>
+    private CardinalSupport? SelectedCardinalSupport =>
+        selectedNode?.ModuleId is long id && analysis is not null && CardinalModules.Embedded.IsKnown
+            ? CardinalModules.Embedded.Check(analysis.Module(id).Plugin, analysis.Module(id).Module.Model)
+            : null;
 
     private void Unfold(DiagramNode node)
     {

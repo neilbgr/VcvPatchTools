@@ -3,7 +3,7 @@ WEB     := src/VcvPatchTools.Web
 CONFIG  := Release
 PLUGINS ?= ../Cardinal/plugins
 
-.PHONY: build test format catalog web publish-linux publish-win publish-osx publish-web publish-all clean
+.PHONY: build test format catalog cardinal-catalog web publish-linux publish-win publish-osx publish-web publish-all clean
 
 build:
 	dotnet build
@@ -17,6 +17,14 @@ format:
 # Regenerates catalog/ports.json from the Cardinal plugin sources (rebuild afterwards: it is embedded in Core).
 catalog:
 	dotnet run --project $(CLI) -- catalog build --src $(PLUGINS) --out catalog/ports.json --report catalog/scan-report.txt
+	dotnet build
+
+# Regenerates catalog/cardinal.json: modules official Cardinal (DISTRHO upstream/main) loads, and those only the
+# neilbgr edition (the Cardinal working copy) adds. Needs the Cardinal clone's "upstream" remote.
+CARDINAL ?= $(PLUGINS)/..
+cardinal-catalog:
+	scripts/export-cardinal-upstream.sh $(CARDINAL) out/cardinal-upstream
+	dotnet run --project $(CLI) -- catalog cardinal --upstream out/cardinal-upstream --fork $(CARDINAL) --out catalog/cardinal.json
 	dotnet build
 
 # Local dev server for the Blazor app: http://localhost:5016 (add ?sample=AmbientJam to load the sample).

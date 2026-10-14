@@ -255,6 +255,24 @@ body:has(.vpd-root[data-theme="dark"]) { background: #16171a; color-scheme: dark
 .vpd-panel li { padding: 2px 0; }
 .vpd-panel .sig { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); margin-right: 8px; vertical-align: 4px; }
 .vpd-panel p { margin: 0 0 8px; }
+/* The panel shot is a button: a click shows it full height. */
+.vpd-panel .panel-zoom { flex: none; padding: 0; border: none; background: none; cursor: zoom-in; border-radius: 3px; line-height: 0; }
+.vpd-panel .panel-zoom:focus-visible { outline: 2px solid var(--vpd-gate); outline-offset: 3px; }
+/* A module official Cardinal can't load: said under its name, with the color of how bad it is. */
+.vpd-panel .cardinal-note { max-width: 70ch; padding: 2px 0 2px 10px; border-left: 3px solid var(--vpd-pitch); }
+.vpd-panel .cardinal-note.missing { border-left-color: var(--vpd-audio); }
+.vpd-panel .cardinal-note a { color: inherit; text-underline-offset: 3px; }
+/* The panel enlarged: the module as if pulled out of the rack, its name on a strip under it. */
+.vpd-zoom { padding: 0; border: none; background: none; overflow: visible; max-width: 92vw; max-height: 94dvh; }
+.vpd-zoom::backdrop { background: rgb(10 11 13 / 72%); backdrop-filter: blur(3px); }
+.vpd-zoom[open] { display: flex; flex-direction: column; align-items: center; gap: 10px; animation: vpd-zoom-in .18s ease-out; }
+.vpd-zoom img { display: block; height: calc(94dvh - 46px); width: auto; max-width: 92vw; object-fit: contain; border-radius: 4px; box-shadow: 0 18px 50px rgb(0 0 0 / 55%), 0 2px 6px rgb(0 0 0 / 40%); }
+.vpd-zoom .caption { display: flex; align-items: center; gap: 10px; margin: 0; color: #ececee; font-family: var(--ui-condensed); font-size: 18px; font-weight: 600; }
+.vpd-zoom .close { font: inherit; font-size: 24px; line-height: 1; padding: 2px 8px; border: none; border-radius: 4px; background: none; color: #a7acb4; cursor: pointer; }
+.vpd-zoom .close:hover, .vpd-zoom .close:focus-visible { color: #fff; }
+.vpd-zoom .close:focus-visible { outline: 2px solid #5cb8ff; }
+@keyframes vpd-zoom-in { from { transform: scale(.96); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .vpd-zoom[open] { animation: none; } }
 
 .vpd-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 12px; font-size: 14px; }
 .vpd-info dt { color: var(--vpd-muted); }
@@ -266,6 +284,13 @@ body:has(.vpd-root[data-theme="dark"]) { background: #16171a; color-scheme: dark
 .vpd-info a, .vpd-convert a { color: inherit; }
 .vpd-convert { font-size: 14px; }
 .vpd-convert .muted { color: var(--vpd-muted); }
+.vpd-notice { max-width: 760px; margin: 0 0 12px; padding: 8px 12px; border-left: 3px solid var(--vpd-pitch); background: var(--vpd-panel); border-radius: 0 6px 6px 0; }
+.vpd-notice p { margin: 0 0 4px; }
+.vpd-notice p:last-child { margin-bottom: 0; }
+.vpd-notice .modules { color: var(--vpd-muted); overflow-wrap: anywhere; }
+.vpd-notice.missing { border-left-color: var(--vpd-audio); }
+.vpd-info td.cardinal-missing { color: var(--vpd-audio); }
+.vpd-info td.cardinal-neilbgredition a { color: var(--vpd-pitch); text-underline-offset: 3px; }
 
 @media (min-width: 701px) and (min-height: 501px) {
   .vpd-short { display: none; }

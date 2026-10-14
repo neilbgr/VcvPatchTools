@@ -63,4 +63,46 @@ internal static class CatalogCommand
         }
         return 0;
     }
+
+    /// <summary>
+    /// "catalog cardinal": which modules official Cardinal and the neilbgr edition load, from two Cardinal source trees
+    /// (plugins/plugins.cpp, plugins/*/plugin.json, src/override/plugin.cpp). Upstream is exported by scripts/export-cardinal-upstream.sh.
+    /// </summary>
+    public static int Cardinal(string upstreamRoot, string forkRoot, string outputPath)
+    {
+        CardinalScan? upstream = ScanCardinal(upstreamRoot);
+        CardinalScan? fork = ScanCardinal(forkRoot);
+        if (upstream is null || fork is null)
+        {
+            return 1;
+        }
+
+        CardinalModules modules = CardinalModules.FromScans(upstream, fork);
+        File.WriteAllText(outputPath, modules.ToJson());
+        Console.WriteLine($"{modules.OfficialCount} official modules, {modules.NeilbgrCount} more in the neilbgr edition, {upstream.ModuleFallbacks.Count + upstream.PluginFallbacks.Count} fallbacks → {outputPath}");
+        foreach (string problem in upstream.Problems.Select(p => $"upstream: {p}").Concat(fork.Problems.Select(p => $"fork: {p}")))
+        {
+            Console.Error.WriteLine(problem);
+        }
+        return 0;
+    }
+
+    private static CardinalScan? ScanCardinal(string root)
+    {
+        string pluginsCpp = Path.Combine(root, "plugins", "plugins.cpp");
+        if (!File.Exists(pluginsCpp))
+        {
+            Console.Error.WriteLine($"Not a Cardinal source tree (no plugins/plugins.cpp): {root}");
+            return null;
+        }
+        string overridePath = Path.Combine(root, "src", "override", "plugin.cpp");
+        return CardinalScanner.Scan(
+            File.ReadAllText(pluginsCpp),
+            File.Exists(overridePath) ? File.ReadAllText(overridePath) : null,
+            dir =>
+            {
+                string manifest = Path.Combine(root, "plugins", dir, "plugin.json");
+                return File.Exists(manifest) ? File.ReadAllText(manifest) : null;
+            });
+    }
 }

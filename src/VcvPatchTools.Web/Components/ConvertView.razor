@@ -19,6 +19,10 @@
             <button disabled="@(target is null)" @onclick="ConvertAsync">Convert and download</button>
         </div>
     </div>
+    @if (target == PatchOrigin.Cardinal && converted is null && cardinalGaps.Count > 0)
+    {
+        <CardinalGapsNotice Gaps="cardinalGaps" />
+    }
     @if (error is not null)
     {
         <p class="vpd-error">@error</p>
@@ -53,6 +57,7 @@
     [Parameter] public EventCallback<(string FileName, byte[] Bytes)> OnOpen { get; set; }
 
     private DetectionResult detection = default!;
+    private List<CardinalGap> cardinalGaps = new List<CardinalGap>();
     private PatchOrigin? target;
     private bool remapCableColors = true;
     private byte[]? converted;
@@ -70,6 +75,7 @@
         // Another patch: start over.
         shownBytes = Bytes;
         detection = PatchDetector.Detect(Archive);
+        cardinalGaps = CardinalCompatibility.Find(Archive.Root);
         target = ConvertedName.OppositeOf(detection.Origin);
         converted = null;
         error = null;

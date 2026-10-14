@@ -17,7 +17,7 @@
     </dl>
 
     <table>
-        <thead><tr><th>Module</th><th>Plugin</th><th>Role</th><th>Does</th><th>Band</th></tr></thead>
+        <thead><tr><th>Module</th><th>Plugin</th><th>Role</th><th>Does</th><th>Band</th><th title="Can Cardinal load it? Official DISTRHO build, or only the neilbgr edition">Cardinal</th></tr></thead>
         <tbody>
             @foreach (AnalyzedModule module in Analysis.Modules.OrderBy(m => m.Band).ThenBy(m => m.Title, StringComparer.Ordinal))
             {
@@ -36,6 +36,17 @@
                     <td>@SvgRenderer.RoleLabel(module.Role)</td>
                     <td>@ModuleFunctions.Label(module.Function)</td>
                     <td>@module.Band</td>
+                    @{ CardinalSupport support = CardinalModules.Embedded.Check(module.Plugin, module.Module.Model); }
+                    <td class="cardinal-@support.Availability.ToString().ToLowerInvariant()">
+                        @if (support.Availability == CardinalAvailability.NeilbgrEdition)
+                        {
+                            <a href="@CardinalModules.NeilbgrEditionUrl" target="_blank" rel="noopener" title="Bundled only with the neilbgr edition of Cardinal">neilbgr edition</a>
+                        }
+                        else
+                        {
+                            @CardinalModules.Label(support)
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

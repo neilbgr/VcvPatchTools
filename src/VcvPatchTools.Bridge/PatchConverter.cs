@@ -71,6 +71,11 @@ public static class PatchConverter
             modulesArray.Add(m);
         }
 
+        if (targetOrigin == PatchOrigin.Cardinal)
+        {
+            result.Warnings.AddRange(CardinalCompatibility.Warnings(CardinalCompatibility.Find(patch.Root)));
+        }
+
         return result;
     }
 

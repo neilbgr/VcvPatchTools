@@ -12,6 +12,7 @@
     <EmbeddedResource Include="..\..\catalog\ports.json" LogicalName="catalog.ports.json" Condition="Exists('..\..\catalog\ports.json')" />
     <EmbeddedResource Include="..\..\catalog\ports.overrides.json" LogicalName="catalog.ports.overrides.json" />
     <EmbeddedResource Include="..\..\catalog\roles.json" LogicalName="catalog.roles.json" />
+    <EmbeddedResource Include="..\..\catalog\cardinal.json" LogicalName="catalog.cardinal.json" Condition="Exists('..\..\catalog\cardinal.json')" />
   </ItemGroup>
 
 </Project>

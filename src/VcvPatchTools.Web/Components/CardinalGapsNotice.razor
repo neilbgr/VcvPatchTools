@@ -1,0 +1,37 @@
+﻿@* Before converting to Cardinal: the modules official Cardinal would drop, and those only the neilbgr edition bundles. *@
+
+<div class="vpd-notice" role="status">
+    @if (missing.Count > 0)
+    {
+        <p><strong>@Count(missing) not bundled with any Cardinal</strong>: Cardinal drops @(missing.Sum(g => g.Count) > 1 ? "them" : "it") when loading the patch.</p>
+        <p class="modules">@List(missing)</p>
+    }
+    @if (neilbgr.Count > 0)
+    {
+        <p><strong>@Count(neilbgr) only in the <a href="@CardinalModules.NeilbgrEditionUrl" target="_blank" rel="noopener">neilbgr edition of Cardinal</a></strong>:
+            official Cardinal drops @(neilbgr.Sum(g => g.Count) > 1 ? "them" : "it"), open the converted patch in that edition.</p>
+        <p class="modules">@List(neilbgr)</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<CardinalGap> Gaps { get; set; } = default!;
+
+    private List<CardinalGap> missing = new List<CardinalGap>();
+    private List<CardinalGap> neilbgr = new List<CardinalGap>();
+
+    protected override void OnParametersSet()
+    {
+        missing = Gaps.Where(g => g.Availability == CardinalAvailability.Missing).ToList();
+        neilbgr = Gaps.Where(g => g.Availability == CardinalAvailability.NeilbgrEdition).ToList();
+    }
+
+    private static string Count(List<CardinalGap> gaps)
+    {
+        int count = gaps.Sum(g => g.Count);
+        return count > 1 ? $"{count} modules" : "1 module";
+    }
+
+    private static string List(List<CardinalGap> gaps) =>
+        string.Join(", ", gaps.Select(g => g.Count > 1 ? $"{g.Module.Plugin} {g.Module.Model} ×{g.Count}" : $"{g.Module.Plugin} {g.Module.Model}"));
+}

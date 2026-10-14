@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 ## Communication
 Respond to the user in **French** during sessions. This file itself is in English for clarity/consistency.
@@ -11,10 +11,10 @@ C# solution targeting **.NET 10**. All code, comments, console/UI output, commit
   Don't use `System.Formats.Tar` in any library (PlatformNotSupported in the browser): `Patch/TarEntries.cs` reads and writes tar for that reason.
 - `src/VcvPatchTools.Diagram`: analysis, layout, exporters. No file I/O.
 - `src/VcvPatchTools.Bridge`: Rack <-> Cardinal conversion. No file I/O.
-- `src/VcvPatchTools.Cli`: `vcvpatch` console app (info, convert, diagram, catalog build), the only project touching files.
+- `src/VcvPatchTools.Cli`: `vcvpatch` console app (info, convert, diagram, catalog build|cardinal), the only project touching files.
 - `src/VcvPatchTools.Web`: standalone Blazor WebAssembly UI (Diagram, Info, Convert tabs), no server.
 - `tests/VcvPatchTools.Tests`: one xUnit project, with folders per library.
-- `catalog/`: `ports.json` is generated (`make catalog`), `ports.overrides.json` and `roles.json` are hand-written.
+- `catalog/`: `ports.json` (`make catalog`) and `cardinal.json` (`make cardinal-catalog`) are generated, `ports.overrides.json` and `roles.json` are hand-written.
 
 ## Development workflow
 Use unit tests (xUnit, `tests/VcvPatchTools.Tests`) to drive development: write/update a test for new behavior or a bug before or alongside the fix, then run `dotnet test`. Don't consider a change done until the test suite passes.

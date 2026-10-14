@@ -1,4 +1,4 @@
-// Small browser helpers for the Blazor app: saving a generated file, and wiring the shared pan/zoom script.
+﻿// Small browser helpers for the Blazor app: saving a generated file, and wiring the shared pan/zoom script.
 window.vpdDownload = (fileName, mimeType, text) => window.vpdDownloadBlob(fileName, new Blob([text], { type: mimeType }));
 
 // A converted patch: bytes from C# arrive as a Uint8Array.
@@ -14,6 +14,13 @@ window.vpdDownloadBlob = (fileName, blob) => {
 };
 
 window.vpdScrollIntoView = element => element.scrollIntoView({ block: 'start' });
+
+// A native modal <dialog>: Escape closes it by itself; a click on the backdrop (the dialog element itself, around its content) too.
+window.vpdShowModal = dialog => {
+  if (!dialog || dialog.open) return;
+  dialog.onclick = e => { if (e.target === dialog) dialog.close(); };
+  dialog.showModal();
+};
 
 // Blazor side of panzoom.js: Ctrl+wheel zoom goes back to C# (PatchDiagramView.ZoomBy), which owns the zoom level.
 window.vpdPanZoomDotNet = (scroller, view) =>

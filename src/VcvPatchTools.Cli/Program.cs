@@ -28,6 +28,18 @@ static int Run(string[] args)
         return CatalogCommand.Build(src, Option(args, "--out") ?? "catalog/ports.json", Option(args, "--report"));
     }
 
+    if (args.Length >= 2 && args[0] == "catalog" && args[1] == "cardinal")
+    {
+        string? upstream = Option(args, "--upstream");
+        string? fork = Option(args, "--fork");
+        if (upstream is null || fork is null)
+        {
+            PrintUsage();
+            return 1;
+        }
+        return CatalogCommand.Cardinal(upstream, fork, Option(args, "--out") ?? "catalog/cardinal.json");
+    }
+
     // "inspect" and "render" are the names these had in vcvdiagram.
     if (args.Length >= 2 && args[0] is "info" or "inspect")
     {
@@ -126,4 +138,5 @@ static void PrintUsage()
     Console.Error.WriteLine("                   [--scopes[=badge|modules]] [--functions] [--no-ports] [--no-links]");
     Console.Error.WriteLine("    (default: folded overview; group keys are listed by \"info\")");
     Console.Error.WriteLine("  vcvpatch catalog build --src <Cardinal/plugins> [--out catalog/ports.json] [--report catalog/scan-report.txt]");
+    Console.Error.WriteLine("  vcvpatch catalog cardinal --upstream <Cardinal tree> --fork <Cardinal tree> [--out catalog/cardinal.json]");
 }
