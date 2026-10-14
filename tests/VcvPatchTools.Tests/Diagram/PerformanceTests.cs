@@ -6,6 +6,8 @@ using VcvPatchTools.Diagram.Layout;
 namespace VcvPatchTools.Tests;
 
 /// <summary>Guards against quadratic-or-worse slips: a big patch must still lay out in a moment (the app does it on every click).</summary>
+/// <remarks>Alone, not next to the other tests: on a two-core CI runner they took its time.</remarks>
+[Collection(nameof(PerformanceTests))]
 public class PerformanceTests
 {
     [Fact]
@@ -25,3 +27,6 @@ public class PerformanceTests
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(3), $"Analysis and layout took {watch.ElapsedMilliseconds} ms");
     }
 }
+
+[CollectionDefinition(nameof(PerformanceTests), DisableParallelization = true)]
+public class PerformanceTestsCollection;
