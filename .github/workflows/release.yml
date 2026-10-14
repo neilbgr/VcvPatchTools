@@ -25,9 +25,9 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       label: ${{ steps.version.outputs.label }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -50,9 +50,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -76,9 +76,9 @@ jobs:
     env:
       NAME: VcvPatchTools-${{ needs.version.outputs.label }}-${{ matrix.rid }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -100,7 +100,7 @@ jobs:
             tar -czf "$NAME.tar.gz" "$NAME"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.NAME }}
           path: dist/${{ env.NAME }}.*
@@ -111,9 +111,9 @@ jobs:
     env:
       NAME: VcvPatchTools-${{ needs.version.outputs.label }}-web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -125,7 +125,7 @@ jobs:
           cp LICENSE "$NAME/"
           zip -qr "$NAME.zip" "$NAME"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.NAME }}
           path: ${{ env.NAME }}.zip
@@ -136,13 +136,13 @@ jobs:
     env:
       NAME: VcvPatchTools-${{ needs.version.outputs.label }}-src
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The generated catalogs are committed: the archive builds as is, without the Cardinal sources.
       - name: Archive
         run: git archive --format=tar.gz --prefix="VcvPatchTools-${{ needs.version.outputs.label }}/" -o "$NAME.tar.gz" HEAD
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.NAME }}
           path: ${{ env.NAME }}.tar.gz
@@ -154,7 +154,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
@@ -163,7 +163,7 @@ jobs:
         run: cd dist && sha256sum * > SHA256SUMS.txt
 
       # A version with a suffix (1.1.0-rc1) is published as a pre-release.
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: VCV Patch Tools ${{ needs.version.outputs.version }}
