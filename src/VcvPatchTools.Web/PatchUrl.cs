@@ -4,10 +4,11 @@
 /// The <c>?url=</c> link: where to fetch a patch from, and the file name to show for it.
 /// GitHub page links (<c>/blob/</c>, <c>/raw/</c>) are turned into raw.githubusercontent.com,
 /// which serves the file itself and lets other sites fetch it (CORS).
+/// <c>&amp;name=</c> names a patch whose link doesn't end with its file name (e.g. Patchstorage's <c>/download/</c>).
 /// </summary>
 public static class PatchUrl
 {
-    public static bool TryResolve(string text, out Uri? uri, out string? fileName)
+    public static bool TryResolve(string text, out Uri? uri, out string? fileName, string? name = null)
     {
         uri = null;
         fileName = null;
@@ -18,7 +19,7 @@ public static class PatchUrl
         }
         uri = FromGitHubPage(parsed) ?? parsed;
         string last = Uri.UnescapeDataString(uri.AbsolutePath.TrimEnd('/').Split('/')[^1]);
-        fileName = last.Length > 0 ? last : "patch.vcv";
+        fileName = !string.IsNullOrWhiteSpace(name) ? name.Trim() : last.Length > 0 ? last : "patch.vcv";
         return true;
     }
 

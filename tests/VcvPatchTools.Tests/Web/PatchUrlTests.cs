@@ -22,6 +22,20 @@ public class PatchUrlTests
     }
 
     [Theory]
+    [InlineData("Solar42f.vcv", "Solar42f.vcv")]
+    [InlineData("Meditations on Death", "Meditations on Death")]
+    [InlineData("", "download")]
+    [InlineData("   ", "download")]
+    [InlineData(null, "download")]
+    public void AGivenNameReplacesTheOneFromTheUrl(string? name, string expectedName)
+    {
+        Assert.True(PatchUrl.TryResolve("https://patchstorage.com/api/beta/patches/197171/files/197170/download/", out Uri? uri, out string? fileName, name));
+
+        Assert.Equal("https://patchstorage.com/api/beta/patches/197171/files/197170/download/", uri!.AbsoluteUri);
+        Assert.Equal(expectedName, fileName);
+    }
+
+    [Theory]
     [InlineData("")]
     [InlineData("not a url")]
     [InlineData("/samples/AmbientJam.vcv.bin")]

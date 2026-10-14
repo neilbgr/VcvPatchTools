@@ -274,7 +274,7 @@
         {
             fileFilter = null;
         }
-        // ?sample=AmbientJam loads the bundled sample, ?url=https://… a patch published elsewhere,
+        // ?sample=AmbientJam loads the bundled sample, ?url=https://… a patch published elsewhere (&name=… to name it),
         // &tab=info|convert opens that tab.
         Dictionary<string, string> query = new Uri(Navigation.Uri).Query.TrimStart('?')
             .Split('&', StringSplitOptions.RemoveEmptyEntries)
@@ -290,7 +290,7 @@
         }
         else if (query.TryGetValue("url", out string? url))
         {
-            await LoadUrlAsync(url);
+            await LoadUrlAsync(url, query.GetValueOrDefault("name"));
         }
     }
 
@@ -333,9 +333,9 @@
         }
     }
 
-    private async Task LoadUrlAsync(string text)
+    private async Task LoadUrlAsync(string text, string? name)
     {
-        if (!PatchUrl.TryResolve(text, out Uri? uri, out string? fileName))
+        if (!PatchUrl.TryResolve(text, out Uri? uri, out string? fileName, name))
         {
             error = $"{text} can't be opened: the url parameter must be an https:// link to a .vcv file.";
             return;
