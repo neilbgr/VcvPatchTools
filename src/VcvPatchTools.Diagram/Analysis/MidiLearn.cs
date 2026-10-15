@@ -25,8 +25,12 @@ public static class MidiLearn
         [74] = "cutoff",
     };
 
-    /// <summary>"Gate 3" → "Gate 3 · D#2", "Cell 1" → "Cell 1 · CC 74 (cutoff)"; other ports and unlearned cells are unchanged.</summary>
-    public static string Name(PatchModule module, int index, string port)
+    /// <summary>
+    /// "Gate 3" → "Gate 3 · D#2", "Cell 1" → "Cell 1 · CC 74 (cutoff)"; other ports and unlearned cells are unchanged.
+    /// Without <paramref name="meaning"/>, no General MIDI meaning: it's what the controller usually does, not what the
+    /// patch makes of it (a CC 11 "expression" can clock a sequencer).
+    /// </summary>
+    public static string Name(PatchModule module, int index, string port, bool meaning = true)
     {
         if (module.Plugin is not ("Core" or "Cardinal"))
         {
@@ -38,7 +42,7 @@ public static class MidiLearn
         }
         if (port.StartsWith("Cell ", StringComparison.Ordinal) && Learned(module.LearnedCcs, index) is int cc)
         {
-            return $"{port} · CC {cc}{(ccNames.TryGetValue(cc, out string? meaning) ? $" ({meaning})" : "")}";
+            return $"{port} · CC {cc}{(meaning && ccNames.TryGetValue(cc, out string? usual) ? $" ({usual})" : "")}";
         }
         // Rack's Gate to MIDI also calls its gate inputs "Cell n".
         return port.StartsWith("Cell ", StringComparison.Ordinal) && Learned(module.LearnedNotes, index) is int gateNote

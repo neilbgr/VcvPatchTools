@@ -212,6 +212,33 @@ public class AnalyzerTests
         Assert.Equal(expected, MidiLearn.Name(module, index, port));
     }
 
+    [Fact]
+    public void ALearnedControllerIsTypedByWhereItGoesNotByItsUsualMeaning()
+    {
+        // CC 11 is "expression" in General MIDI, CC 12 has no usual meaning: both clock a switch, both are gates.
+        string json = """
+            {
+              "version": "2.6.0",
+              "modules": [
+                { "id": 1, "plugin": "Core", "model": "MIDICCToCVInterface", "pos": [0, 0], "data": { "ccs": [12, 11] } },
+                { "id": 2, "plugin": "Fundamental", "model": "SequentialSwitch2", "pos": [10, 0] },
+                { "id": 3, "plugin": "Fundamental", "model": "SequentialSwitch2", "pos": [20, 0] }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 0, "inputModuleId": 2, "inputId": 0, "color": "#3695ef" },
+                { "id": 2, "outputModuleId": 1, "outputId": 1, "inputModuleId": 3, "inputId": 0, "color": "#3695ef" }
+              ]
+            }
+            """;
+
+        PatchAnalysis patch = PatchDiagram.Analyze(Encoding.UTF8.GetBytes(json));
+
+        Assert.All(patch.Cables, c => Assert.Equal(SignalType.Gate, c.Signal));
+        Assert.Contains(patch.Cables, c => c.FromPort == "Cell 2 · CC 11 (expression)");
+        // Its "Clock" input keeps its panel name, but each edge moves on to the next channel, it doesn't set a tempo.
+        Assert.All(patch.Cables, c => Assert.Equal(("Clock", "steps to the next channel"), (c.ToPort, c.SuggestedIntent)));
+    }
+
     [Theory]
     [InlineData("VCF #1", ModuleFunction.Filter)]
     [InlineData("ADSR #2", ModuleFunction.Envelope)]

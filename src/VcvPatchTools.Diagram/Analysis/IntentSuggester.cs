@@ -15,6 +15,11 @@ public static class IntentSuggester
             case SignalType.Pitch:
                 return port.Contains("pitch") || port.Contains("v/oct") ? "plays the notes" : $"pitch tracks {port}";
             case SignalType.Gate:
+                // A sequential switch's "clock" isn't a tempo: each rising edge moves it on to the next channel.
+                if (toRole == Role.Router && (port.Contains("trig") || port.Contains("clock") || port.Contains("clk")))
+                {
+                    return "steps to the next channel";
+                }
                 if (port.Contains("retrig"))
                 {
                     return "retriggers on each note";
