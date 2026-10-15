@@ -26,8 +26,8 @@ static int Run(string[] args)
 
     if (args.Length >= 2 && args[0] == "catalog" && args[1] == "build")
     {
-        string? src = Option(args, "--src");
-        if (src is null)
+        List<string> src = Options(args, "--src");
+        if (src.Count == 0)
         {
             PrintUsage();
             return 1;
@@ -134,6 +134,10 @@ static string? Option(string[] args, string name)
     return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
 }
 
+/// <summary>Every value of a repeatable option ("--src a --src b").</summary>
+static List<string> Options(string[] args, string name) =>
+    args.Select((arg, i) => (arg, i)).Where(a => a.arg == name && a.i + 1 < args.Length).Select(a => args[a.i + 1]).ToList();
+
 static void PrintUsage()
 {
     Console.Error.WriteLine($"vcvpatch {ProductVersion.Display}");
@@ -145,7 +149,7 @@ static void PrintUsage()
     Console.Error.WriteLine("  vcvpatch diagram <patch.vcv> [-f html|svg|dot|mmd|json] [-o <output file>] [--unfold all|<group,...>]");
     Console.Error.WriteLine("                   [--scopes[=badge|modules]] [--functions] [--no-ports] [--no-links]");
     Console.Error.WriteLine("    (default: folded overview; group keys are listed by \"info\")");
-    Console.Error.WriteLine("  vcvpatch catalog build --src <Cardinal/plugins> [--out catalog/ports.json] [--report catalog/scan-report.txt]");
+    Console.Error.WriteLine("  vcvpatch catalog build --src <Cardinal/plugins> [--src <more plugins>…] [--out catalog/ports.json] [--report catalog/scan-report.txt]");
     Console.Error.WriteLine("  vcvpatch catalog cardinal --upstream <Cardinal tree> --fork <Cardinal tree> [--out catalog/cardinal.json]");
     Console.Error.WriteLine("  vcvpatch --version");
 }

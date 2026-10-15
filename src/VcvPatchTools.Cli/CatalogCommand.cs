@@ -3,27 +3,31 @@
 namespace VcvPatchTools.Cli;
 
 /// <summary>
-/// "catalog build": scans every plugin under a Cardinal "plugins" folder and writes catalog/ports.json.
-/// Rack's own Core plugin (MIDI, audio interfaces) lives next to it, in src/Rack: its manifest is Core.json.
+/// "catalog build": scans every plugin under one or more plugin folders (Cardinal's "plugins", plugins fetched apart)
+/// and writes catalog/ports.json. Rack's own Core plugin (MIDI, audio interfaces) lives next to Cardinal's, in src/Rack:
+/// its manifest is Core.json.
 /// </summary>
 internal static class CatalogCommand
 {
-    public static int Build(string pluginsDir, string outputPath, string? reportPath)
+    public static int Build(IReadOnlyList<string> pluginsDirs, string outputPath, string? reportPath)
     {
-        if (!Directory.Exists(pluginsDir))
+        if (pluginsDirs.FirstOrDefault(d => !Directory.Exists(d)) is string missing)
         {
-            Console.Error.WriteLine($"Plugins folder not found: {pluginsDir}");
+            Console.Error.WriteLine($"Plugins folder not found: {missing}");
             return 1;
         }
 
         Dictionary<string, ModuleInfo> all = new Dictionary<string, ModuleInfo>(StringComparer.Ordinal);
         List<string> problems = new List<string>();
 
-        string rackDir = Path.Combine(pluginsDir, "..", "src", "Rack");
-        IEnumerable<(string Manifest, string Sources)> plugins = Directory.GetDirectories(pluginsDir)
-            .OrderBy(d => d, StringComparer.Ordinal)
-            .Select(d => (Path.Combine(d, "plugin.json"), Path.Combine(d, "src")))
-            .Prepend((Path.Combine(rackDir, "Core.json"), Path.Combine(rackDir, "src", "core")));
+        IEnumerable<(string Manifest, string Sources)> plugins = pluginsDirs.SelectMany(pluginsDir =>
+        {
+            string rackDir = Path.Combine(pluginsDir, "..", "src", "Rack");
+            return Directory.GetDirectories(pluginsDir)
+                .OrderBy(d => d, StringComparer.Ordinal)
+                .Select(d => (Path.Combine(d, "plugin.json"), Path.Combine(d, "src")))
+                .Prepend((Path.Combine(rackDir, "Core.json"), Path.Combine(rackDir, "src", "core")));
+        });
         foreach ((string manifestPath, string sourceDir) in plugins)
         {
             string pluginDir = Path.GetDirectoryName(manifestPath)!;

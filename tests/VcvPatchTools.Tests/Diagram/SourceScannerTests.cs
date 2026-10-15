@@ -29,6 +29,21 @@ public class SourceScannerTests
         Assert.Equal(3, entries.Count);
     }
 
+    [Theory]
+    // The count closing the enum isn't a port, whatever its name.
+    [InlineData("A, B, INPUTS_LEN", new[] { "A", "B" })]
+    [InlineData("COUNT_OUTPUT, OUTPUTS_LEN", new[] { "COUNT_OUTPUT" })]
+    [InlineData("A, INPUT_COUNT", new[] { "A" })]
+    [InlineData("A, nINPUTS", new[] { "A" })]
+    // A range is sized by the next entry, or by the end marker.
+    [InlineData("OSC_INPUT, CV_INPUT = OSC_INPUT + 3, NUM_INPUTS = CV_INPUT + 2", new[] { "OSC_INPUT", "OSC_INPUT+1", "OSC_INPUT+2", "CV_INPUT", "CV_INPUT+1" })]
+    // An inclusive "last index" marker, then the count.
+    [InlineData("OUTPUTS_START, OUTPUTS_END = OUTPUTS_START + 3 - 1, NUM_OUTPUTS = 3", new[] { "OUTPUTS_START", "OUTPUTS_START+1", "OUTPUTS_START+2" })]
+    public void EnumBodyEndsAtItsCountAndSizesRanges(string body, string[] ids)
+    {
+        Assert.Equal(ids, SourceScanner.ParseEnumBody(body).Select(e => e.Id));
+    }
+
     [Fact]
     public void StripCommentsKeepsUrlsInStrings()
     {
@@ -164,6 +179,42 @@ public class SourceScannerTests
         Assert.Equal(new[] { "Pitch (v/oct)", "Osc ctrl param 1", "Osc ctrl param 7" }, new[] { classic.Modulation.Targets[0], classic.Modulation.Targets[1], classic.Modulation.Targets[7] });
         Assert.Equal(new[] { "Left", "Right" }, result.Modules["SurgeXTRack/SurgeXTFXReverb"].Inputs);
         Assert.Empty(result.Problems);
+    }
+
+    [Fact]
+    public void ResolvesCompositeEnumsFromAnIncludedHeaderAndQualifiedIds()
+    {
+        // SquinkyLabs' architecture: the module only knows "Comp", the enums are in a composite header outside src/.
+        string manifest = """{ "slug": "squinkylabs-plug1", "modules": [ { "slug": "squinkylabs-mixm" } ] }""";
+        string module = """
+            #include "MixM.h"
+            using Comp = MixM<WidgetComposite>;
+            struct MixMModule : MixerModule
+            {
+                MixMModule();
+            };
+            MixMModule::MixMModule()
+            {
+                config(Comp::NUM_PARAMS, Comp::NUM_INPUTS, Comp::NUM_OUTPUTS, Comp::NUM_LIGHTS);
+                configInput(Comp::AUDIO0_INPUT, "Channel 1");
+            }
+            Model *modelMixMModule = createModel<MixMModule, MixMWidget>("squinkylabs-mixm");
+            """;
+        string composite = """
+            template <class TBase>
+            class MixM : public TBase
+            {
+            public:
+                enum InputIds { AUDIO0_INPUT, AUDIO1_INPUT, NUM_INPUTS };
+                enum OutputIds { LEFT_OUTPUT, NUM_OUTPUTS };
+            };
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("src/MixMModule.cpp", module) }, new[] { new SourceFile("composites/MixM.h", composite) });
+
+        ModuleInfo mixer = result.Modules["squinkylabs-plug1/squinkylabs-mixm"];
+        Assert.Equal(new[] { "Channel 1", "Audio1" }, mixer.Inputs);
+        Assert.Equal(new[] { "Left" }, mixer.Outputs);
     }
 
     [Fact]

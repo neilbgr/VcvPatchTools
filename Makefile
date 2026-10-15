@@ -18,9 +18,12 @@ test:
 format:
 	dotnet format
 
-# Regenerates catalog/ports.json from the Cardinal plugin sources (rebuild afterwards: it is embedded in Core).
+# Regenerates catalog/ports.json from the Cardinal plugin sources, plus the open-source plugins Cardinal doesn't bundle
+# (catalog/extra-sources.txt, fetched into out/extra-plugins at their pinned commits). Rebuild afterwards: it is
+# embedded in Core.
 catalog:
-	dotnet run --project $(CLI) -- catalog build --src $(PLUGINS) --out catalog/ports.json --report catalog/scan-report.txt
+	scripts/fetch-extra-sources.sh
+	dotnet run --project $(CLI) -- catalog build --src $(PLUGINS) --src out/extra-plugins --out catalog/ports.json --report catalog/scan-report.txt
 	dotnet build
 
 # Regenerates catalog/cardinal.json: modules official Cardinal (DISTRHO upstream/main) loads, and those only the

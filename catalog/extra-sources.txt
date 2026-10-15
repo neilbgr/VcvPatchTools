@@ -1,0 +1,12 @@
+# Open-source plugins not bundled with Cardinal whose port names the catalog also reads.
+# slug  repository  commit (pinned: bump on purpose, then `make catalog`)
+dbRackModules       https://github.com/docb/dbRackModules                     5e20b4e3c9cfed4d30537f6d9e7859198e617d14
+VostokInstruments   https://github.com/Vostok-Instruments/Vostok_VCVRack      2a838dc14ef93b7fa37e9c9771057a6aab32da22
+squinkylabs-plug1   https://github.com/kockie69/SquinkyVCV-main               3701a8c8931e5e8073e00cd5632db3966befe54f
+Geodesics           https://github.com/MarcBoule/Geodesics                    cf04f560fde22b8f0060913aec914bd40ff01be5
+trowaSoft           https://github.com/j4s0n-c/trowaSoft-VCV                  1aa238ed33490baf72fe7d9d02c09542a6292434
+StudioSixPlusOne    https://github.com/StudioSixPlusOne/rack-modules          81178c61dc68c0821d9ca68c73d7af289202a2c4
+SubmarineFree       https://github.com/david-c14/SubmarineFree                4846b82e7d4c51b4ea9c2e960f62f2bd49450330
+shapetaker          https://github.com/joshpanzarella/shapetaker-vcv          b42dff6d0f26c0bb06da025045ad3f10e945eec6
+Bastl               https://github.com/hemmer/bastl-vcv                       b3e94b2965ea2a5d51eccef30ba6bb9b467504e6
+Ahornberg           https://github.com/Ahornberg/Ahornberg-VCV-Modules        3a9441f594d6a7cc8b6f11c19ff81d95ff8977ad

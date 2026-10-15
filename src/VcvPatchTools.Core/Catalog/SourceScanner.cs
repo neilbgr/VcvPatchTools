@@ -30,7 +30,7 @@ public static partial class SourceScanner
     [GeneratedRegex(@"\benum\s+(\w+)\s*(?::\s*\w+\s*)?\{")]
     private static partial Regex EnumRegex();
 
-    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(\w+)\s*(?:\+\s*(\d+)\s*)?,\s*""((?:[^""\\]|\\.)*)""")]
+    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*(?:\+\s*(\d+)\s*)?,\s*""((?:[^""\\]|\\.)*)""")]
     private static partial Regex ConfigCallRegex();
 
     [GeneratedRegex(@"ModulationAssistant\s*<\s*[\w:]+(?:\s*<[^<>]*>)?\s*,\s*([^,<>]+?)\s*,\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*>")]
@@ -51,7 +51,7 @@ public static partial class SourceScanner
     [GeneratedRegex(@"^\s*#\s*define\s+(\w+)\s+(\d+)\s*$", RegexOptions.Multiline)]
     private static partial Regex DefineRegex();
 
-    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(\w+)\s*\+\s*(\w+)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*;")]
+    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*\+\s*(\w+)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*;")]
     private static partial Regex LoopConfigRegex();
 
     [GeneratedRegex(@"\b(\w+)\s*\[[^\]]*\]\s*=\s*\{([^}]*)\}")]
@@ -82,7 +82,8 @@ public static partial class SourceScanner
         string pluginSlug = manifest.RootElement.GetProperty("slug").GetString() ?? "";
 
         List<SourceFile> cleaned = sources.Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
-        Dictionary<string, int> constants = CollectConstants(cleaned.Concat((includedHeaders ?? Array.Empty<SourceFile>()).Select(s => new SourceFile(s.Path, StripComments(s.Text)))).ToList());
+        List<SourceFile> headers = (includedHeaders ?? Array.Empty<SourceFile>()).Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
+        Dictionary<string, int> constants = CollectConstants(cleaned.Concat(headers).ToList());
 
         Dictionary<string, (string Type, string? TemplateArgs)> structBySlug = new Dictionary<string, (string Type, string? TemplateArgs)>(StringComparer.Ordinal);
         foreach (SourceFile file in cleaned)
@@ -117,7 +118,7 @@ public static partial class SourceScanner
             {
                 problems.Add($"{pluginSlug}/{slug}: no createModel<...>(\"{slug}\") registration found");
             }
-            else if (!TryResolvePorts(registration.Type, cleaned, WithTemplateArgs(registration, cleaned, constants), inputs, outputs, out modulation))
+            else if (!TryResolvePorts(registration.Type, cleaned, headers, WithTemplateArgs(registration, cleaned, constants), inputs, outputs, out modulation))
             {
                 problems.Add($"{pluginSlug}/{slug}: struct '{registration.Type}' has no resolvable InputIds/OutputIds enum");
             }
@@ -128,7 +129,7 @@ public static partial class SourceScanner
         return new ScanResult(result, problems);
     }
 
-    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, Dictionary<string, int> constants, List<string> inputs, List<string> outputs, out ModMatrix? modulation)
+    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, List<SourceFile> headers, Dictionary<string, int> constants, List<string> inputs, List<string> outputs, out ModMatrix? modulation)
     {
         modulation = null;
         StructSource? found = FindStruct(LastSegment(typeName), sources, depth: 0)
@@ -137,6 +138,7 @@ public static partial class SourceScanner
         {
             return false;
         }
+        found = WithCompositeEnums(found, sources, headers);
 
         List<(string Id, int Index, string Fallback)>? inputEnum = ParseNamedEnum(found.EnumScopes, inputEnumNames, constants);
         List<(string Id, int Index, string Fallback)>? outputEnum = ParseNamedEnum(found.EnumScopes, outputEnumNames, constants);
@@ -168,7 +170,8 @@ public static partial class SourceScanner
         modulation = FindModMatrix(found, inputEnum, constants);
         if (modulation is not null)
         {
-            // The enum only names the first modulation input ("X_MOD_INPUT, NUM_INPUTS = X_MOD_INPUT + n").
+            // Surge XT's usual name for its modulation inputs, unless the source names them ("Mod 0" on QuadAD).
+            HashSet<int> named = inputEnum!.Where(e => inputNames.ContainsKey(e.Id)).Select(e => e.Index).ToHashSet();
             for (int i = 0; i < modulation.InputCount; i++)
             {
                 int index = modulation.FirstInput + i;
@@ -176,7 +179,10 @@ public static partial class SourceScanner
                 {
                     inputs.Add("");
                 }
-                inputs[index] = $"Modulation Signal {i + 1}";
+                if (!named.Contains(index))
+                {
+                    inputs[index] = $"Modulation Signal {i + 1}";
+                }
             }
         }
         return true;
@@ -342,12 +348,7 @@ public static partial class SourceScanner
         for (int i = 0; i < count; i++)
         {
             (string Id, int Index, string Fallback) entry = paramEnum.FirstOrDefault(e => e.Index == firstTarget + i);
-            // "OSC_CTRL_PARAM_0, OSC_MOD_PARAM_0 = OSC_CTRL_PARAM_0 + n": a block named at run time → "Osc ctrl param 1…n".
-            (string Id, int Index, string Fallback) block = paramEnum.LastOrDefault(e => e.Index <= firstTarget + i);
-            string? numbered = block.Id is not null && block.Id.EndsWith("_0", StringComparison.Ordinal) && !paramNames.ContainsKey(block.Id)
-                ? $"{Humanize(block.Id[..^2])} {firstTarget + i - block.Index + 1}"
-                : null;
-            targets.Add(numbered ?? (entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback));
+            targets.Add(entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback);
         }
         return new ModMatrix(firstInput.Value, inputCount.Value, firstDepth.Value, targets);
     }
@@ -376,18 +377,42 @@ public static partial class SourceScanner
         {
             byIndex[index] = names.GetValueOrDefault(id) ?? fallback;
         }
-        // Loop-named slots between two enum entries ("MOD_INPUT_0+3").
-        foreach ((string id, int index, string _) in entries)
-        {
-            for (int k = 1; index + k < byIndex.Length && byIndex[index + k] is null && names.TryGetValue($"{id}+{k}", out string? name); k++)
-            {
-                byIndex[index + k] = name;
-            }
-        }
         ports.AddRange(byIndex.Select(s => s ?? ""));
     }
 
-    private sealed record StructSource(List<string> EnumScopes, List<string> ConfigScopes);
+    /// <param name="FileText">The file the struct is defined in (for its file-scope aliases).</param>
+    private sealed record StructSource(List<string> EnumScopes, List<string> ConfigScopes, string FileText = "");
+
+    /// <summary>
+    /// SquinkyLabs' "composite" architecture (also StudioSixPlusOne): "using Comp = MixM&lt;WidgetComposite&gt;;" next to
+    /// the module, which uses Comp::NUM_INPUTS and configInput(Comp::AUDIO_INPUT, …); the enums are in the composite
+    /// class, often in a header outside src/.
+    /// </summary>
+    private static StructSource WithCompositeEnums(StructSource found, List<SourceFile> sources, List<SourceFile> headers)
+    {
+        // The struct and its constructors (often defined out of line).
+        string body = string.Join("\n", found.ConfigScopes);
+        IEnumerable<(string Alias, string Target)> aliases = Regex.Matches(found.FileText, @"\busing\s+(\w+)\s*=\s*(?:typename\s+)?([\w:]+)\s*(?:<[^;]*>)?\s*;")
+            .Select(m => (m.Groups[1].Value, m.Groups[2].Value))
+            .Concat(Regex.Matches(found.FileText, @"\btypedef\s+([\w:]+)\s*(?:<[^;]*>)?\s+(\w+)\s*;").Select(m => (m.Groups[2].Value, m.Groups[1].Value)));
+        foreach ((string alias, string target) in aliases)
+        {
+            if (!Regex.IsMatch(body, @"\b" + Regex.Escape(alias) + @"::NUM_(INPUTS|OUTPUTS)\b"))
+            {
+                continue;
+            }
+            StructSource? composite = FindStruct(LastSegment(target), sources, depth: 0) ?? FindStruct(LastSegment(target), headers, depth: 0);
+            if (composite is not null)
+            {
+                return found with
+                {
+                    EnumScopes = composite.EnumScopes.Concat(found.EnumScopes).ToList(),
+                    ConfigScopes = found.ConfigScopes.Concat(composite.ConfigScopes).ToList(),
+                };
+            }
+        }
+        return found;
+    }
 
     /// <summary>Finds the struct body (plus base structs and out-of-line constructors) for enum and config lookups.</summary>
     private static StructSource? FindStruct(string structName, List<SourceFile> sources, int depth)
@@ -426,7 +451,7 @@ public static partial class SourceScanner
 
                 // Old-style plugins sometimes declare the enums at file scope next to the struct.
                 enumScopes.Add(file.Text);
-                return new StructSource(enumScopes, configScopes);
+                return new StructSource(enumScopes, configScopes, file.Text);
             }
         }
         return null;
@@ -475,6 +500,7 @@ public static partial class SourceScanner
         List<(string Id, int Index, string Fallback)> entries = new List<(string Id, int Index, string Fallback)>();
         Dictionary<string, int> known = new Dictionary<string, int>(StringComparer.Ordinal);
         int next = 0;
+        bool ended = false;
 
         foreach (string rawEntry in SplitTopLevel(body))
         {
@@ -485,6 +511,10 @@ public static partial class SourceScanner
             }
 
             Match enums = EnumsMacroRegex().Match(entry);
+            if (enums.Success && ended)
+            {
+                break;
+            }
             if (enums.Success)
             {
                 string id = enums.Groups[1].Value;
@@ -499,7 +529,7 @@ public static partial class SourceScanner
                 known[id] = next;
                 for (int i = 0; i < count; i++)
                 {
-                    entries.Add((i == 0 ? id : $"{id}+{i}", next + i, $"{Humanize(id)} {i + 1}"));
+                    entries.Add((i == 0 ? id : $"{id}+{i}", next + i, RangeName(id, i)));
                 }
                 next += count;
                 continue;
@@ -507,6 +537,10 @@ public static partial class SourceScanner
 
             string name = entry;
             int equals = entry.IndexOf('=');
+            if (ended && !IsEnumEnd(equals >= 0 ? entry[..equals].Trim() : entry))
+            {
+                break;
+            }
             if (equals >= 0)
             {
                 name = entry[..equals].Trim();
@@ -516,12 +550,29 @@ public static partial class SourceScanner
                     // Can't follow the numbering past an unknown expression: stop here, overrides fill the rest.
                     break;
                 }
+                // "OSC_INPUT, CV_INPUT = OSC_INPUT + 4": the slots skipped belong to the entry before (a range).
+                int gap = value.Value - next;
+                if (gap > 0 && gap <= 256 && entries.Count > 0 && entries[^1].Index == next - 1)
+                {
+                    string rangeId = entries[^1].Id.Split('+')[0];
+                    int start = entries.First(e => e.Id == rangeId).Index;
+                    if (entries[^1].Id == rangeId)
+                    {
+                        entries[^1] = (rangeId, start, RangeName(rangeId, 0));
+                    }
+                    for (int index = next; index < value.Value; index++)
+                    {
+                        entries.Add(($"{rangeId}+{index - start}", index, RangeName(rangeId, index - start)));
+                    }
+                }
                 next = value.Value;
             }
 
-            if (name.StartsWith("NUM_", StringComparison.Ordinal))
+            // "OUTPUTS_END = OUTPUTS_START + N - 1, NUM_OUTPUTS = N": the last of the end markers sizes the range.
+            if (IsEnumEnd(name))
             {
-                break;
+                ended = true;
+                continue;
             }
 
             known[name] = next;
@@ -656,12 +707,7 @@ public static partial class SourceScanner
                 argument = local.Groups[1].Value.Trim();
             }
 
-            // "MOD_INPUT_0, NEXT = MOD_INPUT_0 + n": the slots up to the next entry are the loop's too.
             List<string> ids = entries.Where(e => e.Id == baseId || e.Id.StartsWith(baseId + "+", StringComparison.Ordinal)).Select(e => e.Id).ToList();
-            if (ids.Count == 1 && entries.FindIndex(e => e.Id == baseId) is int at and >= 0 && at + 1 < entries.Count)
-            {
-                ids.AddRange(Enumerable.Range(1, entries[at + 1].Index - entries[at].Index - 1).Select(k => $"{baseId}+{k}"));
-            }
 
             foreach (string id in ids)
             {
@@ -683,7 +729,7 @@ public static partial class SourceScanner
             return indexed.Success && arrays.TryGetValue(indexed.Groups[1].Value, out List<string>? values) && i < values.Count ? values[i] : null;
         }
 
-        Match concatenated = Regex.Match(argument, @"^(?:std::)?string\s*\(\s*""((?:[^""\\]|\\.)*)""\s*\)\s*\+\s*(?:std::)?to_string\s*\(\s*" + Regex.Escape(loopVar) + @"\s*(\+\s*1\s*)?\)$");
+        Match concatenated = Regex.Match(argument, @"^(?:(?:std::)?string\s*\(\s*)?""((?:[^""\\]|\\.)*)""\s*\)?\s*\+\s*(?:std::)?to_string\s*\(\s*" + Regex.Escape(loopVar) + @"\s*(\+\s*1\s*)?\)$");
         if (concatenated.Success)
         {
             return Regex.Unescape(concatenated.Groups[1].Value) + (concatenated.Groups[2].Success ? i + 1 : i).ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -709,6 +755,14 @@ public static partial class SourceScanner
     }
 
     /// <summary>"PITCH_INPUT" → "Pitch", "CLK_OUTPUTS" → "Clk".</summary>
+    /// <summary>"CV_INPUTS", 2 → "Cv 3"; "OSC_CTRL_PARAM_0", 6 → "Osc ctrl param 7".</summary>
+    private static string RangeName(string rangeId, int offset) =>
+        $"{Humanize(Regex.Replace(rangeId, "_0$", ""))} {offset + 1}";
+
+    /// <summary>The count closing an enum, not a port: NUM_INPUTS, INPUTS_LEN, OUTPUT_COUNT, OUTPUTS_END, nINPUTS…</summary>
+    private static bool IsEnumEnd(string name) =>
+        Regex.IsMatch(name, @"^(NUM_\w+|\w*?(INPUTS?|OUTPUTS?|PARAMS?|LIGHTS?)_(LEN|COUNT|END|NUM)|n(INPUTS|OUTPUTS|PARAMS|LIGHTS))$");
+
     public static string Humanize(string identifier)
     {
         string trimmed = Regex.Replace(identifier, @"_(INPUTS?|OUTPUTS?)$", "");
