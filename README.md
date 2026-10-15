@@ -405,10 +405,11 @@ Graphviz: `dot -Tsvg patch.dot > patch.svg`. Mermaid: paste the `.mmd` into any 
 
 `make catalog PLUGINS=<path to Cardinal/plugins>` scans the C++ sources of every plugin bundled with Cardinal, plus Rack's own Core plugin (`src/Rack/Core.json` and `src/Rack/src/core` next to it), plus the plugins of `extra-sources.txt` (popular open-source plugins Cardinal doesn't bundle: dbRackModules, Vostok, SquinkyLabs, Geodesics…), fetched by `scripts/fetch-extra-sources.sh` into `out/extra-plugins` at their pinned commits:
 
-- `createModel<…>("slug")` and plugin helpers named alike (`createSapphireModel<…>`), including through a widget's alias (`createModel<VCOWidget<ot_classic>::M, …>`), a `using`/`typedef` alias (also for base classes) and macros (`FXMODEL(fxt_reverb, Reverb)`);
+- `createModel<…>("slug")` (or a string constant, `createModel<…>(SLUG)`) and plugin helpers named alike (`createSapphireModel<…>`), including through a widget's alias (`createModel<VCOWidget<ot_classic>::M, …>`), a `using`/`typedef` alias (also for base classes) and macros (`FXMODEL(fxt_reverb, Reverb)`);
 - headers written against the including file's macros (mscHack's mixers: `#define Mixer_ Mixer_4_0_4`, `#define nCHANNELS 8`, then `#include "Mixer_x_x_x.hpp"`), with their `#if` resolved; a file's own constants win over the plugin's, template arguments over both;
 - `enum InputIds/OutputIds`, including `ENUMS(X, n)` with constant expressions and template arguments, ranges sized by the next entry (`CV_INPUT = OSC_INPUT + 4`) and every way of closing the enum (`NUM_INPUTS`, `INPUTS_LEN`, `OUTPUTS_END`…, never taken for a port); constants also come from the headers the sources include from elsewhere in the plugin (a bundled engine);
-- `configInput` / `configOutput` names, including names built in loops and qualified ids (`Plateau::LEFT_INPUT`);
+- enums of any name, found through the counts given to `config(…)` (`venomConfig(PARAMS_LEN, INPUTS_LEN, …)`), or plain counts (`config(0, 8, 1, 0)`: unnamed ports, `#1`… as Rack shows them); DHE-style modules (every one a `Module` in its own folder, `struct InputId { enum { … } }` in a header next to it, ranges written with macros);
+- `configInput` / `configOutput` names, including qualified ids (`Plateau::LEFT_INPUT`) and names built in loops (`"Gate #" + std::to_string(i + 1)`, `step_name + "curvature CV"`, `"Reset " + std::string(colors[i])`, `i += 2` steps); an empty name shows as `#n`, as in Rack;
 - SquinkyLabs-style composites (`using Comp = MixM<WidgetComposite>;`, enums in a header outside `src/`);
 - for Surge XT, `ModulationAssistant<…>` (which knob each modulation input can move).
 

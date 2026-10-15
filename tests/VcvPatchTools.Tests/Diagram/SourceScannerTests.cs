@@ -302,6 +302,141 @@ public class SourceScannerTests
     }
 
     [Fact]
+    public void FindsEnumsThroughConfigCountsSlugConstantsAndRackDefaultNames()
+    {
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "ACLFold" }, { "slug": "8CV" }, { "slug": "Thru" }, { "slug": "Blank" }, { "slug": "atoms" } ] }""";
+        string source = """
+            constexpr auto SlugLFold {"ACLFold"};
+            struct LFold : Module
+            {
+                enum LFoldInputIds { SIGNAL_INPUT, CLOCK_INPUT, NUM_INPUTS };
+                enum LFoldOutputIds { OUT_OUTPUT, NUM_OUTPUTS };
+                LFold() { config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS); configInput(SIGNAL_INPUT, "Signal"); }
+            };
+            Model *modelLFold = createModel<LFold, LFoldWidget>(SlugLFold);
+            struct Module8CV : Module { Module8CV() { config( 0, 8, 1, 0 ); } };
+            Model *model8CV = createModel<Module8CV, Widget8CV>("8CV");
+            struct Thru : VenomModule
+            {
+                enum ExpInputId { ENUMS(POLY_INPUT, 2), EXP_INPUTS_LEN };
+                enum ExpOutputId { ENUMS(POLY_OUTPUT, 2), EXP_OUTPUTS_LEN };
+                Thru() { venomConfig(EXP_PARAMS_LEN, EXP_INPUTS_LEN, EXP_OUTPUTS_LEN, EXP_LIGHTS_LEN); configOutput(POLY_OUTPUT + 1, ""); }
+            };
+            Model *modelThru = createModel<Thru, ThruWidget>("Thru");
+            Model *modelBlank = createModel<Module, BlankWidget>("Blank");
+            """;
+        string atoms = """
+            #define SLUG "atoms"
+            struct Atoms : Module { enum InputIds { ATOM_INPUT, NUM_INPUTS }; enum OutputIds { NUM_OUTPUTS }; };
+            Model *modelAtoms = createModel<Atoms, AtomsWidget>(SLUG);
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("all.cpp", source), new SourceFile("atoms.cpp", atoms) });
+
+        Assert.Equal(new[] { "Signal", "Clock" }, result.Modules["P/ACLFold"].Inputs);
+        Assert.Equal(new[] { "#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8" }, result.Modules["P/8CV"].Inputs);
+        Assert.Equal(new[] { "#1" }, result.Modules["P/8CV"].Outputs);
+        // An empty configured name shows as "#n", as in Rack.
+        Assert.Equal(new[] { "Poly 1", "#2" }, result.Modules["P/Thru"].Outputs);
+        Assert.Equal(new[] { "Atom" }, result.Modules["P/atoms"].Inputs);
+        Assert.Empty(result.Modules["P/Blank"].Inputs);
+        Assert.Empty(result.Problems);
+    }
+
+    [Fact]
+    public void NamesLoopPortsFromStringConcatenations()
+    {
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "Loops" } ] }""";
+        string source = """
+            struct Loops : Module
+            {
+                enum InputIds { ENUMS(OR_INPUT, 3), ENUMS(RESET_INPUT, 2), ENUMS(ANG_INPUT, 3), NUM_INPUTS };
+                enum OutputIds { ENUMS(TRACK_OUTPUTS, 4), NUM_OUTPUTS };
+                Loops()
+                {
+                    const char* colors[2] = { "Orange", "Yellow" };
+                    for (int i = 0; i < 3; i++) { configInput(OR_INPUT + i, "OR " + std::to_string((2-i)+1)); }
+                    for (int i = 0; i < 2; i++) { configInput(RESET_INPUT + i, "Reset " + std::string(colors[i])); }
+                    configInput(ANG_INPUT, "Ball");
+                    for (int i = 0; i < 2; i++) { configInput(ANG_INPUT + i+1, "Angle " + std::to_string(i+1)); }
+                    for (unsigned int i = 0; i < 4; i += 2)
+                    {
+                        configOutput(TRACK_OUTPUTS + i, "Track " + std::to_string((i / 2) + 1) + ": left");
+                        configOutput(TRACK_OUTPUTS + i + 1, "Track " + std::to_string((i / 2) + 1) + ": right");
+                    }
+                }
+            };
+            Model *modelLoops = createModel<Loops, LoopsWidget>("Loops");
+            """;
+
+        ModuleInfo loops = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("loops.cpp", source) }).Modules["P/Loops"];
+
+        Assert.Equal(new[] { "OR 3", "OR 2", "OR 1", "Reset Orange", "Reset Yellow", "Ball", "Angle 1", "Angle 2" }, loops.Inputs);
+        Assert.Equal(new[] { "Track 1: left", "Track 1: right", "Track 2: left", "Track 2: right" }, loops.Outputs);
+    }
+
+    [Fact]
+    public void ResolvesDheStyleModulesFolderByFolder()
+    {
+        // Every DHE module is "Module" in its own folder; enums nested in structs, sized by macros, in a header next to it.
+        string manifest = """{ "slug": "DHE-Modules", "modules": [ { "slug": "Scannibal4" }, { "slug": "Blossom" } ] }""";
+        string scannibalIds = """
+            #define PER_STEP(name, n) name, name##_LAST = (name) + (n)-1
+            #define ONE_PER_STEP(name, n) PER_STEP(name, n)
+            namespace dhe { namespace scannibal {
+            template <int N> struct InputIds { enum { InA, Phase, ONE_PER_STEP(StepCurvatureCv, N), Count }; };
+            struct OutputId { enum { Out, Count }; };
+            } }
+            """;
+        string scannibalModule = """
+            #include "control-ids.h"
+            namespace dhe { namespace scannibal {
+            template <int N> struct Module : rack::engine::Module
+            {
+                using InputId = InputIds<N>;
+                Module()
+                {
+                    config(ParamId::Count, InputId::Count, OutputId::Count);
+                    configInput(InputId::InA, "A");
+                    for (auto step = 0; step < N; step++)
+                    {
+                        auto const step_name = "Step " + std::to_string(step + 1) + " ";
+                        configInput(InputId::StepCurvatureCv + step, step_name + "curvature CV");
+                    }
+                }
+            };
+            } }
+            """;
+        string scannibalInit = """
+            #include "module.h"
+            void init(rack::plugin::Plugin *plugin) { plugin->addModel(rack::createModel<Module<4>, Panel<Scannibal4>>("Scannibal4")); }
+            """;
+        string blossomIds = "namespace dhe { namespace blossom { struct InputId { enum { SpinSpeedCv, Count }; }; struct OutputId { enum { X, Count }; }; } }";
+        string blossomModule = """
+            #include "control-ids.h"
+            namespace dhe { namespace blossom { struct Module : rack::engine::Module { Module() { configOutput(OutputId::X, "X"); } }; } }
+            """;
+        string blossomInit = """
+            #include "module.h"
+            void init(rack::plugin::Plugin *plugin) { plugin->addModel(rack::createModel<Module, Panel>("Blossom")); }
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[]
+        {
+            new SourceFile("modules/blossom/control-ids.h", blossomIds),
+            new SourceFile("modules/blossom/module.h", blossomModule),
+            new SourceFile("modules/blossom/init.cpp", blossomInit),
+            new SourceFile("modules/scannibal/control-ids.h", scannibalIds),
+            new SourceFile("modules/scannibal/module.h", scannibalModule),
+            new SourceFile("modules/scannibal/init.cpp", scannibalInit),
+        });
+
+        Assert.Equal(new[] { "A", "Phase", "Step 1 curvature CV", "Step 2 curvature CV", "Step 3 curvature CV", "Step 4 curvature CV" }, result.Modules["DHE-Modules/Scannibal4"].Inputs);
+        Assert.Equal(new[] { "Spin speed cv" }, result.Modules["DHE-Modules/Blossom"].Inputs);
+        Assert.Equal(new[] { "X" }, result.Modules["DHE-Modules/Blossom"].Outputs);
+    }
+
+    [Fact]
     public void ResolvesConstantSizesTemplateArgsAndLoopNames()
     {
         string manifest = """{ "slug": "P", "modules": [ { "slug": "Mix" }, { "slug": "Drone" } ] }""";
