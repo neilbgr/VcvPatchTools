@@ -23,8 +23,9 @@ public static partial class SourceScanner
     private static readonly string[] paramEnumNames = { "ParamIds", "ParamsIds", "ParamId", "Params" };
     private static readonly string[] outputEnumNames = { "OutputIds", "OutputsIds", "OutputId", "Outputs" };
 
-    // createModel<Type<Args>, …> or createModel<Widget<Args>::M, …> (Surge XT: a typedef inside a templated widget).
-    [GeneratedRegex(@"createModel\s*<\s*([\w:]+)\s*(?:<([^<>]*)>)?\s*(?:::\s*(\w+)\s*)?,\s*[\w:]+\s*(?:<[^<>]*>)?\s*>\s*\(\s*""([^""]+)""")]
+    // createModel<Type<Args>, …> or createModel<Widget<Args>::M, …> (Surge XT: a typedef inside a templated widget);
+    // plugin helpers named alike too (Sapphire's createSapphireModel<Module, Widget>("slug", role)).
+    [GeneratedRegex(@"create\w*Model\s*<\s*([\w:]+)\s*(?:<([^<>]*)>)?\s*(?:::\s*(\w+)\s*)?,\s*[\w:]+\s*(?:<[^<>]*>)?\s*>\s*\(\s*""([^""]+)""")]
     private static partial Regex CreateModelRegex();
 
     [GeneratedRegex(@"\benum\s+(\w+)\s*(?::\s*\w+\s*)?\{")]
@@ -82,6 +83,7 @@ public static partial class SourceScanner
         string pluginSlug = manifest.RootElement.GetProperty("slug").GetString() ?? "";
 
         List<SourceFile> cleaned = sources.Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
+        cleaned.AddRange(MacroInstantiations(cleaned));
         List<SourceFile> headers = (includedHeaders ?? Array.Empty<SourceFile>()).Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
         Dictionary<string, int> constants = CollectConstants(cleaned.Concat(headers).ToList());
 
@@ -118,7 +120,7 @@ public static partial class SourceScanner
             {
                 problems.Add($"{pluginSlug}/{slug}: no createModel<...>(\"{slug}\") registration found");
             }
-            else if (!TryResolvePorts(registration.Type, cleaned, headers, WithTemplateArgs(registration, cleaned, constants), inputs, outputs, out modulation))
+            else if (!TryResolvePorts(registration.Type, cleaned, headers, constants, TemplateArgs(registration, cleaned, constants), inputs, outputs, out modulation))
             {
                 problems.Add($"{pluginSlug}/{slug}: struct '{registration.Type}' has no resolvable InputIds/OutputIds enum");
             }
@@ -129,16 +131,31 @@ public static partial class SourceScanner
         return new ScanResult(result, problems);
     }
 
-    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, List<SourceFile> headers, Dictionary<string, int> constants, List<string> inputs, List<string> outputs, out ModMatrix? modulation)
+    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, List<SourceFile> headers, Dictionary<string, int> constants, Dictionary<string, int> templateArgs, List<string> inputs, List<string> outputs, out ModMatrix? modulation)
     {
         modulation = null;
         StructSource? found = FindStruct(LastSegment(typeName), sources, depth: 0)
-            ?? FindAliasedStruct(typeName, sources);
+            ?? FindAliasedStruct(typeName, sources)
+            ?? (AliasTarget(LastSegment(typeName), sources) is string aliasedType ? FindStruct(aliasedType, sources, depth: 0) : null);
         if (found is null)
         {
             return false;
         }
         found = WithCompositeEnums(found, sources, headers);
+        // The file's own constants win over the plugin's (mscHack's "#define nCHANNELS 8" in ASAF8.cpp, another value
+        // elsewhere), the template arguments over both (MixMaster<8, 2>).
+        constants = new Dictionary<string, int>(constants, StringComparer.Ordinal);
+        if (found.FileText.Length > 0)
+        {
+            foreach ((string name, int value) in CollectConstants(new List<SourceFile> { new SourceFile("", found.FileText) }))
+            {
+                constants[name] = value;
+            }
+        }
+        foreach ((string name, int value) in templateArgs)
+        {
+            constants[name] = value;
+        }
 
         List<(string Id, int Index, string Fallback)>? inputEnum = ParseNamedEnum(found.EnumScopes, inputEnumNames, constants);
         List<(string Id, int Index, string Fallback)>? outputEnum = ParseNamedEnum(found.EnumScopes, outputEnumNames, constants);
@@ -190,13 +207,14 @@ public static partial class SourceScanner
 
     /// <summary>
     /// createModel&lt;MixMaster&lt;8, 2&gt;, ...&gt; with "template&lt;int N_TRK, int N_GRP&gt; struct MixMaster": binds
-    /// N_TRK = 8, N_GRP = 2 on top of the plugin constants, so ENUMS(X, N_TRK * 2) can be sized.
+    /// N_TRK = 8, N_GRP = 2, so ENUMS(X, N_TRK * 2) can be sized.
     /// </summary>
-    private static Dictionary<string, int> WithTemplateArgs((string Type, string? TemplateArgs) registration, List<SourceFile> sources, Dictionary<string, int> constants)
+    private static Dictionary<string, int> TemplateArgs((string Type, string? TemplateArgs) registration, List<SourceFile> sources, Dictionary<string, int> constants)
     {
+        Dictionary<string, int> bound = new Dictionary<string, int>(StringComparer.Ordinal);
         if (registration.TemplateArgs is null)
         {
-            return constants;
+            return bound;
         }
 
         Regex declaration = new Regex(@"template\s*<([^<>]*)>\s*(?:struct|class)\s+" + Regex.Escape(LastSegment(registration.Type)) + @"\b");
@@ -208,7 +226,6 @@ public static partial class SourceScanner
                 continue;
             }
 
-            Dictionary<string, int> bound = new Dictionary<string, int>(constants, StringComparer.Ordinal);
             string[] names = SplitTopLevel(match.Groups[1].Value).Select(p => p.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault() ?? "").ToArray();
             string[] values = SplitTopLevel(registration.TemplateArgs).Select(a => a.Trim()).ToArray();
             for (int i = 0; i < Math.Min(names.Length, values.Length); i++)
@@ -220,7 +237,7 @@ public static partial class SourceScanner
             }
             return bound;
         }
-        return constants;
+        return bound;
     }
 
     /// <summary>
@@ -262,6 +279,93 @@ public static partial class SourceScanner
             }
         }
         return expanded.ToString();
+    }
+
+    /// <summary>
+    /// mscHack's mixers share one header written against macros: Mixer_4_0_4.cpp has "#define nCHANNELS 8",
+    /// "#define Mixer_ Mixer_4_0_4", then #include "Mixer_x_x_x.hpp" which declares "struct Mixer_". For every source that
+    /// defines macros a header of the plugin it includes uses, gives that header as the source sees it: macros replaced,
+    /// #if / #ifdef / #else / #endif resolved.
+    /// </summary>
+    private static List<SourceFile> MacroInstantiations(List<SourceFile> sources)
+    {
+        List<SourceFile> instances = new List<SourceFile>();
+        foreach (SourceFile file in sources)
+        {
+            Dictionary<string, string> defines = Regex.Matches(file.Text, @"^[ \t]*#[ \t]*define[ \t]+(\w+)[ \t]+([^\r\n]+?)[ \t]*\r?$", RegexOptions.Multiline)
+                .GroupBy(m => m.Groups[1].Value).ToDictionary(g => g.Key, g => g.First().Groups[2].Value, StringComparer.Ordinal);
+            if (defines.Count == 0)
+            {
+                continue;
+            }
+            foreach (Match include in Regex.Matches(file.Text, @"^[ \t]*#[ \t]*include[ \t]*""([^""]+)""", RegexOptions.Multiline))
+            {
+                string name = Path.GetFileName(include.Groups[1].Value);
+                SourceFile? header = sources.FirstOrDefault(s => s != file && Path.GetFileName(s.Path) == name);
+                if (header is null || !defines.Keys.Any(d => Regex.IsMatch(header.Text, @"\b(?:struct|class)\s+" + Regex.Escape(d) + @"\b")))
+                {
+                    continue;
+                }
+                string text = ResolveConditionals(header.Text, defines);
+                text = Regex.Replace(text, @"\b\w+\b", m => defines.TryGetValue(m.Value, out string? value) && Regex.IsMatch(value, @"^[\w.]+$") ? value : m.Value);
+                instances.Add(new SourceFile($"{file.Path} > {name}", text));
+            }
+        }
+        return instances;
+    }
+
+    /// <summary>Keeps the branches of #if / #ifdef / #ifndef / #else / #endif that these defines select.</summary>
+    private static string ResolveConditionals(string text, Dictionary<string, string> defines)
+    {
+        Dictionary<string, int> numbers = defines.Where(d => int.TryParse(d.Value, out _)).ToDictionary(d => d.Key, d => int.Parse(d.Value), StringComparer.Ordinal);
+        bool? Condition(string directive, string expression) => directive switch
+        {
+            "ifdef" => defines.ContainsKey(expression.Trim()),
+            "ifndef" => !defines.ContainsKey(expression.Trim()),
+            _ => Regex.Match(expression, @"^\s*(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+?)\s*$") is { Success: true } comparison
+                && Evaluate(comparison.Groups[1].Value, numbers) is int left && Evaluate(comparison.Groups[3].Value, numbers) is int right
+                ? comparison.Groups[2].Value switch { "==" => left == right, "!=" => left != right, ">=" => left >= right, "<=" => left <= right, ">" => left > right, _ => left < right }
+                : Evaluate(expression, numbers) is int value ? value != 0 : null,
+        };
+
+        StringBuilder kept = new StringBuilder();
+        // Per nesting level: is this branch kept, has a branch of this #if been taken already.
+        Stack<(bool Keep, bool Taken)> levels = new Stack<(bool Keep, bool Taken)>();
+        bool Keeping() => levels.All(l => l.Keep);
+        foreach (string line in text.Split('\n'))
+        {
+            Match directive = Regex.Match(line, @"^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)$");
+            if (!directive.Success)
+            {
+                if (Keeping())
+                {
+                    kept.Append(line).Append('\n');
+                }
+                continue;
+            }
+            string expression = directive.Groups[2].Value.Trim();
+            switch (directive.Groups[1].Value)
+            {
+                case "if" or "ifdef" or "ifndef":
+                    // An unknown condition keeps its first branch.
+                    bool keep = Condition(directive.Groups[1].Value, expression) ?? true;
+                    levels.Push((keep, keep));
+                    break;
+                case "elif" when levels.Count > 0:
+                    (bool _, bool taken) = levels.Pop();
+                    bool elif = !taken && (Condition("if", expression) ?? false);
+                    levels.Push((elif, taken || elif));
+                    break;
+                case "else" when levels.Count > 0:
+                    (bool _, bool done) = levels.Pop();
+                    levels.Push((!done, true));
+                    break;
+                case "endif" when levels.Count > 0:
+                    levels.Pop();
+                    break;
+            }
+        }
+        return kept.ToString();
     }
 
     private static string LastSegment(string typeName)
@@ -381,6 +485,25 @@ public static partial class SourceScanner
     }
 
     /// <param name="FileText">The file the struct is defined in (for its file-scope aliases).</param>
+    /// <summary>
+    /// "using FrolicModuleBase = Sapphire::Chaos::ChaosModule&lt;Rucklidge&gt;;" (a base class) or
+    /// "using SlothTorporModule = SlothModule&lt;…&gt;;" (a registered type): the struct the alias names.
+    /// </summary>
+    private static string? AliasTarget(string alias, List<SourceFile> sources)
+    {
+        Regex aliasRegex = new Regex(@"(?:\busing\s+" + Regex.Escape(alias) + @"\s*=\s*(?:typename\s+)?([\w:]+)\s*(?:<[^;]*>)?\s*;|\btypedef\s+([\w:]+)\s*(?:<[^;]*>)?\s+" + Regex.Escape(alias) + @"\s*;)");
+        foreach (SourceFile file in sources)
+        {
+            Match match = aliasRegex.Match(file.Text);
+            if (match.Success)
+            {
+                string target = LastSegment(match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value);
+                return target == alias ? null : target;
+            }
+        }
+        return null;
+    }
+
     private sealed record StructSource(List<string> EnumScopes, List<string> ConfigScopes, string FileText = "");
 
     /// <summary>
@@ -440,7 +563,8 @@ public static partial class SourceScanner
                 {
                     foreach (string baseName in BaseNames(match.Groups[1].Value))
                     {
-                        StructSource? baseSource = FindStruct(baseName, sources, depth + 1);
+                        StructSource? baseSource = FindStruct(baseName, sources, depth + 1)
+                            ?? (AliasTarget(baseName, sources) is string aliased ? FindStruct(aliased, sources, depth + 1) : null);
                         if (baseSource is not null)
                         {
                             enumScopes.AddRange(baseSource.EnumScopes);

@@ -12311,7 +12311,14 @@
     "tags": [
       "Expander"
     ],
-    "inputs": [],
+    "inputs": [
+      "Memory select CV",
+      "Store trigger",
+      "Recall trigger",
+      "Freeze",
+      "Morph CV",
+      "Cruise CV"
+    ],
     "outputs": []
   },
   "CosineKitty-Sapphire/Echo": {
@@ -12320,8 +12327,26 @@
       "Delay",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Time cv",
+      "Feedback cv",
+      "Pan cv",
+      "Input gain cv",
+      "Level cv",
+      "Return left",
+      "Return right",
+      "Reverse",
+      "Freeze",
+      "Clear",
+      "Clock"
+    ],
+    "outputs": [
+      "Send left",
+      "Send right",
+      "Envelope follower"
+    ]
   },
   "CosineKitty-Sapphire/EchoOut": {
     "name": "Echo Out",
@@ -12330,8 +12355,26 @@
       "Polyphonic",
       "Expander"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Time cv",
+      "Feedback cv",
+      "Pan cv",
+      "Input gain cv",
+      "Level cv",
+      "Return left",
+      "Return right",
+      "Reverse",
+      "Freeze",
+      "Clear",
+      "Clock"
+    ],
+    "outputs": [
+      "Send left",
+      "Send right",
+      "Env"
+    ]
   },
   "CosineKitty-Sapphire/EchoTap": {
     "name": "Echo Tap",
@@ -12340,8 +12383,26 @@
       "Polyphonic",
       "Expander"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Time cv",
+      "Feedback cv",
+      "Pan cv",
+      "Input gain cv",
+      "Level cv",
+      "Return left",
+      "Return right",
+      "Reverse",
+      "Freeze",
+      "Clear",
+      "Clock"
+    ],
+    "outputs": [
+      "Send left",
+      "Send right",
+      "Envelope follower"
+    ]
   },
   "CosineKitty-Sapphire/Elastika": {
     "name": "Elastika",
@@ -12351,8 +12412,22 @@
       "Filter",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Friction CV",
+      "Stiffness CV",
+      "Spring span CV",
+      "Magnetic field CV",
+      "Impurity mass CV",
+      "Left audio",
+      "Right audio",
+      "Power gate",
+      "Input tilt CV",
+      "Output tilt CV"
+    ],
+    "outputs": [
+      "Left audio",
+      "Right audio"
+    ]
   },
   "CosineKitty-Sapphire/Empath": {
     "name": "Empath",
@@ -12360,8 +12435,18 @@
       "Polyphonic",
       "Filter"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Cascade cv",
+      "Chaos speed cv",
+      "Chaos level cv",
+      "Input gain cv"
+    ],
+    "outputs": [
+      "Audio left",
+      "Audio right"
+    ]
   },
   "CosineKitty-Sapphire/EmpathFilter": {
     "name": "Empath Filter",
@@ -12370,8 +12455,18 @@
       "Polyphonic",
       "Expander"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Cascade cv",
+      "Chaos speed cv",
+      "Chaos level cv",
+      "Input gain cv"
+    ],
+    "outputs": [
+      "Audio left",
+      "Audio right"
+    ]
   },
   "CosineKitty-Sapphire/EmpathOutput": {
     "name": "Empath Output",
@@ -12380,8 +12475,18 @@
       "Polyphonic",
       "Expander"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Cascade cv",
+      "Chaos speed cv",
+      "Chaos level cv",
+      "Input gain cv"
+    ],
+    "outputs": [
+      "Audio left",
+      "Audio right"
+    ]
   },
   "CosineKitty-Sapphire/Env": {
     "name": "Env",
@@ -12389,8 +12494,19 @@
       "Polyphonic",
       "Envelope follower"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio",
+      "Threshold cv",
+      "Speed cv",
+      "Freq cv",
+      "Res cv",
+      "Gain cv"
+    ],
+    "outputs": [
+      "Envelope",
+      "Pitch V/OCT",
+      "Detector gate"
+    ]
   },
   "CosineKitty-Sapphire/Frolic": {
     "name": "Frolic",
@@ -12399,8 +12515,16 @@
       "Effect",
       "Low-frequency oscillator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Speed CV",
+      "Chaos CV"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "Z",
+      "Polyphonic (X, Y, Z)"
+    ]
   },
   "CosineKitty-Sapphire/Galaxy": {
     "name": "Galaxy",
@@ -12410,8 +12534,20 @@
       "Filter",
       "Distortion"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Replace cv",
+      "Brightness cv",
+      "Detune cv",
+      "Bigness cv",
+      "Mix cv",
+      "Clear"
+    ],
+    "outputs": [
+      "Audio left",
+      "Audio right"
+    ]
   },
   "CosineKitty-Sapphire/Glee": {
     "name": "Glee",
@@ -12420,16 +12556,34 @@
       "Effect",
       "Low-frequency oscillator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Speed CV",
+      "Chaos CV"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "Z",
+      "Polyphonic (X, Y, Z)"
+    ]
   },
   "CosineKitty-Sapphire/Gravy": {
     "name": "Gravy",
     "tags": [
       "Filter"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio left",
+      "Audio right",
+      "Freq cv",
+      "Res cv",
+      "Mix cv",
+      "Gain cv"
+    ],
+    "outputs": [
+      "Audio left",
+      "Audio right"
+    ]
   },
   "CosineKitty-Sapphire/Hiss": {
     "name": "Hiss",
@@ -12438,7 +12592,18 @@
       "Polyphonic"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "Noise 1",
+      "Noise 2",
+      "Noise 3",
+      "Noise 4",
+      "Noise 5",
+      "Noise 6",
+      "Noise 7",
+      "Noise 8",
+      "Noise 9",
+      "Noise 10"
+    ]
   },
   "CosineKitty-Sapphire/Lark": {
     "name": "Lark",
@@ -12447,8 +12612,16 @@
       "Effect",
       "Low-frequency oscillator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Speed CV",
+      "Chaos CV"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "Z",
+      "Polyphonic (X, Y, Z)"
+    ]
   },
   "CosineKitty-Sapphire/Moots": {
     "name": "Moots",
@@ -12457,8 +12630,25 @@
       "Switch",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Signal 1",
+      "Signal 2",
+      "Signal 3",
+      "Signal 4",
+      "Signal 5",
+      "Control 1",
+      "Control 2",
+      "Control 3",
+      "Control 4",
+      "Control 5"
+    ],
+    "outputs": [
+      "Signal 1",
+      "Signal 2",
+      "Signal 3",
+      "Signal 4",
+      "Signal 5"
+    ]
   },
   "CosineKitty-Sapphire/Nucleus": {
     "name": "Nucleus",
@@ -12468,16 +12658,46 @@
       "Filter",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "AX",
+      "AY",
+      "AZ",
+      "Speed CV",
+      "Decay CV",
+      "Magnetic coupling CV",
+      "Input level CV",
+      "Output level CV"
+    ],
+    "outputs": [
+      "BX",
+      "BY",
+      "BZ",
+      "CX",
+      "CY",
+      "CZ",
+      "DX",
+      "DY",
+      "DZ",
+      "EX",
+      "EY",
+      "EZ"
+    ]
   },
   "CosineKitty-Sapphire/Pivot": {
     "name": "Pivot",
     "tags": [
       "Utility"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "A",
+      "Twist CV"
+    ],
+    "outputs": [
+      "Polyphonic (X, Y, Z)",
+      "X",
+      "Y",
+      "Z"
+    ]
   },
   "CosineKitty-Sapphire/Polynucleus": {
     "name": "Polynucleus",
@@ -12487,8 +12707,22 @@
       "Filter",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Particle A",
+      "Speed CV",
+      "Decay CV",
+      "Magnetic coupling CV",
+      "Input level CV",
+      "Output level CV",
+      "Aether viscosity CV",
+      "Aether rotation CV"
+    ],
+    "outputs": [
+      "Particle B",
+      "Particle C",
+      "Particle D",
+      "Particle E"
+    ]
   },
   "CosineKitty-Sapphire/Pop": {
     "name": "Pop",
@@ -12497,16 +12731,30 @@
       "Polyphonic",
       "Random"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Speed CV",
+      "Chaos CV",
+      "Sync trigger"
+    ],
+    "outputs": [
+      "Pulse"
+    ]
   },
   "CosineKitty-Sapphire/Rotini": {
     "name": "Rotini",
     "tags": [
       "Utility"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "A",
+      "B"
+    ],
+    "outputs": [
+      "Polyphonic (X, Y, Z)",
+      "X",
+      "Y",
+      "Z"
+    ]
   },
   "CosineKitty-Sapphire/Sauce": {
     "name": "Sauce",
@@ -12514,16 +12762,37 @@
       "Filter",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Audio",
+      "Freq cv",
+      "Res cv",
+      "Mix cv",
+      "Gain cv"
+    ],
+    "outputs": [
+      "Lowpass",
+      "Bandpass",
+      "Highpass",
+      "Notch"
+    ]
   },
   "CosineKitty-Sapphire/SplitAddMerge": {
     "name": "Split/Add/Merge",
     "tags": [
       "Utility"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Polyphonic (X, Y, Z)",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "outputs": [
+      "Polyphonic (X, Y, Z)",
+      "X",
+      "Y",
+      "Z"
+    ]
   },
   "CosineKitty-Sapphire/Tin": {
     "name": "Tin",
@@ -12531,7 +12800,14 @@
       "Expander",
       "Utility"
     ],
-    "inputs": [],
+    "inputs": [
+      "X",
+      "Y",
+      "Z",
+      "Clear display trigger",
+      "Polyphonic (X, Y, Z)",
+      "Level CV"
+    ],
     "outputs": []
   },
   "CosineKitty-Sapphire/Tout": {
@@ -12540,8 +12816,16 @@
       "Expander",
       "Utility"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Level CV"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "Z",
+      "Clear display trigger",
+      "Polyphonic (X, Y, Z)"
+    ]
   },
   "CosineKitty-Sapphire/Tricorder": {
     "name": "Tricorder",
@@ -12561,8 +12845,23 @@
       "Polyphonic",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Airflow",
+      "Reflection decay",
+      "Reflection angle",
+      "Stiffness",
+      "Bypass width",
+      "Bypass center",
+      "Root frequency",
+      "Vortex",
+      "Vent gate",
+      "Left audio",
+      "Right audio"
+    ],
+    "outputs": [
+      "Left audio",
+      "Right audio"
+    ]
   },
   "CosineKitty-Sapphire/Zoo": {
     "name": "Zoo",
@@ -12571,8 +12870,16 @@
       "Effect",
       "Low-frequency oscillator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Speed CV",
+      "Chaos CV"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "Z",
+      "Polyphonic (X, Y, Z)"
+    ]
   },
   "CountModula/AnalogueShiftRegister": {
     "name": "Analogue Shift Register",
@@ -18758,7 +19065,39 @@
       "Output 29",
       "Output 30",
       "Output 31",
-      "Output 32"
+      "Output 32",
+      "Output 33",
+      "Output 34",
+      "Output 35",
+      "Output 36",
+      "Output 37",
+      "Output 38",
+      "Output 39",
+      "Output 40",
+      "Output 41",
+      "Output 42",
+      "Output 43",
+      "Output 44",
+      "Output 45",
+      "Output 46",
+      "Output 47",
+      "Output 48",
+      "Output 49",
+      "Output 50",
+      "Output 51",
+      "Output 52",
+      "Output 53",
+      "Output 54",
+      "Output 55",
+      "Output 56",
+      "Output 57",
+      "Output 58",
+      "Output 59",
+      "Output 60",
+      "Output 61",
+      "Output 62",
+      "Output 63",
+      "Output 64"
     ]
   },
   "HetrickCV/PhasorStutter": {
@@ -24837,7 +25176,10 @@
       "Low-frequency oscillator"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "Small",
+      "Big"
+    ]
   },
   "NonlinearCircuits/SlothInertia": {
     "name": "Sloth Inertia",
@@ -24846,7 +25188,10 @@
       "Low-frequency oscillator"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "Small",
+      "Big"
+    ]
   },
   "NonlinearCircuits/SlothTorpor": {
     "name": "Sloth Torpor",
@@ -24855,7 +25200,10 @@
       "Low-frequency oscillator"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "Small",
+      "Big"
+    ]
   },
   "NonlinearCircuits/Splish": {
     "name": "Splish",
@@ -33629,6 +33977,7 @@
       "Trig 7",
       "Trig 8",
       "Trig 9",
+      "Trig 10",
       "Data 1",
       "Data 2",
       "Data 3",
@@ -33637,7 +33986,8 @@
       "Data 6",
       "Data 7",
       "Data 8",
-      "Data 9"
+      "Data 9",
+      "Data 10"
     ],
     "outputs": [
       "Output 1",
@@ -33648,7 +33998,8 @@
       "Output 6",
       "Output 7",
       "Output 8",
-      "Output 9"
+      "Output 9",
+      "Output 10"
     ]
   },
   "Venom/PolyScale": {
@@ -34210,13 +34561,17 @@
       "Ch. 1",
       "Ch. 2",
       "Ch. 3",
-      "Ch. 4"
+      "Ch. 4",
+      "Ch. 5",
+      "Ch. 6"
     ],
     "outputs": [
       "Ch. 1",
       "Ch. 2",
       "Ch. 3",
-      "Ch. 4"
+      "Ch. 4",
+      "Ch. 5",
+      "Ch. 6"
     ]
   },
   "VostokInstruments/Atlas": {
@@ -34262,16 +34617,22 @@
       "Ch. 2",
       "Ch. 3",
       "Ch. 4",
+      "Ch. 5",
+      "Ch. 6",
       "Ch. 1 level CV",
       "Ch. 2 level CV",
       "Ch. 3 level CV",
-      "Ch. 4 level CV"
+      "Ch. 4 level CV",
+      "Ch. 5 level CV",
+      "Ch. 6 level CV"
     ],
     "outputs": [
       "Ch. 1",
       "Ch. 2",
       "Ch. 3",
-      "Ch. 4"
+      "Ch. 4",
+      "Ch. 5",
+      "Ch. 6"
     ]
   },
   "VostokInstruments/Fuji": {
@@ -34285,13 +34646,17 @@
       "Gate Ch. 1",
       "Gate Ch. 2",
       "Gate Ch. 3",
-      "Gate Ch. 4"
+      "Gate Ch. 4",
+      "Gate Ch. 5",
+      "Gate Ch. 6"
     ],
     "outputs": [
       "Ch. 1",
       "Ch. 2",
       "Ch. 3",
-      "Ch. 4"
+      "Ch. 4",
+      "Ch. 5",
+      "Ch. 6"
     ]
   },
   "VostokInstruments/Halo": {
@@ -39384,14 +39749,6 @@
       "In 6",
       "In 7",
       "In 8",
-      "In 9",
-      "In 10",
-      "In 11",
-      "In 12",
-      "In 13",
-      "In 14",
-      "In 15",
-      "In 16",
       "Mod 1",
       "Mod 2",
       "Mod 3",
@@ -39455,199 +39812,7 @@
       "Mod 61",
       "Mod 62",
       "Mod 63",
-      "Mod 64",
-      "Mod 65",
-      "Mod 66",
-      "Mod 67",
-      "Mod 68",
-      "Mod 69",
-      "Mod 70",
-      "Mod 71",
-      "Mod 72",
-      "Mod 73",
-      "Mod 74",
-      "Mod 75",
-      "Mod 76",
-      "Mod 77",
-      "Mod 78",
-      "Mod 79",
-      "Mod 80",
-      "Mod 81",
-      "Mod 82",
-      "Mod 83",
-      "Mod 84",
-      "Mod 85",
-      "Mod 86",
-      "Mod 87",
-      "Mod 88",
-      "Mod 89",
-      "Mod 90",
-      "Mod 91",
-      "Mod 92",
-      "Mod 93",
-      "Mod 94",
-      "Mod 95",
-      "Mod 96",
-      "Mod 97",
-      "Mod 98",
-      "Mod 99",
-      "Mod 100",
-      "Mod 101",
-      "Mod 102",
-      "Mod 103",
-      "Mod 104",
-      "Mod 105",
-      "Mod 106",
-      "Mod 107",
-      "Mod 108",
-      "Mod 109",
-      "Mod 110",
-      "Mod 111",
-      "Mod 112",
-      "Mod 113",
-      "Mod 114",
-      "Mod 115",
-      "Mod 116",
-      "Mod 117",
-      "Mod 118",
-      "Mod 119",
-      "Mod 120",
-      "Mod 121",
-      "Mod 122",
-      "Mod 123",
-      "Mod 124",
-      "Mod 125",
-      "Mod 126",
-      "Mod 127",
-      "Mod 128",
-      "Mod 129",
-      "Mod 130",
-      "Mod 131",
-      "Mod 132",
-      "Mod 133",
-      "Mod 134",
-      "Mod 135",
-      "Mod 136",
-      "Mod 137",
-      "Mod 138",
-      "Mod 139",
-      "Mod 140",
-      "Mod 141",
-      "Mod 142",
-      "Mod 143",
-      "Mod 144",
-      "Mod 145",
-      "Mod 146",
-      "Mod 147",
-      "Mod 148",
-      "Mod 149",
-      "Mod 150",
-      "Mod 151",
-      "Mod 152",
-      "Mod 153",
-      "Mod 154",
-      "Mod 155",
-      "Mod 156",
-      "Mod 157",
-      "Mod 158",
-      "Mod 159",
-      "Mod 160",
-      "Mod 161",
-      "Mod 162",
-      "Mod 163",
-      "Mod 164",
-      "Mod 165",
-      "Mod 166",
-      "Mod 167",
-      "Mod 168",
-      "Mod 169",
-      "Mod 170",
-      "Mod 171",
-      "Mod 172",
-      "Mod 173",
-      "Mod 174",
-      "Mod 175",
-      "Mod 176",
-      "Mod 177",
-      "Mod 178",
-      "Mod 179",
-      "Mod 180",
-      "Mod 181",
-      "Mod 182",
-      "Mod 183",
-      "Mod 184",
-      "Mod 185",
-      "Mod 186",
-      "Mod 187",
-      "Mod 188",
-      "Mod 189",
-      "Mod 190",
-      "Mod 191",
-      "Mod 192",
-      "Mod 193",
-      "Mod 194",
-      "Mod 195",
-      "Mod 196",
-      "Mod 197",
-      "Mod 198",
-      "Mod 199",
-      "Mod 200",
-      "Mod 201",
-      "Mod 202",
-      "Mod 203",
-      "Mod 204",
-      "Mod 205",
-      "Mod 206",
-      "Mod 207",
-      "Mod 208",
-      "Mod 209",
-      "Mod 210",
-      "Mod 211",
-      "Mod 212",
-      "Mod 213",
-      "Mod 214",
-      "Mod 215",
-      "Mod 216",
-      "Mod 217",
-      "Mod 218",
-      "Mod 219",
-      "Mod 220",
-      "Mod 221",
-      "Mod 222",
-      "Mod 223",
-      "Mod 224",
-      "Mod 225",
-      "Mod 226",
-      "Mod 227",
-      "Mod 228",
-      "Mod 229",
-      "Mod 230",
-      "Mod 231",
-      "Mod 232",
-      "Mod 233",
-      "Mod 234",
-      "Mod 235",
-      "Mod 236",
-      "Mod 237",
-      "Mod 238",
-      "Mod 239",
-      "Mod 240",
-      "Mod 241",
-      "Mod 242",
-      "Mod 243",
-      "Mod 244",
-      "Mod 245",
-      "Mod 246",
-      "Mod 247",
-      "Mod 248",
-      "Mod 249",
-      "Mod 250",
-      "Mod 251",
-      "Mod 252",
-      "Mod 253",
-      "Mod 254",
-      "Mod 255",
-      "Mod 256"
+      "Mod 64"
     ],
     "outputs": [
       "Out1",
@@ -39657,15 +39822,7 @@
       "Out5",
       "Out6",
       "Out7",
-      "Out8",
-      "Out9",
-      "Out10",
-      "Out11",
-      "Out12",
-      "Out13",
-      "Out14",
-      "Out15",
-      "Out16"
+      "Out8"
     ]
   },
   "dbRackModules/YAC": {
@@ -40176,20 +40333,45 @@
       "In trigs 1",
       "In trigs 2",
       "In trigs 3",
+      "In trigs 4",
+      "In trigs 5",
+      "In trigs 6",
+      "In trigs 7",
+      "In trigs 8",
       "In audiol 1",
       "In audiol 2",
       "In audiol 3",
+      "In audiol 4",
+      "In audiol 5",
+      "In audiol 6",
+      "In audiol 7",
+      "In audiol 8",
       "In audior 1",
       "In audior 2",
-      "In audior 3"
+      "In audior 3",
+      "In audior 4",
+      "In audior 5",
+      "In audior 6",
+      "In audior 7",
+      "In audior 8"
     ],
     "outputs": [
       "Out audiol 1",
       "Out audiol 2",
       "Out audiol 3",
+      "Out audiol 4",
+      "Out audiol 5",
+      "Out audiol 6",
+      "Out audiol 7",
+      "Out audiol 8",
       "Out audior 1",
       "Out audior 2",
-      "Out audior 3"
+      "Out audior 3",
+      "Out audior 4",
+      "Out audior 5",
+      "Out audior 6",
+      "Out audior 7",
+      "Out audior 8"
     ]
   },
   "mscHack/Alienz": {
@@ -40263,6 +40445,7 @@
       "Input ext sync 1",
       "Input ext sync 2",
       "Input ext sync 3",
+      "Input ext sync 4",
       "Chain"
     ],
     "outputs": [
@@ -40278,6 +40461,10 @@
       "Output clk 10",
       "Output clk 11",
       "Output clk 12",
+      "Output clk 13",
+      "Output clk 14",
+      "Output clk 15",
+      "Output clk 16",
       "Output trig 1",
       "Output trig 2",
       "Output trig 3",
@@ -40290,6 +40477,10 @@
       "Output trig 10",
       "Output trig 11",
       "Output trig 12",
+      "Output trig 13",
+      "Output trig 14",
+      "Output trig 15",
+      "Output trig 16",
       "Chain"
     ]
   },
@@ -40313,32 +40504,374 @@
     "tags": [
       "Mixer"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In left 1",
+      "In left 2",
+      "In left 3",
+      "In left 4",
+      "In left 5",
+      "In left 6",
+      "In left 7",
+      "In left 8",
+      "In left 9",
+      "In left 10",
+      "In left 11",
+      "In left 12",
+      "In left 13",
+      "In left 14",
+      "In left 15",
+      "In left 16",
+      "In left 17",
+      "In left 18",
+      "In left 19",
+      "In left 20",
+      "In left 21",
+      "In left 22",
+      "In left 23",
+      "In left 24",
+      "In right 1",
+      "In right 2",
+      "In right 3",
+      "In right 4",
+      "In right 5",
+      "In right 6",
+      "In right 7",
+      "In right 8",
+      "In right 9",
+      "In right 10",
+      "In right 11",
+      "In right 12",
+      "In right 13",
+      "In right 14",
+      "In right 15",
+      "In right 16",
+      "In right 17",
+      "In right 18",
+      "In right 19",
+      "In right 20",
+      "In right 21",
+      "In right 22",
+      "In right 23",
+      "In right 24",
+      "In levelcv 1",
+      "In levelcv 2",
+      "In levelcv 3",
+      "In levelcv 4",
+      "In levelcv 5",
+      "In levelcv 6",
+      "In levelcv 7",
+      "In levelcv 8",
+      "In levelcv 9",
+      "In levelcv 10",
+      "In levelcv 11",
+      "In levelcv 12",
+      "In levelcv 13",
+      "In levelcv 14",
+      "In levelcv 15",
+      "In levelcv 16",
+      "In pancv 1",
+      "In pancv 2",
+      "In pancv 3",
+      "In pancv 4",
+      "In pancv 5",
+      "In pancv 6",
+      "In pancv 7",
+      "In pancv 8",
+      "In pancv 9",
+      "In pancv 10",
+      "In pancv 11",
+      "In pancv 12",
+      "In pancv 13",
+      "In pancv 14",
+      "In pancv 15",
+      "In pancv 16",
+      "FadeX",
+      "FadeY"
+    ],
+    "outputs": [
+      "Main Left",
+      "Main Right",
+      "Out grpl 1",
+      "Out grpl 2",
+      "Out grpl 3",
+      "Out grpl 4",
+      "Out grpr 1",
+      "Out grpr 2",
+      "Out grpr 3",
+      "Out grpr 4",
+      "Out auxl 1",
+      "Out auxl 2",
+      "Out auxl 3",
+      "Out auxl 4",
+      "Out auxr 1",
+      "Out auxr 2",
+      "Out auxr 3",
+      "Out auxr 4"
+    ]
   },
   "mscHack/Mix_24_4_4": {
     "name": "MIX 24 Channel, 4 groups",
     "tags": [
       "Mixer"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In left 1",
+      "In left 2",
+      "In left 3",
+      "In left 4",
+      "In left 5",
+      "In left 6",
+      "In left 7",
+      "In left 8",
+      "In left 9",
+      "In left 10",
+      "In left 11",
+      "In left 12",
+      "In left 13",
+      "In left 14",
+      "In left 15",
+      "In left 16",
+      "In left 17",
+      "In left 18",
+      "In left 19",
+      "In left 20",
+      "In left 21",
+      "In left 22",
+      "In left 23",
+      "In left 24",
+      "In left 25",
+      "In left 26",
+      "In left 27",
+      "In left 28",
+      "In left 29",
+      "In left 30",
+      "In left 31",
+      "In left 32",
+      "In right 1",
+      "In right 2",
+      "In right 3",
+      "In right 4",
+      "In right 5",
+      "In right 6",
+      "In right 7",
+      "In right 8",
+      "In right 9",
+      "In right 10",
+      "In right 11",
+      "In right 12",
+      "In right 13",
+      "In right 14",
+      "In right 15",
+      "In right 16",
+      "In right 17",
+      "In right 18",
+      "In right 19",
+      "In right 20",
+      "In right 21",
+      "In right 22",
+      "In right 23",
+      "In right 24",
+      "In right 25",
+      "In right 26",
+      "In right 27",
+      "In right 28",
+      "In right 29",
+      "In right 30",
+      "In right 31",
+      "In right 32",
+      "In levelcv 1",
+      "In levelcv 2",
+      "In levelcv 3",
+      "In levelcv 4",
+      "In levelcv 5",
+      "In levelcv 6",
+      "In levelcv 7",
+      "In levelcv 8",
+      "In levelcv 9",
+      "In levelcv 10",
+      "In levelcv 11",
+      "In levelcv 12",
+      "In levelcv 13",
+      "In levelcv 14",
+      "In levelcv 15",
+      "In levelcv 16",
+      "In levelcv 17",
+      "In levelcv 18",
+      "In levelcv 19",
+      "In levelcv 20",
+      "In levelcv 21",
+      "In levelcv 22",
+      "In levelcv 23",
+      "In levelcv 24",
+      "In pancv 1",
+      "In pancv 2",
+      "In pancv 3",
+      "In pancv 4",
+      "In pancv 5",
+      "In pancv 6",
+      "In pancv 7",
+      "In pancv 8",
+      "In pancv 9",
+      "In pancv 10",
+      "In pancv 11",
+      "In pancv 12",
+      "In pancv 13",
+      "In pancv 14",
+      "In pancv 15",
+      "In pancv 16",
+      "In pancv 17",
+      "In pancv 18",
+      "In pancv 19",
+      "In pancv 20",
+      "In pancv 21",
+      "In pancv 22",
+      "In pancv 23",
+      "In pancv 24",
+      "FadeX",
+      "FadeY"
+    ],
+    "outputs": [
+      "Main Left",
+      "Main Right",
+      "Out grpl 1",
+      "Out grpl 2",
+      "Out grpl 3",
+      "Out grpl 4",
+      "Out grpr 1",
+      "Out grpr 2",
+      "Out grpr 3",
+      "Out grpr 4",
+      "Out auxl 1",
+      "Out auxl 2",
+      "Out auxl 3",
+      "Out auxl 4",
+      "Out auxr 1",
+      "Out auxr 2",
+      "Out auxr 3",
+      "Out auxr 4"
+    ]
   },
   "mscHack/Mix_4_0_4": {
     "name": "MIX 4 Channel",
     "tags": [
       "Mixer"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In left 1",
+      "In left 2",
+      "In left 3",
+      "In left 4",
+      "In left 5",
+      "In left 6",
+      "In left 7",
+      "In left 8",
+      "In right 1",
+      "In right 2",
+      "In right 3",
+      "In right 4",
+      "In right 5",
+      "In right 6",
+      "In right 7",
+      "In right 8",
+      "In levelcv 1",
+      "In levelcv 2",
+      "In levelcv 3",
+      "In levelcv 4",
+      "In pancv 1",
+      "In pancv 2",
+      "In pancv 3",
+      "In pancv 4"
+    ],
+    "outputs": [
+      "Main Left",
+      "Main Right",
+      "Out auxl 1",
+      "Out auxl 2",
+      "Out auxl 3",
+      "Out auxl 4",
+      "Out auxr 1",
+      "Out auxr 2",
+      "Out auxr 3",
+      "Out auxr 4"
+    ]
   },
   "mscHack/Mix_9_3_4": {
     "name": "MIX 9 Channel, 3 Groups",
     "tags": [
       "Mixer"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In left 1",
+      "In left 2",
+      "In left 3",
+      "In left 4",
+      "In left 5",
+      "In left 6",
+      "In left 7",
+      "In left 8",
+      "In left 9",
+      "In left 10",
+      "In left 11",
+      "In left 12",
+      "In left 13",
+      "In left 14",
+      "In left 15",
+      "In left 16",
+      "In right 1",
+      "In right 2",
+      "In right 3",
+      "In right 4",
+      "In right 5",
+      "In right 6",
+      "In right 7",
+      "In right 8",
+      "In right 9",
+      "In right 10",
+      "In right 11",
+      "In right 12",
+      "In right 13",
+      "In right 14",
+      "In right 15",
+      "In right 16",
+      "In levelcv 1",
+      "In levelcv 2",
+      "In levelcv 3",
+      "In levelcv 4",
+      "In levelcv 5",
+      "In levelcv 6",
+      "In levelcv 7",
+      "In levelcv 8",
+      "In levelcv 9",
+      "In pancv 1",
+      "In pancv 2",
+      "In pancv 3",
+      "In pancv 4",
+      "In pancv 5",
+      "In pancv 6",
+      "In pancv 7",
+      "In pancv 8",
+      "In pancv 9",
+      "FadeX",
+      "FadeY"
+    ],
+    "outputs": [
+      "Main Left",
+      "Main Right",
+      "Out grpl 1",
+      "Out grpl 2",
+      "Out grpl 3",
+      "Out grpr 1",
+      "Out grpr 2",
+      "Out grpr 3",
+      "Out auxl 1",
+      "Out auxl 2",
+      "Out auxl 3",
+      "Out auxl 4",
+      "Out auxr 1",
+      "Out auxr 2",
+      "Out auxr 3",
+      "Out auxr 4"
+    ]
   },
   "mscHack/Morze": {
     "name": "Morze",
@@ -40449,21 +40982,36 @@
       "Clock 1",
       "Clock 2",
       "Clock 3",
+      "Clock 4",
+      "Clock 5",
+      "Clock 6",
       "Trigger Pattern 1",
       "Trigger Pattern 2",
       "Trigger Pattern 3",
+      "Trigger Pattern 4",
+      "Trigger Pattern 5",
+      "Trigger Pattern 6",
       "Global Trigger Mute"
     ],
     "outputs": [
       "Trigger 1",
       "Trigger 2",
       "Trigger 3",
+      "Trigger 4",
+      "Trigger 5",
+      "Trigger 6",
       "CV 1",
       "CV 2",
       "CV 3",
+      "CV 4",
+      "CV 5",
+      "CV 6",
       "Pattern Start 1",
       "Pattern Start 2",
-      "Pattern Start 3"
+      "Pattern Start 3",
+      "Pattern Start 4",
+      "Pattern Start 5",
+      "Pattern Start 6"
     ]
   },
   "mscHack/StepDelay": {
@@ -41103,17 +41651,13 @@
       "cv 1",
       "cv 2",
       "cv 3",
-      "cv 4",
-      "cv 5",
-      "cv 6"
+      "cv 4"
     ],
     "outputs": [
       "gate 1",
       "gate 2",
       "gate 3",
-      "gate 4",
-      "gate 5",
-      "gate 6"
+      "gate 4"
     ]
   },
   "repelzen/rewin": {

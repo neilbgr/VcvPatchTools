@@ -218,6 +218,90 @@ public class SourceScannerTests
     }
 
     [Fact]
+    public void ResolvesPluginModelHelpersAndAliasedBases()
+    {
+        // Sapphire: its own createSapphireModel helper, a base class reached through an alias.
+        string manifest = """{ "slug": "CosineKitty-Sapphire", "modules": [ { "slug": "Frolic" } ] }""";
+        string source = """
+            namespace Sapphire::Chaos
+            {
+                template <typename circuit_t>
+                struct ChaosModule : SapphireModule
+                {
+                    enum InputId { SPEED_CV_INPUT, CHAOS_CV_INPUT, INPUTS_LEN };
+                    enum OutputId { X_OUTPUT, OUTPUTS_LEN };
+                    ChaosModule() { configInput(SPEED_CV_INPUT, "Speed CV"); configOutput(X_OUTPUT, "X"); }
+                };
+            }
+            namespace Sapphire
+            {
+                using FrolicModuleBase = Sapphire::Chaos::ChaosModule<Rucklidge>;
+                struct FrolicModule : FrolicModuleBase {};
+            }
+            Model* modelSapphireFrolic = createSapphireModel<Sapphire::FrolicModule, Sapphire::FrolicWidget>(
+                "Frolic",
+                Sapphire::ExpanderRole::ChaosOpReceiver
+            );
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("frolic_vcv.cpp", source) });
+
+        ModuleInfo frolic = result.Modules["CosineKitty-Sapphire/Frolic"];
+        Assert.Equal(new[] { "Speed CV", "Chaos cv" }, frolic.Inputs);
+        Assert.Equal(new[] { "X" }, frolic.Outputs);
+    }
+
+    [Fact]
+    public void InstantiatesHeadersWrittenAgainstTheIncludingFilesMacros()
+    {
+        // mscHack: each mixer .cpp defines its sizes and its struct name, then includes one shared header.
+        string manifest = """{ "slug": "mscHack", "modules": [ { "slug": "Mix_4_0_4" }, { "slug": "Mix_9_3_4" }, { "slug": "ASAF8" } ] }""";
+        string header = """
+            struct Mixer_ : Module
+            {
+                enum InputIds
+                {
+                    IN_LEFT,
+                    IN_RIGHT = IN_LEFT + nCHANNELS,
+            #if nGROUPS > 0
+                    IN_FADEX = IN_RIGHT + nCHANNELS,
+                    nINPUTS
+            #else
+                    nINPUTS = IN_RIGHT + nCHANNELS
+            #endif
+                };
+                enum OutputIds { OUT_MAINL, nOUTPUTS };
+            };
+            """;
+        string mixer(string name, int channels, int groups) => $"""
+            #define nCHANNELS {channels}
+            #define nGROUPS {groups}
+            #define Mixer_ {name}
+            #include "Mixer_x_x_x.hpp"
+            Model *model{name} = createModel<{name}, {name}_Widget>( "{name.Replace("Mixer", "Mix")}" );
+            """;
+        // A file's own #define wins over another file's.
+        string asaf = """
+            #define nCHANNELS 8
+            struct ASAF8 : Module { enum InputIds { IN_TRIGS, nINPUTS = IN_TRIGS + nCHANNELS }; };
+            Model *modelASAF8 = createModel<ASAF8, ASAF8_Widget>( "ASAF8" );
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[]
+        {
+            new SourceFile("Mixer_x_x_x.hpp", header),
+            new SourceFile("Mixer_4_0_4.cpp", mixer("Mixer_4_0_4", 4, 0)),
+            new SourceFile("Mixer_9_3_4.cpp", mixer("Mixer_9_3_4", 9, 3)),
+            new SourceFile("ASAF8.cpp", asaf),
+        });
+
+        Assert.Equal(8, result.Modules["mscHack/Mix_4_0_4"].Inputs.Count);
+        Assert.Equal(19, result.Modules["mscHack/Mix_9_3_4"].Inputs.Count);
+        Assert.Equal("In fadex", result.Modules["mscHack/Mix_9_3_4"].Inputs[^1]);
+        Assert.Equal(8, result.Modules["mscHack/ASAF8"].Inputs.Count);
+    }
+
+    [Fact]
     public void ResolvesConstantSizesTemplateArgsAndLoopNames()
     {
         string manifest = """{ "slug": "P", "modules": [ { "slug": "Mix" }, { "slug": "Drone" } ] }""";

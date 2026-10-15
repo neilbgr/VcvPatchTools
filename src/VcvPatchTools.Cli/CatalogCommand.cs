@@ -20,19 +20,35 @@ internal static class CatalogCommand
         Dictionary<string, ModuleInfo> all = new Dictionary<string, ModuleInfo>(StringComparer.Ordinal);
         List<string> problems = new List<string>();
 
-        IEnumerable<(string Manifest, string Sources)> plugins = pluginsDirs.SelectMany(pluginsDir =>
+        List<(string Manifest, string Sources)> plugins = pluginsDirs.SelectMany(pluginsDir =>
         {
             string rackDir = Path.Combine(pluginsDir, "..", "src", "Rack");
             return Directory.GetDirectories(pluginsDir)
                 .OrderBy(d => d, StringComparer.Ordinal)
                 .Select(d => (Path.Combine(d, "plugin.json"), Path.Combine(d, "src")))
                 .Prepend((Path.Combine(rackDir, "Core.json"), Path.Combine(rackDir, "src", "core")));
-        });
+        }).ToList();
+        // Two folders can hold the same plugin (Cardinal has mscHack 1.0.2 and, for one CardinalMini module, 2.0.0):
+        // the newest one is scanned, the one the VCV Library has.
+        Dictionary<string, (Version Version, string Manifest)> newest = new Dictionary<string, (Version, string)>(StringComparer.Ordinal);
+        foreach ((string manifestPath, string _) in plugins.Where(p => File.Exists(p.Manifest)))
+        {
+            if (ManifestIdentity(manifestPath) is (string slug, Version version) && (!newest.TryGetValue(slug, out (Version Version, string Manifest) best) || version > best.Version))
+            {
+                newest[slug] = (version, manifestPath);
+            }
+        }
+
         foreach ((string manifestPath, string sourceDir) in plugins)
         {
             string pluginDir = Path.GetDirectoryName(manifestPath)!;
             if (!File.Exists(manifestPath) || !Directory.Exists(sourceDir))
             {
+                continue;
+            }
+            if (ManifestIdentity(manifestPath) is (string duplicate, Version _) && newest[duplicate].Manifest != manifestPath)
+            {
+                problems.Add($"{duplicate}: older copy in {Path.GetFileName(pluginDir)} skipped, {Path.GetFileName(Path.GetDirectoryName(newest[duplicate].Manifest))} is newer");
                 continue;
             }
 
@@ -99,6 +115,22 @@ internal static class CatalogCommand
             .OrderBy(p => p, StringComparer.Ordinal)
             .Select(p => new SourceFile(p, File.ReadAllText(p)))
             .ToList();
+    }
+
+    /// <summary>Slug and version of a plugin.json (null when unreadable).</summary>
+    private static (string Slug, Version Version)? ManifestIdentity(string manifestPath)
+    {
+        try
+        {
+            using System.Text.Json.JsonDocument manifest = System.Text.Json.JsonDocument.Parse(File.ReadAllText(manifestPath), new System.Text.Json.JsonDocumentOptions { CommentHandling = System.Text.Json.JsonCommentHandling.Skip, AllowTrailingCommas = true });
+            string? slug = manifest.RootElement.TryGetProperty("slug", out System.Text.Json.JsonElement s) ? s.GetString() : null;
+            string? version = manifest.RootElement.TryGetProperty("version", out System.Text.Json.JsonElement v) ? v.GetString() : null;
+            return slug is null ? null : (slug, Version.TryParse(version, out Version? parsed) ? parsed : new Version(0, 0));
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return null;
+        }
     }
 
     private static string PluginOf(string key) => key[..key.IndexOf('/')];

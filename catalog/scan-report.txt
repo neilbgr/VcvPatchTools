@@ -52,34 +52,6 @@ JW-Modules/BlankPanel_LG: struct 'Module' has no resolvable InputIds/OutputIds e
 JW-Modules/CoolBreeze: struct 'Module' has no resolvable InputIds/OutputIds enum
 MindMeldModular/PatchMasterBlank: struct 'PatchMasterBlank' has no resolvable InputIds/OutputIds enum
 MindMeldModular/ShapeMaster: struct 'ShapeMaster' has no resolvable InputIds/OutputIds enum
-CosineKitty-Sapphire/Chaops: no createModel<...>("Chaops") registration found
-CosineKitty-Sapphire/Echo: no createModel<...>("Echo") registration found
-CosineKitty-Sapphire/EchoOut: no createModel<...>("EchoOut") registration found
-CosineKitty-Sapphire/EchoTap: no createModel<...>("EchoTap") registration found
-CosineKitty-Sapphire/Elastika: no createModel<...>("Elastika") registration found
-CosineKitty-Sapphire/Empath: no createModel<...>("Empath") registration found
-CosineKitty-Sapphire/EmpathFilter: no createModel<...>("EmpathFilter") registration found
-CosineKitty-Sapphire/EmpathOutput: no createModel<...>("EmpathOutput") registration found
-CosineKitty-Sapphire/Env: no createModel<...>("Env") registration found
-CosineKitty-Sapphire/Frolic: no createModel<...>("Frolic") registration found
-CosineKitty-Sapphire/Galaxy: no createModel<...>("Galaxy") registration found
-CosineKitty-Sapphire/Glee: no createModel<...>("Glee") registration found
-CosineKitty-Sapphire/Gravy: no createModel<...>("Gravy") registration found
-CosineKitty-Sapphire/Hiss: no createModel<...>("Hiss") registration found
-CosineKitty-Sapphire/Lark: no createModel<...>("Lark") registration found
-CosineKitty-Sapphire/Moots: no createModel<...>("Moots") registration found
-CosineKitty-Sapphire/Nucleus: no createModel<...>("Nucleus") registration found
-CosineKitty-Sapphire/Pivot: no createModel<...>("Pivot") registration found
-CosineKitty-Sapphire/Polynucleus: no createModel<...>("Polynucleus") registration found
-CosineKitty-Sapphire/Pop: no createModel<...>("Pop") registration found
-CosineKitty-Sapphire/Rotini: no createModel<...>("Rotini") registration found
-CosineKitty-Sapphire/Sauce: no createModel<...>("Sauce") registration found
-CosineKitty-Sapphire/SplitAddMerge: no createModel<...>("SplitAddMerge") registration found
-CosineKitty-Sapphire/Tin: no createModel<...>("Tin") registration found
-CosineKitty-Sapphire/Tout: no createModel<...>("Tout") registration found
-CosineKitty-Sapphire/Tricorder: no createModel<...>("Tricorder") registration found
-CosineKitty-Sapphire/TubeUnit: no createModel<...>("TubeUnit") registration found
-CosineKitty-Sapphire/Zoo: no createModel<...>("Zoo") registration found
 Venom/AuxClone: struct 'Venom::AuxClone' has no resolvable InputIds/OutputIds enum
 Venom/BayInput: struct 'Venom::BayInput' has no resolvable InputIds/OutputIds enum
 Venom/BayNorm: struct 'Venom::BayNorm' has no resolvable InputIds/OutputIds enum
@@ -97,17 +69,7 @@ Venom/MixSend: struct 'Venom::MixSend' has no resolvable InputIds/OutputIds enum
 Venom/MixSolo: struct 'Venom::MixSolo' has no resolvable InputIds/OutputIds enum
 Venom/Thru: struct 'Venom::Thru' has no resolvable InputIds/OutputIds enum
 Venom/VenomBlank: struct 'Venom::VenomBlank' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_4_0_4: struct 'Mixer_4_0_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_9_3_4: struct 'Mixer_9_3_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_16_4_4: struct 'Mixer_16_4_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_24_4_4: struct 'Mixer_24_4_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_4_0_4: struct 'Mixer_4_0_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_9_3_4: struct 'Mixer_9_3_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_16_4_4: struct 'Mixer_16_4_4' has no resolvable InputIds/OutputIds enum
-mscHack/Mix_24_4_4: struct 'Mixer_24_4_4' has no resolvable InputIds/OutputIds enum
-NonlinearCircuits/SlothTorpor: struct 'SlothTorporModule' has no resolvable InputIds/OutputIds enum
-NonlinearCircuits/SlothApathy: struct 'SlothApathyModule' has no resolvable InputIds/OutputIds enum
-NonlinearCircuits/SlothInertia: struct 'SlothInertiaModule' has no resolvable InputIds/OutputIds enum
+mscHack: older copy in mscHack skipped, mschack-VCV-Rack-Plugins is newer
 Stoermelder-P1/MidiCat: struct 'StoermelderPackOne::MidiCat::MidiCatModule' has no resolvable InputIds/OutputIds enum
 Stoermelder-P1/MidiPlug: struct 'StoermelderPackOne::MidiPlug::MidiPlugModule' has no resolvable InputIds/OutputIds enum
 Stoermelder-P1/MidiKey: struct 'StoermelderPackOne::MidiKey::MidiKeyModule' has no resolvable InputIds/OutputIds enum
