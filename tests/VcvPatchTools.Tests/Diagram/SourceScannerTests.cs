@@ -437,6 +437,67 @@ public class SourceScannerTests
     }
 
     [Fact]
+    public void ResolvesIndexOnlyPortsTypeMacrosAndCStrings()
+    {
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "SS-112" }, { "slug": "SS-208" }, { "slug": "X4" }, { "slug": "Clock" }, { "slug": "WM-101" } ] }""";
+        string source = """
+            struct SS_112 : Module {
+                static constexpr int deviceCount = 3;
+                SS_112() : Module() {
+                    config(0, deviceCount, 0, 0);
+                    for (unsigned int i = 0; i < deviceCount; i++) { configInput(i, "Signal Sink"); }
+                }
+            };
+            struct SS_208 : Module {
+                static constexpr int deviceCount = 2;
+                SS_208() { config(0, 0, deviceCount * 1, 0); configOutput(0, "\xcf\x80 V"); configOutput(1, "\xe2\x88\x9a" "2 V"); }
+            };
+            template<size_t MSIZE>
+            struct XX : Module {
+                enum InputId { M_INPUT, INPUTS_LEN = M_INPUT + MSIZE };
+                enum OutputId { OUTPUTS_LEN = MSIZE };
+                XX() {
+                    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+                    for (int k = 0; k < MSIZE; k++) { configOutput(k, "Out" + std::to_string(k + 1)); }
+                }
+            };
+            #define X4 XX<4>
+            struct Clocked : Module {
+                enum OutputIds { ENUMS(CLK_OUTPUTS, 2), NUM_OUTPUTS };
+                Clocked() { configOutput(CLK_OUTPUTS + 0, "Master clock"); configOutput(CLK_OUTPUTS + 1, "Clock 1"); }
+            };
+            struct SizeableModule : Module { float size = 0; };
+            Model *modelSS112 = createModel<SS_112, SS112>("SS-112");
+            Model *modelSS208 = createModel<SS_208, SS208>("SS-208");
+            Model* modelX4 = createModel<X4, X4Widget>("X4");
+            Model* modelClocked = createModel<Clocked, ClockedWidget>("Clock");
+            Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("all.cpp", source) });
+
+        Assert.Equal(new[] { "Signal Sink", "Signal Sink", "Signal Sink" }, result.Modules["P/SS-112"].Inputs);
+        Assert.Equal(new[] { "π V", "√2 V" }, result.Modules["P/SS-208"].Outputs);
+        Assert.Equal(4, result.Modules["P/X4"].Inputs.Count);
+        Assert.Equal(new[] { "Out1", "Out2", "Out3", "Out4" }, result.Modules["P/X4"].Outputs);
+        // "+ 0" isn't a loop: each port keeps its own name.
+        Assert.Equal(new[] { "Master clock", "Clock 1" }, result.Modules["P/Clock"].Outputs);
+        // No config() call: no ports, and not a problem.
+        Assert.Empty(result.Modules["P/WM-101"].Inputs);
+        Assert.Empty(result.Problems);
+    }
+
+    [Theory]
+    [InlineData(@"\xcf\x80 V", "π V")]
+    [InlineData(@"tab\there", "tab\there")]
+    [InlineData(@"\u00b0C", "°C")]
+    [InlineData(@"Say \""hi\""", "Say \"hi\"")]
+    public void DecodesCStringLiterals(string content, string expected)
+    {
+        Assert.Equal(expected, SourceScanner.CString(content));
+    }
+
+    [Fact]
     public void ResolvesConstantSizesTemplateArgsAndLoopNames()
     {
         string manifest = """{ "slug": "P", "modules": [ { "slug": "Mix" }, { "slug": "Drone" } ] }""";

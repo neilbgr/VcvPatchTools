@@ -35,7 +35,8 @@ public static partial class SourceScanner
     [GeneratedRegex(@"\benum\s+(\w+)\s*(?::\s*\w+\s*)?\{")]
     private static partial Regex EnumRegex();
 
-    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*(?:\+\s*(\d+)\s*)?,\s*""((?:[^""\\]|\\.)*)""")]
+    // configInput(X_INPUT, "Name"), adjacent literals included ("\xe2\x88\x9a" "2 V"); the literal is the whole argument.
+    [GeneratedRegex(@"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*(?:\+\s*(\d+)\s*)?,\s*((?:""(?:[^""\\]|\\.)*""\s*)+)(?=[,)])")]
     private static partial Regex ConfigCallRegex();
 
     [GeneratedRegex(@"ModulationAssistant\s*<\s*[\w:]+(?:\s*<[^<>]*>)?\s*,\s*([^,<>]+?)\s*,\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*>")]
@@ -71,7 +72,7 @@ public static partial class SourceScanner
     private static partial Regex EnumsMacroRegex();
 
     // config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS), venomConfig(…), config(0, 8, 1, 0)
-    [GeneratedRegex(@"\b(?:config|\w+Config)\s*\(\s*([\w:]+)\s*,\s*([\w:]+)\s*,\s*([\w:]+)\s*,\s*([\w:]+)\s*\)")]
+    [GeneratedRegex(@"\b(?:config|\w+Config)\s*\(\s*([^,();""]+?)\s*,\s*([^,();""]+?)\s*,\s*([^,();""]+?)\s*,\s*([^,();""]+?)\s*\)")]
     private static partial Regex ConfigCountsRegex();
 
     [GeneratedRegex(@"^[ \t]*#[ \t]*define[ \t]+(\w+)\(([^)]*)\)((?:[^\n]*\\\r?\n)*[^\n]*)", RegexOptions.Multiline)]
@@ -111,6 +112,16 @@ public static partial class SourceScanner
                     : fileStrings.GetValueOrDefault(match.Groups[5].Value) ?? pluginStrings.GetValueOrDefault(match.Groups[5].Value);
                 if (slug is null)
                 {
+                    continue;
+                }
+                // "#define X4 XX<4>" then createModel<X4, X4Widget>: the template the macro names.
+                Match typeMacro = Regex.Match(file.Text, @"^[ \t]*#[ \t]*define[ \t]+" + Regex.Escape(match.Groups[1].Value) + @"[ \t]+([\w:]+)\s*<([^<>\r\n]*)>[ \t]*\r?$", RegexOptions.Multiline);
+                if (!match.Groups[2].Success && !match.Groups[3].Success && typeMacro.Success)
+                {
+                    if (structBySlug.TryAdd(slug, (typeMacro.Groups[1].Value, typeMacro.Groups[2].Value)))
+                    {
+                        registeredIn[slug] = file;
+                    }
                     continue;
                 }
                 // Widget<Args>::M: the arguments are the widget's, the module is found through the alias.
@@ -173,7 +184,7 @@ public static partial class SourceScanner
         }
         found = WithCompositeEnums(found, sources, headers);
         // The file's own constants win over the plugin's (mscHack's "#define nCHANNELS 8" in ASAF8.cpp, another value
-        // elsewhere), the template arguments over both (MixMaster<8, 2>).
+        // elsewhere), the struct's over its file's, the template arguments over all (MixMaster<8, 2>).
         constants = new Dictionary<string, int>(constants, StringComparer.Ordinal);
         if (found.FileText.Length > 0)
         {
@@ -181,6 +192,11 @@ public static partial class SourceScanner
             {
                 constants[name] = value;
             }
+        }
+        // The struct's own constants over its file's (SubmarineFree's SS_112 and SS_208 each have a "deviceCount").
+        foreach ((string name, int value) in CollectConstants(new List<SourceFile> { new SourceFile("", string.Join("\n", found.ConfigScopes.Take(1))) }))
+        {
+            constants[name] = value;
         }
         foreach ((string name, int value) in templateArgs)
         {
@@ -208,7 +224,8 @@ public static partial class SourceScanner
                 outputEnum = ParseNamedEnum(found.HeaderScopes, outputEnumNames, constants);
                 if (inputEnum is null && outputEnum is null)
                 {
-                    return false;
+                    // A module that never calls config() has no ports (Notes, a wire manager…).
+                    return !found.ConfigScopes.Any(scope => Regex.IsMatch(scope, @"\b(?:config|\w+Config)\s*\(|\bconfig(?:Input|Output)\s*\("));
                 }
             }
         }
@@ -221,7 +238,7 @@ public static partial class SourceScanner
             {
                 Dictionary<string, string> target = match.Groups[1].Value == "Input" ? inputNames : outputNames;
                 string key = match.Groups[3].Success && match.Groups[3].Value != "0" ? $"{match.Groups[2].Value}+{match.Groups[3].Value}" : match.Groups[2].Value;
-                target.TryAdd(key, Regex.Unescape(match.Groups[4].Value));
+                target.TryAdd(key, CLiterals(match.Groups[4].Value));
             }
         }
 
@@ -474,6 +491,76 @@ public static partial class SourceScanner
         return strings;
     }
 
+    /// <summary>A file without the bodies of its structs and classes: its file-scope declarations only.</summary>
+    private static string WithoutStructBodies(string text)
+    {
+        StringBuilder kept = new StringBuilder();
+        int position = 0;
+        foreach (Match definition in Regex.Matches(text, @"\b(?:struct|class)\s+\w+\b[^;{()]*\{"))
+        {
+            if (definition.Index < position)
+            {
+                continue;
+            }
+            int open = definition.Index + definition.Length - 1;
+            kept.Append(text, position, open + 1 - position);
+            position = open + 1 + BraceBody(text, open).Length;
+        }
+        return kept.Append(text, position, text.Length - position).ToString();
+    }
+
+    /// <summary>One or more adjacent C string literals, quotes included: "\xe2\x88\x9a" "2 V" → "√2 V".</summary>
+    private static string CLiterals(string literals) =>
+        string.Concat(StringLiteralRegex().Matches(literals).Select(m => CString(m.Groups[1].Value)));
+
+    /// <summary>A C string literal's content: escapes are bytes ("\xcf\x80" is π in UTF-8), the rest UTF-8 text.</summary>
+    public static string CString(string content)
+    {
+        List<byte> bytes = new List<byte>();
+        for (int i = 0; i < content.Length; i++)
+        {
+            char c = content[i];
+            if (c != '\\' || i + 1 >= content.Length)
+            {
+                bytes.AddRange(Encoding.UTF8.GetBytes(c.ToString()));
+                continue;
+            }
+            char e = content[++i];
+            switch (e)
+            {
+                case 'x':
+                    int hexEnd = i + 1;
+                    while (hexEnd < content.Length && hexEnd < i + 3 && Uri.IsHexDigit(content[hexEnd]))
+                    {
+                        hexEnd++;
+                    }
+                    if (hexEnd > i + 1)
+                    {
+                        bytes.Add(Convert.ToByte(content[(i + 1)..hexEnd], 16));
+                        i = hexEnd - 1;
+                    }
+                    break;
+                case >= '0' and <= '7':
+                    int octalEnd = i;
+                    while (octalEnd < content.Length && octalEnd < i + 3 && content[octalEnd] is >= '0' and <= '7')
+                    {
+                        octalEnd++;
+                    }
+                    bytes.Add((byte)Convert.ToInt32(content[i..octalEnd], 8));
+                    i = octalEnd - 1;
+                    break;
+                case 'u' when i + 4 < content.Length:
+                    bytes.AddRange(Encoding.UTF8.GetBytes(char.ConvertFromUtf32(Convert.ToInt32(content[(i + 1)..(i + 5)], 16))));
+                    i += 4;
+                    break;
+                default:
+                    bytes.AddRange(Encoding.UTF8.GetBytes(e switch { 'n' => "\n", 't' => "\t", 'r' => "\r", _ => e.ToString() }));
+                    break;
+            }
+        }
+        return Encoding.UTF8.GetString(bytes.ToArray());
+    }
+
     /// <summary>Splits on a character outside parentheses, brackets and string literals.</summary>
     private static List<string> SplitTopLevelOn(string text, char separator)
     {
@@ -644,7 +731,7 @@ public static partial class SourceScanner
         {
             foreach (Match match in ConfigParamRegex().Matches(scope))
             {
-                paramNames.TryAdd(match.Groups[1].Value, Regex.Unescape(match.Groups[2].Value));
+                paramNames.TryAdd(match.Groups[1].Value, CString(match.Groups[2].Value));
             }
         }
 
@@ -707,6 +794,9 @@ public static partial class SourceScanner
 
     private sealed record StructSource(List<string> EnumScopes, List<string> ConfigScopes, string FileText = "")
     {
+        /// <summary>Other files defining its constructor out of line (SquinkyLabs: class in a .h, constructor in the .cpp).</summary>
+        public List<string> ConstructorFiles { get; init; } = new List<string>();
+
         /// <summary>Headers the struct's file includes from its folder: enums looked for there last.</summary>
         public List<string> HeaderScopes { get; init; } = new List<string>();
     }
@@ -720,16 +810,23 @@ public static partial class SourceScanner
     {
         // The struct and its constructors (often defined out of line).
         string body = string.Join("\n", found.ConfigScopes);
-        IEnumerable<(string Alias, string Target)> aliases = Regex.Matches(found.FileText, @"\busing\s+(\w+)\s*=\s*(?:typename\s+)?([\w:]+)\s*(?:<[^;]*>)?\s*;")
+        string files = string.Join("\n", found.ConstructorFiles.Prepend(found.FileText));
+        IEnumerable<(string Alias, string Target)> aliases = Regex.Matches(files, @"\busing\s+(\w+)\s*=\s*(?:typename\s+)?([\w:]+)\s*(?:<[^;]*>)?\s*;")
             .Select(m => (m.Groups[1].Value, m.Groups[2].Value))
-            .Concat(Regex.Matches(found.FileText, @"\btypedef\s+([\w:]+)\s*(?:<[^;]*>)?\s+(\w+)\s*;").Select(m => (m.Groups[2].Value, m.Groups[1].Value)));
+            .Concat(Regex.Matches(files, @"\btypedef\s+([\w:]+)\s*(?:<[^;]*>)?\s+(\w+)\s*;").Select(m => (m.Groups[2].Value, m.Groups[1].Value)));
         foreach ((string alias, string target) in aliases)
         {
-            if (!Regex.IsMatch(body, @"\b" + Regex.Escape(alias) + @"::NUM_(INPUTS|OUTPUTS)\b"))
+            // "config(Comp::NUM_PARAMS, Comp::NUM_INPUTS, …)", or through a member: "Comp vco; … config(vco.NUM_PARAMS, vco.NUM_INPUTS, …)".
+            Match member = Regex.Match(body, @"\b" + Regex.Escape(alias) + @"\s+(\w+)\s*;");
+            if (!Regex.IsMatch(body, @"\b" + Regex.Escape(alias) + @"::NUM_(INPUTS|OUTPUTS)\b")
+                && !(member.Success && Regex.IsMatch(body, @"\b" + member.Groups[1].Value + @"\.NUM_(INPUTS|OUTPUTS)\b")))
             {
                 continue;
             }
-            StructSource? composite = FindStruct(LastSegment(target), sources, depth: 0) ?? FindStruct(LastSegment(target), headers, depth: 0);
+            // The header the module includes first: StudioSixPlusOne's EmptyComposite.h also declares a "MaccomoComp".
+            HashSet<string> included = Regex.Matches(files, @"#\s*include\s*[<""]([^>""]+)[>""]").Select(m => Path.GetFileName(m.Groups[1].Value)).ToHashSet(StringComparer.Ordinal);
+            List<SourceFile> candidates = sources.Concat(headers).OrderBy(f => included.Contains(Path.GetFileName(f.Path)) ? 0 : 1).ToList();
+            StructSource? composite = FindStruct(LastSegment(target), candidates, depth: 0);
             if (composite is not null)
             {
                 return found with
@@ -755,12 +852,17 @@ public static partial class SourceScanner
                 string body = BraceBody(file.Text, match.Index + match.Length - 1);
                 List<string> enumScopes = new List<string> { body };
                 List<string> configScopes = new List<string> { body };
+                List<string> constructorFiles = new List<string>();
 
                 foreach (SourceFile other in sources)
                 {
                     foreach (Match ctor in constructor.Matches(other.Text))
                     {
                         configScopes.Add(BraceBody(other.Text, ctor.Index + ctor.Length - 1));
+                        if (other != file && !constructorFiles.Contains(other.Text))
+                        {
+                            constructorFiles.Add(other.Text);
+                        }
                     }
                 }
 
@@ -780,8 +882,8 @@ public static partial class SourceScanner
 
                 // Old-style plugins sometimes declare the enums at file scope next to the struct, or in a header next to
                 // it (DHE's control-ids.h).
-                enumScopes.Add(file.Text);
-                return new StructSource(enumScopes, configScopes, file.Text) { HeaderScopes = LocalIncludes(sources, file).Select(header => header.Text).ToList() };
+                enumScopes.Add(WithoutStructBodies(file.Text));
+                return new StructSource(enumScopes, configScopes, file.Text) { ConstructorFiles = constructorFiles, HeaderScopes = LocalIncludes(sources, file).Select(header => header.Text).ToList() };
             }
         }
         return null;
@@ -812,9 +914,11 @@ public static partial class SourceScanner
     /// </summary>
     private static List<(string Id, int Index, string Fallback)>? EnumClosedBy(string count, List<string> scopes, Dictionary<string, int> constants)
     {
-        if (int.TryParse(count, out int literal))
+        // A number, a constant or an expression of them ("config(0, deviceCount * deviceSetCount, 0, 0)"): ports known by
+        // index only.
+        if (Evaluate(count, constants) is int ports && !Regex.IsMatch(count, @"^(NUM_\w+|\w+_(LEN|COUNT|END)|Count)$"))
         {
-            return Enumerable.Range(0, literal).Select(i => ($"#{i}", i, $"#{i + 1}")).ToList();
+            return Enumerable.Range(0, ports).Select(i => (i.ToString(System.Globalization.CultureInfo.InvariantCulture), i, $"#{i + 1}")).ToList();
         }
         Regex closing = new Regex(@"(^|,)\s*" + Regex.Escape(count) + @"\s*(=|,|$)");
         foreach (string scope in scopes)
@@ -934,6 +1038,11 @@ public static partial class SourceScanner
             // "OUTPUTS_END = OUTPUTS_START + N - 1, NUM_OUTPUTS = N": the last of the end markers sizes the range.
             if (IsEnumEnd(name))
             {
+                // "enum OutputId { OUTPUTS_LEN = MSIZE };": a count and no names, ports known by index.
+                if (entries.Count == 0 && !ended && next is > 0 and <= 256)
+                {
+                    entries.AddRange(Enumerable.Range(0, next).Select(i => (i.ToString(System.Globalization.CultureInfo.InvariantCulture), i, $"#{i + 1}")));
+                }
                 ended = true;
                 continue;
             }
@@ -1074,7 +1183,25 @@ public static partial class SourceScanner
         }
         Dictionary<string, List<string>> arrays = StringArrayRegex().Matches(scope)
             .GroupBy(m => m.Groups[1].Value)
-            .ToDictionary(g => g.Key, g => StringLiteralRegex().Matches(g.First().Groups[2].Value).Select(m => Regex.Unescape(m.Groups[1].Value)).ToList());
+            .ToDictionary(g => g.Key, g => StringLiteralRegex().Matches(g.First().Groups[2].Value).Select(m => CString(m.Groups[1].Value)).ToList());
+
+        // Ports known by index only, named in a loop: "for (unsigned int i = 0; i < deviceCount; i++) configInput(i, "Signal Sink");"
+        foreach (Match call in Regex.Matches(scope, @"config(Input|Output)\s*\(\s*(\w+)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*(?:;|->)"))
+        {
+            string loopVar = call.Groups[2].Value;
+            string before = scope[..call.Index];
+            if (call.Groups[1].Value != kind || !Regex.IsMatch(before, @"\bfor\s*\([^;]*\b" + Regex.Escape(loopVar) + @"\s*=") || int.TryParse(loopVar, out _))
+            {
+                continue;
+            }
+            foreach ((string id, int index, string _) in entries.Where(e => int.TryParse(e.Id, out _)))
+            {
+                if (LoopName(call.Groups[3].Value.Trim(), loopVar, index, arrays, name => LocalString(before, name)) is string name)
+                {
+                    names.TryAdd(id, name);
+                }
+            }
+        }
 
         foreach (Match call in LoopConfigRegex().Matches(scope))
         {
@@ -1092,6 +1219,11 @@ public static partial class SourceScanner
             string argument = call.Groups[5].Value.Trim();
             // "auto s = std::string("Modulation Signal ") + std::to_string(m + 1); configInput(MOD_INPUT_0 + m, s);"
             string before = scope[..call.Index];
+            // Only a real loop variable: "configOutput(CLK_OUTPUTS + 0, …)" isn't a loop.
+            if (!Regex.IsMatch(before, @"\bfor\s*\([^;]*\b" + Regex.Escape(loopVar) + @"\s*=") || char.IsDigit(loopVar[0]))
+            {
+                continue;
+            }
             if (Regex.IsMatch(argument, @"^\w+$") && LocalString(before, argument) is string value)
             {
                 argument = value;
@@ -1133,7 +1265,7 @@ public static partial class SourceScanner
             Match literal = Regex.Match(term, @"^""((?:[^""\\]|\\.)*)""$");
             if (literal.Success)
             {
-                return Regex.Unescape(literal.Groups[1].Value);
+                return CString(literal.Groups[1].Value);
             }
             Match number = Regex.Match(term, @"^(?:std::)?to_string\s*\((.*)\)$");
             if (number.Success)
@@ -1160,6 +1292,10 @@ public static partial class SourceScanner
             List<string?> parts = terms.Select(Term).ToList();
             return parts.Contains(null) ? null : string.Concat(parts);
         }
+        if (Regex.IsMatch(argument, @"^(?:""(?:[^""\\]|\\.)*""\s*)+$"))
+        {
+            return CLiterals(argument);
+        }
         if (argument.Contains('+') && Concatenation(argument) is string joined)
         {
             return joined;
@@ -1168,7 +1304,7 @@ public static partial class SourceScanner
         Match format = Regex.Match(argument, @"^(?:rack::)?string::f\(\s*""((?:[^""\\]|\\.)*)""\s*,\s*(.+)\)$");
         if (format.Success)
         {
-            string pattern = Regex.Unescape(format.Groups[1].Value);
+            string pattern = CString(format.Groups[1].Value);
             string formatArg = format.Groups[2].Value.Trim();
             if (Regex.IsMatch(formatArg, @"^" + Regex.Escape(loopVar) + @"\s*\+\s*1$"))
             {

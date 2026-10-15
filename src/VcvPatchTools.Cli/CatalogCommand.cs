@@ -89,6 +89,14 @@ internal static class CatalogCommand
             }
         }
 
+        // Modules the hand-written overrides name (ports known only at run time…) aren't problems.
+        string overridesPath = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(outputPath))!, "ports.overrides.json");
+        if (File.Exists(overridesPath))
+        {
+            HashSet<string> overridden = PortCatalog.FromJson(File.ReadAllText(overridesPath)).Modules.Keys.ToHashSet(StringComparer.Ordinal);
+            problems.RemoveAll(problem => problem.IndexOf(':') is int colon and > 0 && overridden.Contains(problem[..colon]));
+        }
+
         File.WriteAllText(outputPath, new PortCatalog(all).ToJson());
         int resolved = all.Values.Count(m => m.Inputs.Count > 0 || m.Outputs.Count > 0);
         Console.WriteLine($"{all.Count} modules, {resolved} with ports resolved, {problems.Count} problems → {outputPath}");

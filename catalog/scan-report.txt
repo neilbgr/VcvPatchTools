@@ -1,23 +1,2 @@
-Core/Blank: struct 'BlankModule' has no resolvable InputIds/OutputIds enum
-Core/Notes: struct 'NotesModule' has no resolvable InputIds/OutputIds enum
-Cardinal/HostAudio2: struct 'HostAudio2' has no resolvable InputIds/OutputIds enum
-Cardinal/HostAudio8: struct 'HostAudio8' has no resolvable InputIds/OutputIds enum
-Cardinal/HostParameters: struct 'HostParameters' has no resolvable InputIds/OutputIds enum
-Cardinal/TextEditor: struct 'TextEditorModule' has no resolvable InputIds/OutputIds enum
 mscHack: older copy in mscHack skipped, mschack-VCV-Rack-Plugins is newer
-Stoermelder-P1/MidiPlug: struct 'StoermelderPackOne::MidiPlug::MidiPlugModule' has no resolvable InputIds/OutputIds enum
-StudioSixPlusOne/Maccomo: struct 'Maccomo' has no resolvable InputIds/OutputIds enum
-SubmarineFree/SS-112: struct 'SS_112' has no resolvable InputIds/OutputIds enum
-SubmarineFree/SS-208: struct 'SS_208' has no resolvable InputIds/OutputIds enum
-SubmarineFree/SS-212: struct 'SS_212' has no resolvable InputIds/OutputIds enum
-SubmarineFree/SS-220: struct 'SS_220' has no resolvable InputIds/OutputIds enum
-SubmarineFree/SS-221: struct 'SS_221' has no resolvable InputIds/OutputIds enum
-SubmarineFree/WM-101: struct 'SizeableModule' has no resolvable InputIds/OutputIds enum
-dbRackModules/X6: struct 'X6' has no resolvable InputIds/OutputIds enum
-dbRackModules/X4: struct 'X4' has no resolvable InputIds/OutputIds enum
-squinkylabs-plug1/squinkylabs-funv: struct 'FunVModule' has no resolvable InputIds/OutputIds enum
-squinkylabs-plug1/squinkylabs-lfnb: struct 'LFNBModule' has no resolvable InputIds/OutputIds enum
-squinkylabs-plug1/squinkylabs-sequencer4: struct 'Sequencer4Module' has no resolvable InputIds/OutputIds enum
-squinkylabs-plug1/squinkylabs-lfn: struct 'LFNModule' has no resolvable InputIds/OutputIds enum
-squinkylabs-plug1/squinkylabs-sequencer: struct 'SequencerModule' has no resolvable InputIds/OutputIds enum
 CountModula: no sources found, 138 modules kept from the previous catalog

@@ -6941,14 +6941,14 @@
       "Gate",
       "Pitch",
       "Accent",
-      "Step 1",
-      "Step 2",
-      "Step 3",
-      "Step 4",
-      "Step 5",
-      "Step 6",
-      "Step 7",
-      "Step 8"
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate"
     ]
   },
   "Bidoo/cANARd": {
@@ -7020,14 +7020,14 @@
     "outputs": [
       "Gate",
       "Pitch",
-      "Step 1",
-      "Step 2",
-      "Step 3",
-      "Step 4",
-      "Step 5",
-      "Step 6",
-      "Step 7",
-      "Step 8"
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate",
+      "Step gate"
     ]
   },
   "Bidoo/dUKe": {
@@ -11089,8 +11089,30 @@
     "tags": [
       "External"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10"
+    ],
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10"
+    ]
   },
   "Cardinal/HostMIDI": {
     "name": "Host MIDI",
@@ -11409,7 +11431,17 @@
       "Inputs off 7",
       "Inputs off 8"
     ],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9"
+    ]
   },
   "CatroModulo/CatroModulo_CM-3": {
     "name": "PreSetSeq",
@@ -20898,11 +20930,11 @@
       "Polyphonic"
     ],
     "inputs": [
-      "Phasor 1",
-      "Phasor 2",
-      "Phasor 3",
-      "Phasor 4",
-      "Phasor 5"
+      "Phasor",
+      "Phasor",
+      "Phasor",
+      "Phasor",
+      "Phasor"
     ],
     "outputs": [
       "Wrap",
@@ -22249,10 +22281,10 @@
       "Scale",
       "Octave",
       "Random Velocities",
-      "Length 1",
-      "Length 2",
-      "Length 3",
-      "Length 4",
+      "Length",
+      "Length",
+      "Length",
+      "Length",
       "Random Lengths"
     ],
     "outputs": [
@@ -24607,7 +24639,7 @@
       "Polyphonic"
     ],
     "inputs": [
-      "In1",
+      "CV",
       "In2",
       "In3",
       "In4",
@@ -24627,14 +24659,14 @@
       "Polyphonic"
     ],
     "inputs": [
-      "In 1",
-      "In 2",
-      "In 3",
-      "In 4",
-      "In 5",
-      "In 6",
-      "In 7",
-      "In 8"
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV"
     ],
     "outputs": [
       "CV Sum"
@@ -24647,14 +24679,14 @@
       "Polyphonic"
     ],
     "inputs": [
-      "In 1",
-      "In 2",
-      "In 3",
-      "In 4",
-      "In 5",
-      "In 6",
-      "In 7",
-      "In 8"
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV",
+      "CV"
     ],
     "outputs": [
       "CV Sum"
@@ -27226,7 +27258,24 @@
       "OOXO",
       "OOOX"
     ],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10",
+      "#11",
+      "#12",
+      "#13",
+      "#14",
+      "#15",
+      "#16"
+    ]
   },
   "NonlinearCircuits/Router": {
     "name": "Router",
@@ -27362,7 +27411,16 @@
       "OXO",
       "OOX"
     ],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8"
+    ]
   },
   "NonlinearCircuits/TripleSloth": {
     "name": "Triple Sloth",
@@ -28724,12 +28782,12 @@
       "Channel 2 quantized pitch",
       "Channel 3 quantized pitch",
       "Channel 4 quantized pitch",
-      "Chg 1",
-      "Chg 2",
-      "Chg 3",
-      "Chg 4",
+      "(retired)",
+      "(retired)",
+      "(retired)",
+      "(retired)",
       "Root CV (1V/oct) \u2014 drives any module\u0027s ROOT input",
-      "Scale CV (1V per scale on channel 0; the full scale, "
+      "Scale CV (1V per scale on channel 0; the full scale, including microtonal and Scala, on the further channels)"
     ]
   },
   "SignalFunctionSet/Kit": {
@@ -29169,8 +29227,8 @@
     ],
     "inputs": [
       "CV (data, sampled on each tap fire)",
-      "Clock (advances all taps in parallel mode, ",
-      "N CV (\u00B15V \u2192 \u00B115, summed into every N pot \u2014 ",
+      "Clock (advances all taps in parallel mode, and the cascade chain root)",
+      "N CV (\u00B15V \u2192 \u00B115, summed into every N pot \u2014 global modulator on top of per-lane Step CVs)",
       "Reset (clears all counters and held values)",
       "Step CV A (\u00B15V \u2192 \u00B115, summed with N pot)",
       "Step cv input b",
@@ -29186,7 +29244,7 @@
       "Gate b",
       "Gate c",
       "Gate d",
-      "Jumble CV (random pick from A/B/C/D, ",
+      "Jumble CV (random pick from A/B/C/D, re-rolled on each input clock)",
       "Jumble clock (mirrors the input clock shape)"
     ]
   },
@@ -30534,40 +30592,40 @@
       "Switch"
     ],
     "inputs": [
-      "Round1 1",
-      "Round1 2",
-      "Round1 3",
-      "Round1 4",
-      "Round1 5",
-      "Round1 6",
-      "Round1 7",
-      "Round1 8",
-      "Round1 9",
-      "Round1 10",
-      "Round1 11",
-      "Round1 12",
-      "Round1 13",
-      "Round1 14",
-      "Round1 15",
-      "Round1 16",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
+      "Contest",
       "Contest trigger",
       "Invert trigger"
     ],
     "outputs": [
-      "Round2 1",
-      "Round2 2",
-      "Round2 3",
-      "Round2 4",
-      "Round2 5",
-      "Round2 6",
-      "Round2 7",
-      "Round2 8",
-      "Round3 1",
-      "Round3 2",
-      "Round3 3",
-      "Round3 4",
-      "Round4 1",
-      "Round4 2",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 1 winner",
+      "Round 2 winner",
+      "Round 2 winner",
+      "Round 2 winner",
+      "Round 2 winner",
+      "Round 3 winner",
+      "Round 3 winner",
       "Contest champion"
     ]
   },
@@ -31440,8 +31498,17 @@
       "Polyphonic",
       "Filter"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Voct",
+      "Resonance cv",
+      "Drive cv",
+      "Mode cv",
+      "Main",
+      "Freq cv"
+    ],
+    "outputs": [
+      "Main"
+    ]
   },
   "StudioSixPlusOne/Mix": {
     "name": "Mix",
@@ -32598,22 +32665,22 @@
       "Phase shift #4"
     ],
     "outputs": [
-      "0\u00C2\u00B0",
-      "30\u00C2\u00B0",
-      "45\u00C2\u00B0",
-      "60\u00C2\u00B0",
-      "90\u00C2\u00B0",
-      "120\u00C2\u00B0",
-      "135\u00C2\u00B0",
-      "150\u00C2\u00B0",
-      "180\u00C2\u00B0",
-      "210\u00C2\u00B0",
-      "225\u00C2\u00B0",
-      "240\u00C2\u00B0",
-      "270\u00C2\u00B0",
-      "300\u00C2\u00B0",
-      "315\u00C2\u00B0",
-      "330\u00C2\u00B0",
+      "0\u00B0",
+      "30\u00B0",
+      "45\u00B0",
+      "60\u00B0",
+      "90\u00B0",
+      "120\u00B0",
+      "135\u00B0",
+      "150\u00B0",
+      "180\u00B0",
+      "210\u00B0",
+      "225\u00B0",
+      "240\u00B0",
+      "270\u00B0",
+      "300\u00B0",
+      "315\u00B0",
+      "330\u00B0",
       "Custom #1",
       "Custom #2",
       "Custom #3",
@@ -32635,22 +32702,22 @@
       "Phase shift #4"
     ],
     "outputs": [
-      "0\u00C2\u00B0",
-      "30\u00C2\u00B0",
-      "45\u00C2\u00B0",
-      "60\u00C2\u00B0",
-      "90\u00C2\u00B0",
-      "120\u00C2\u00B0",
-      "135\u00C2\u00B0",
-      "150\u00C2\u00B0",
-      "180\u00C2\u00B0",
-      "210\u00C2\u00B0",
-      "225\u00C2\u00B0",
-      "240\u00C2\u00B0",
-      "270\u00C2\u00B0",
-      "300\u00C2\u00B0",
-      "315\u00C2\u00B0",
-      "330\u00C2\u00B0",
+      "0\u00B0",
+      "30\u00B0",
+      "45\u00B0",
+      "60\u00B0",
+      "90\u00B0",
+      "120\u00B0",
+      "135\u00B0",
+      "150\u00B0",
+      "180\u00B0",
+      "210\u00B0",
+      "225\u00B0",
+      "240\u00B0",
+      "270\u00B0",
+      "300\u00B0",
+      "315\u00B0",
+      "330\u00B0",
       "Custom #1",
       "Custom #2",
       "Custom #3",
@@ -32705,7 +32772,20 @@
     "tags": [
       "UTILITY"
     ],
-    "inputs": [],
+    "inputs": [
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink",
+      "Signal Sink"
+    ],
     "outputs": []
   },
   "SubmarineFree/SS-208": {
@@ -32714,7 +32794,16 @@
       "UTILITY"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "\u03C0 V",
+      "\u03C4 V",
+      "\u212F V",
+      "\u221A\u00BD V",
+      "\u221A2 V",
+      "\u221A3 V",
+      "\u221A5 V",
+      "\u221A7 V"
+    ]
   },
   "SubmarineFree/SS-212": {
     "name": "SS-212",
@@ -32722,7 +32811,20 @@
       "UTILITY"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10",
+      "#11",
+      "#12"
+    ]
   },
   "SubmarineFree/SS-220": {
     "name": "SS-220",
@@ -32730,7 +32832,128 @@
       "UTILITY"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10",
+      "#11",
+      "#12",
+      "#13",
+      "#14",
+      "#15",
+      "#16",
+      "#17",
+      "#18",
+      "#19",
+      "#20",
+      "#21",
+      "#22",
+      "#23",
+      "#24",
+      "#25",
+      "#26",
+      "#27",
+      "#28",
+      "#29",
+      "#30",
+      "#31",
+      "#32",
+      "#33",
+      "#34",
+      "#35",
+      "#36",
+      "#37",
+      "#38",
+      "#39",
+      "#40",
+      "#41",
+      "#42",
+      "#43",
+      "#44",
+      "#45",
+      "#46",
+      "#47",
+      "#48",
+      "#49",
+      "#50",
+      "#51",
+      "#52",
+      "#53",
+      "#54",
+      "#55",
+      "#56",
+      "#57",
+      "#58",
+      "#59",
+      "#60",
+      "#61",
+      "#62",
+      "#63",
+      "#64",
+      "#65",
+      "#66",
+      "#67",
+      "#68",
+      "#69",
+      "#70",
+      "#71",
+      "#72",
+      "#73",
+      "#74",
+      "#75",
+      "#76",
+      "#77",
+      "#78",
+      "#79",
+      "#80",
+      "#81",
+      "#82",
+      "#83",
+      "#84",
+      "#85",
+      "#86",
+      "#87",
+      "#88",
+      "#89",
+      "#90",
+      "#91",
+      "#92",
+      "#93",
+      "#94",
+      "#95",
+      "#96",
+      "#97",
+      "#98",
+      "#99",
+      "#100",
+      "#101",
+      "#102",
+      "#103",
+      "#104",
+      "#105",
+      "#106",
+      "#107",
+      "#108",
+      "#109",
+      "#110",
+      "#111",
+      "#112",
+      "#113",
+      "#114",
+      "#115",
+      "#116",
+      "#117",
+      "#118",
+      "#119",
+      "#120"
+    ]
   },
   "SubmarineFree/SS-221": {
     "name": "SS-221",
@@ -32738,7 +32961,29 @@
       "UTILITY"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10",
+      "#11",
+      "#12",
+      "#13",
+      "#14",
+      "#15",
+      "#16",
+      "#17",
+      "#18",
+      "#19",
+      "#20",
+      "#21"
+    ]
   },
   "SubmarineFree/TD-116": {
     "name": "TD-116",
@@ -32746,10 +32991,10 @@
       "VISUAL"
     ],
     "inputs": [
-      "#1"
+      "Deprecated"
     ],
     "outputs": [
-      "#1"
+      "Deprecated"
     ]
   },
   "SubmarineFree/TD-202": {
@@ -40591,8 +40836,16 @@
       "Utility",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "CV",
+      "CV",
+      "CV"
+    ],
+    "outputs": [
+      "CV",
+      "CV",
+      "CV"
+    ]
   },
   "dbRackModules/Drums": {
     "name": "Drums",
@@ -40843,7 +41096,47 @@
       "Expander"
     ],
     "inputs": [],
-    "outputs": []
+    "outputs": [
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Gate 17",
+      "Gate 18",
+      "Gate 19",
+      "Gate 20",
+      "Gate 21",
+      "Gate 22",
+      "Gate 23",
+      "Gate 24",
+      "Gate 25",
+      "Gate 26",
+      "Gate 27",
+      "Gate 28",
+      "Gate 29",
+      "Gate 30",
+      "Gate 31",
+      "Gate 32",
+      "Gate 33",
+      "Gate 34",
+      "Gate 35",
+      "Gate 36",
+      "Gate 37",
+      "Gate 38",
+      "Gate 39"
+    ]
   },
   "dbRackModules/HexSeqP": {
     "name": "HexSeqP",
@@ -41466,7 +41759,12 @@
       "Chn 3",
       "Chn 4"
     ],
-    "outputs": []
+    "outputs": [
+      "CV 1",
+      "CV 2",
+      "CV 3",
+      "CV 4"
+    ]
   },
   "dbRackModules/PShift": {
     "name": "PShift",
@@ -41948,8 +42246,34 @@
       "Mixer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In 1",
+      "In 2",
+      "In 3",
+      "In 4",
+      "Mod 1",
+      "Mod 2",
+      "Mod 3",
+      "Mod 4",
+      "Mod 5",
+      "Mod 6",
+      "Mod 7",
+      "Mod 8",
+      "Mod 9",
+      "Mod 10",
+      "Mod 11",
+      "Mod 12",
+      "Mod 13",
+      "Mod 14",
+      "Mod 15",
+      "Mod 16"
+    ],
+    "outputs": [
+      "Out1",
+      "Out2",
+      "Out3",
+      "Out4"
+    ]
   },
   "dbRackModules/X6": {
     "name": "X6",
@@ -41957,8 +42281,58 @@
       "Mixer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "In 1",
+      "In 2",
+      "In 3",
+      "In 4",
+      "In 5",
+      "In 6",
+      "Mod 1",
+      "Mod 2",
+      "Mod 3",
+      "Mod 4",
+      "Mod 5",
+      "Mod 6",
+      "Mod 7",
+      "Mod 8",
+      "Mod 9",
+      "Mod 10",
+      "Mod 11",
+      "Mod 12",
+      "Mod 13",
+      "Mod 14",
+      "Mod 15",
+      "Mod 16",
+      "Mod 17",
+      "Mod 18",
+      "Mod 19",
+      "Mod 20",
+      "Mod 21",
+      "Mod 22",
+      "Mod 23",
+      "Mod 24",
+      "Mod 25",
+      "Mod 26",
+      "Mod 27",
+      "Mod 28",
+      "Mod 29",
+      "Mod 30",
+      "Mod 31",
+      "Mod 32",
+      "Mod 33",
+      "Mod 34",
+      "Mod 35",
+      "Mod 36"
+    ],
+    "outputs": [
+      "Out1",
+      "Out2",
+      "Out3",
+      "Out4",
+      "Out5",
+      "Out6"
+    ]
   },
   "dbRackModules/X8": {
     "name": "X8",
@@ -44319,8 +44693,18 @@
     "tags": [
       "VCO"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Pitch",
+      "Fm",
+      "Sync",
+      "Pw"
+    ],
+    "outputs": [
+      "Sin",
+      "Tri",
+      "Saw",
+      "Sqr"
+    ]
   },
   "squinkylabs-plug1/squinkylabs-gry": {
     "name": "Gray Code",
@@ -44351,8 +44735,16 @@
       "Random",
       "LFO"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "EQ Gain",
+      "Eq1",
+      "Eq2",
+      "Eq3",
+      "Eq4"
+    ],
+    "outputs": [
+      "Output"
+    ]
   },
   "squinkylabs-plug1/squinkylabs-lfnb": {
     "name": "LFNB",
@@ -44361,8 +44753,16 @@
       "RANDOM",
       "LFO"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Fc0",
+      "Fc1",
+      "Q0",
+      "Q1"
+    ],
+    "outputs": [
+      "Audio0",
+      "Audio1"
+    ]
   },
   "squinkylabs-plug1/squinkylabs-mix4": {
     "name": "ExFor",
@@ -44543,8 +44943,18 @@
       "Sequencer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Clock",
+      "Reset",
+      "Run",
+      "Gate",
+      "CV"
+    ],
+    "outputs": [
+      "Cv",
+      "Gate",
+      "Eoc"
+    ]
   },
   "squinkylabs-plug1/squinkylabs-sequencer4": {
     "name": "Seq4x4",
@@ -44552,8 +44962,28 @@
       "Sequencer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Clock",
+      "Reset",
+      "Run",
+      "Track 1 CV",
+      "Mod1",
+      "Mod2",
+      "Mod3",
+      "Select CV",
+      "Select gate"
+    ],
+    "outputs": [
+      "Track 1 CV",
+      "Cv1",
+      "Cv2",
+      "Cv3",
+      "Track 1 gate",
+      "Gate1",
+      "Gate2",
+      "Gate3",
+      "Eoc"
+    ]
   },
   "squinkylabs-plug1/squinkylabs-shp": {
     "name": "Shaper",
@@ -45925,22 +46355,22 @@
       "Position 8"
     ],
     "outputs": [
-      "Audio left 1",
-      "Audio left 2",
-      "Audio left 3",
-      "Audio left 4",
-      "Audio left 5",
-      "Audio left 6",
-      "Audio left 7",
-      "Audio left 8",
-      "Audio right 1",
-      "Audio right 2",
-      "Audio right 3",
-      "Audio right 4",
-      "Audio right 5",
-      "Audio right 6",
-      "Audio right 7",
-      "Audio right 8",
+      "left",
+      "left",
+      "left",
+      "left",
+      "left",
+      "left",
+      "left",
+      "left",
+      "right",
+      "right",
+      "right",
+      "right",
+      "right",
+      "right",
+      "right",
+      "right",
       "Audio mix output left",
       "Audio mix output right"
     ]
