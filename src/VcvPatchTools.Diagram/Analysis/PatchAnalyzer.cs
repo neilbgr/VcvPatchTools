@@ -150,6 +150,8 @@ public sealed class PatchAnalyzer
             string toPort = PortOn(toModule, MidiLearn.Name(toModule, original.To.PortId, ports.InputName(toModule.Plugin, toModule.Model, original.To.PortId)), baseOf);
             // The signal is typed from what the port is, not from what its controller usually does.
             string typedFromPort = PortOn(fromModule, MidiLearn.Name(fromModule, original.From.PortId, ports.OutputName(fromModule.Plugin, fromModule.Model, original.From.PortId), meaning: false), baseOf);
+            // A modulation-matrix input is shown with the knobs it moves ("Mod 1 → Pitch -3%"), but it's typed as itself.
+            string typedToPort = toPort;
             PatchCable cable = original with
             {
                 From = original.From with { ModuleId = baseOf.GetValueOrDefault(original.From.ModuleId, original.From.ModuleId) },
@@ -170,7 +172,7 @@ public sealed class PatchAnalyzer
                 }
             }
 
-            (SignalType signal, string? mismatch) = classifier.Classify(cable.Color, typedFromPort, toPort, roleById[from.Id], roleById[to.Id]);
+            (SignalType signal, string? mismatch) = classifier.Classify(cable.Color, typedFromPort, typedToPort, roleById[from.Id], roleById[to.Id]);
             if (mismatch is not null)
             {
                 diagnostics.Add($"{titles[from.Id]} '{fromPort}' → {titles[to.Id]} '{toPort}': {mismatch}");

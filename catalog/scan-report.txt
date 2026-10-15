@@ -3,10 +3,6 @@ Core/Notes: struct 'NotesModule' has no resolvable InputIds/OutputIds enum
 AmbientModules/Blank: struct 'Blank' has no resolvable InputIds/OutputIds enum
 AnimatedCircuits/ACFolding: no createModel<...>("ACFolding") registration found
 AnimatedCircuits/ACLFold: no createModel<...>("ACLFold") registration found
-BaconMusic/Glissinator: struct 'GlissinatorWidget::G' has no resolvable InputIds/OutputIds enum
-BaconMusic/PolyGnome: struct 'PolyGnomeWidget::M' has no resolvable InputIds/OutputIds enum
-BaconMusic/SampleDelay: struct 'SampleDelayWidget::SD' has no resolvable InputIds/OutputIds enum
-BaconMusic/PleaseQuit: struct 'PleaseQuitWidget::SD' has no resolvable InputIds/OutputIds enum
 Cardinal/HostAudio2: struct 'HostAudio2' has no resolvable InputIds/OutputIds enum
 Cardinal/HostAudio8: struct 'HostAudio8' has no resolvable InputIds/OutputIds enum
 Cardinal/HostParameters: struct 'HostParameters' has no resolvable InputIds/OutputIds enum
@@ -84,40 +80,6 @@ CosineKitty-Sapphire/Tout: no createModel<...>("Tout") registration found
 CosineKitty-Sapphire/Tricorder: no createModel<...>("Tricorder") registration found
 CosineKitty-Sapphire/TubeUnit: no createModel<...>("TubeUnit") registration found
 CosineKitty-Sapphire/Zoo: no createModel<...>("Zoo") registration found
-CountModula/StepSequencer8: no createModel<...>("StepSequencer8") registration found
-CountModula/TriggerSequencer8: no createModel<...>("TriggerSequencer8") registration found
-CountModula/TriggerSequencer16: no createModel<...>("TriggerSequencer16") registration found
-CountModula/RackEarLeft: no createModel<...>("RackEarLeft") registration found
-CountModula/RackEarRight: no createModel<...>("RackEarRight") registration found
-CountModula/Blank2HP: no createModel<...>("Blank2HP") registration found
-CountModula/Blank4HP: no createModel<...>("Blank4HP") registration found
-CountModula/Blank8HP: no createModel<...>("Blank8HP") registration found
-CountModula/Blank12HP: no createModel<...>("Blank12HP") registration found
-CountModula/Blank16HP: no createModel<...>("Blank16HP") registration found
-CountModula/Blank20HP: no createModel<...>("Blank20HP") registration found
-CountModula/Blank24HP: no createModel<...>("Blank24HP") registration found
-CountModula/GateSequencer8: no createModel<...>("GateSequencer8") registration found
-CountModula/GateSequencer16: no createModel<...>("GateSequencer16") registration found
-CountModula/Sequencer16: no createModel<...>("Sequencer16") registration found
-CountModula/Sequencer8: no createModel<...>("Sequencer8") registration found
-CountModula/SequencerChannel16: no createModel<...>("SequencerChannel16") registration found
-CountModula/SequencerChannel8: no createModel<...>("SequencerChannel8") registration found
-CountModula/SequencerGates8: no createModel<...>("SequencerGates8") registration found
-CountModula/SequencerGates16: no createModel<...>("SequencerGates16") registration found
-CountModula/Switch1To8: no createModel<...>("Switch1To8") registration found
-CountModula/Switch8To1: no createModel<...>("Switch8To1") registration found
-CountModula/Switch1To16: no createModel<...>("Switch1To16") registration found
-CountModula/Switch16To1: no createModel<...>("Switch16To1") registration found
-CountModula/SequencerTriggers8: no createModel<...>("SequencerTriggers8") registration found
-CountModula/SequencerTriggers16: no createModel<...>("SequencerTriggers16") registration found
-CountModula/EventTimer: no createModel<...>("EventTimer") registration found
-CountModula/EventTimer2: no createModel<...>("EventTimer2") registration found
-CountModula/OctetTriggerSequencerCVExpander: no createModel<...>("OctetTriggerSequencerCVExpander") registration found
-CountModula/OctetTriggerSequencerGateExpander: no createModel<...>("OctetTriggerSequencerGateExpander") registration found
-CountModula/MultiStepSequencer: no createModel<...>("MultiStepSequencer") registration found
-CountModula/GateSequencer16b: no createModel<...>("GateSequencer16b") registration found
-CountModula/ShiftRegister16: no createModel<...>("ShiftRegister16") registration found
-CountModula/ShiftRegister32: no createModel<...>("ShiftRegister32") registration found
 Venom/AuxClone: struct 'Venom::AuxClone' has no resolvable InputIds/OutputIds enum
 Venom/BayInput: struct 'Venom::BayInput' has no resolvable InputIds/OutputIds enum
 Venom/BayNorm: struct 'Venom::BayNorm' has no resolvable InputIds/OutputIds enum
@@ -149,37 +111,5 @@ NonlinearCircuits/SlothInertia: struct 'SlothInertiaModule' has no resolvable In
 Stoermelder-P1/MidiCat: struct 'StoermelderPackOne::MidiCat::MidiCatModule' has no resolvable InputIds/OutputIds enum
 Stoermelder-P1/MidiPlug: struct 'StoermelderPackOne::MidiPlug::MidiPlugModule' has no resolvable InputIds/OutputIds enum
 Stoermelder-P1/MidiKey: struct 'StoermelderPackOne::MidiKey::MidiKeyModule' has no resolvable InputIds/OutputIds enum
-SurgeXTRack/SurgeXTOSCModern: no createModel<...>("SurgeXTOSCModern") registration found
-SurgeXTRack/SurgeXTOSCClassic: no createModel<...>("SurgeXTOSCClassic") registration found
-SurgeXTRack/SurgeXTOSCWavetable: no createModel<...>("SurgeXTOSCWavetable") registration found
-SurgeXTRack/SurgeXTOSCWindow: no createModel<...>("SurgeXTOSCWindow") registration found
-SurgeXTRack/SurgeXTOSCSine: no createModel<...>("SurgeXTOSCSine") registration found
-SurgeXTRack/SurgeXTOSCFM2: no createModel<...>("SurgeXTOSCFM2") registration found
-SurgeXTRack/SurgeXTOSCFM3: no createModel<...>("SurgeXTOSCFM3") registration found
-SurgeXTRack/SurgeXTOSCSHNoise: no createModel<...>("SurgeXTOSCSHNoise") registration found
-SurgeXTRack/SurgeXTOSCAlias: no createModel<...>("SurgeXTOSCAlias") registration found
-SurgeXTRack/SurgeXTOSCString: no createModel<...>("SurgeXTOSCString") registration found
-SurgeXTRack/SurgeXTOSCTwist: no createModel<...>("SurgeXTOSCTwist") registration found
-SurgeXTRack/SurgeXTFXReverb: no createModel<...>("SurgeXTFXReverb") registration found
-SurgeXTRack/SurgeXTFXPhaser: no createModel<...>("SurgeXTFXPhaser") registration found
-SurgeXTRack/SurgeXTFXRotarySpeaker: no createModel<...>("SurgeXTFXRotarySpeaker") registration found
-SurgeXTRack/SurgeXTFXDistortion: no createModel<...>("SurgeXTFXDistortion") registration found
-SurgeXTRack/SurgeXTFXFrequencyShifter: no createModel<...>("SurgeXTFXFrequencyShifter") registration found
-SurgeXTRack/SurgeXTFXChorus: no createModel<...>("SurgeXTFXChorus") registration found
-SurgeXTRack/SurgeXTFXVocoder: no createModel<...>("SurgeXTFXVocoder") registration found
-SurgeXTRack/SurgeXTFXReverb2: no createModel<...>("SurgeXTFXReverb2") registration found
-SurgeXTRack/SurgeXTFXFlanger: no createModel<...>("SurgeXTFXFlanger") registration found
-SurgeXTRack/SurgeXTFXRingMod: no createModel<...>("SurgeXTFXRingMod") registration found
-SurgeXTRack/SurgeXTFXNeuron: no createModel<...>("SurgeXTFXNeuron") registration found
-SurgeXTRack/SurgeXTFXResonator: no createModel<...>("SurgeXTFXResonator") registration found
-SurgeXTRack/SurgeXTFXChow: no createModel<...>("SurgeXTFXChow") registration found
-SurgeXTRack/SurgeXTFXExciter: no createModel<...>("SurgeXTFXExciter") registration found
-SurgeXTRack/SurgeXTFXEnsemble: no createModel<...>("SurgeXTFXEnsemble") registration found
-SurgeXTRack/SurgeXTFXCombulator: no createModel<...>("SurgeXTFXCombulator") registration found
-SurgeXTRack/SurgeXTFXSpringReverb: no createModel<...>("SurgeXTFXSpringReverb") registration found
-SurgeXTRack/SurgeXTFXTreeMonster: no createModel<...>("SurgeXTFXTreeMonster") registration found
-SurgeXTRack/SurgeXTFXBonsai: no createModel<...>("SurgeXTFXBonsai") registration found
-SurgeXTRack/SurgeXTFXNimbus: no createModel<...>("SurgeXTFXNimbus") registration found
-SurgeXTRack/SurgeXTMixer: no createModel<...>("SurgeXTMixer") registration found
-SurgeXTRack/SurgeXTMixerSlider: no createModel<...>("SurgeXTMixerSlider") registration found
 unless_modules/atoms: no createModel<...>("atoms") registration found
+CountModula: no sources found, 138 modules kept from the previous catalog

@@ -23,7 +23,8 @@ public static partial class SourceScanner
     private static readonly string[] paramEnumNames = { "ParamIds", "ParamsIds", "ParamId", "Params" };
     private static readonly string[] outputEnumNames = { "OutputIds", "OutputsIds", "OutputId", "Outputs" };
 
-    [GeneratedRegex(@"createModel\s*<\s*([\w:]+)\s*(?:<([^<>]*)>)?\s*,\s*[\w:]+\s*(?:<[^<>]*>)?\s*>\s*\(\s*""([^""]+)""")]
+    // createModel<Type<Args>, …> or createModel<Widget<Args>::M, …> (Surge XT: a typedef inside a templated widget).
+    [GeneratedRegex(@"createModel\s*<\s*([\w:]+)\s*(?:<([^<>]*)>)?\s*(?:::\s*(\w+)\s*)?,\s*[\w:]+\s*(?:<[^<>]*>)?\s*>\s*\(\s*""([^""]+)""")]
     private static partial Regex CreateModelRegex();
 
     [GeneratedRegex(@"\benum\s+(\w+)\s*(?::\s*\w+\s*)?\{")]
@@ -32,7 +33,7 @@ public static partial class SourceScanner
     [GeneratedRegex(@"config(Input|Output)\s*\(\s*(\w+)\s*(?:\+\s*(\d+)\s*)?,\s*""((?:[^""\\]|\\.)*)""")]
     private static partial Regex ConfigCallRegex();
 
-    [GeneratedRegex(@"ModulationAssistant\s*<\s*[\w:<>]+\s*,\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*>")]
+    [GeneratedRegex(@"ModulationAssistant\s*<\s*[\w:]+(?:\s*<[^<>]*>)?\s*,\s*([^,<>]+?)\s*,\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*>")]
     private static partial Regex ModulationAssistantRegex();
 
     [GeneratedRegex(@"modulatorIndexFor\s*\([^)]*\)\s*\{[^}]*return\s+(\w+)\s*\+\s*offset\s*\*\s*\w+\s*\+\s*modulator")]
@@ -62,7 +63,17 @@ public static partial class SourceScanner
     [GeneratedRegex(@"^ENUMS\s*\(\s*(\w+)\s*,\s*(.+)\)$", RegexOptions.Singleline)]
     private static partial Regex EnumsMacroRegex();
 
-    public static ScanResult ScanPlugin(string pluginJson, IReadOnlyList<SourceFile> sources)
+    [GeneratedRegex(@"^[ \t]*#[ \t]*define[ \t]+(\w+)\(([^)]*)\)((?:[^\n]*\\\r?\n)*[^\n]*)", RegexOptions.Multiline)]
+    private static partial Regex FunctionMacroRegex();
+
+    [GeneratedRegex(@"std::string\s*\(\s*""((?:[^""\\]|\\.)*)""\s*\)\s*\+\s*""((?:[^""\\]|\\.)*)""")]
+    private static partial Regex StringConcatRegex();
+
+    /// <param name="includedHeaders">
+    /// Headers the sources include from elsewhere in the plugin (a bundled engine: Surge XT's n_osc_params is in
+    /// SurgeStorage.h): only their constants are read, the sources' own ones win.
+    /// </param>
+    public static ScanResult ScanPlugin(string pluginJson, IReadOnlyList<SourceFile> sources, IReadOnlyList<SourceFile>? includedHeaders = null)
     {
         List<string> problems = new List<string>();
         Dictionary<string, ModuleInfo> result = new Dictionary<string, ModuleInfo>(StringComparer.Ordinal);
@@ -71,14 +82,18 @@ public static partial class SourceScanner
         string pluginSlug = manifest.RootElement.GetProperty("slug").GetString() ?? "";
 
         List<SourceFile> cleaned = sources.Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
-        Dictionary<string, int> constants = CollectConstants(cleaned);
+        Dictionary<string, int> constants = CollectConstants(cleaned.Concat((includedHeaders ?? Array.Empty<SourceFile>()).Select(s => new SourceFile(s.Path, StripComments(s.Text)))).ToList());
 
         Dictionary<string, (string Type, string? TemplateArgs)> structBySlug = new Dictionary<string, (string Type, string? TemplateArgs)>(StringComparer.Ordinal);
         foreach (SourceFile file in cleaned)
         {
-            foreach (Match match in CreateModelRegex().Matches(file.Text))
+            foreach (Match match in CreateModelRegex().Matches(file.Text + ExpandModelMacros(file.Text)))
             {
-                structBySlug.TryAdd(match.Groups[3].Value, (match.Groups[1].Value, match.Groups[2].Success ? match.Groups[2].Value : null));
+                // Widget<Args>::M: the arguments are the widget's, the module is found through the alias.
+                (string Type, string? TemplateArgs) registration = match.Groups[3].Success
+                    ? ($"{match.Groups[1].Value}::{match.Groups[3].Value}", null)
+                    : (match.Groups[1].Value, match.Groups[2].Success ? match.Groups[2].Value : null);
+                structBySlug.TryAdd(match.Groups[4].Value, registration);
             }
         }
 
@@ -202,6 +217,47 @@ public static partial class SourceScanner
         return constants;
     }
 
+    /// <summary>
+    /// Surge XT registers its effects through a macro, "#define FXMODEL(type, nm) … createModel&lt;…&gt;(std::string("SurgeXTFX") + #nm)"
+    /// then "FXMODEL(fxt_reverb, Reverb);": expands the invocations of such macros, with their slugs folded into one literal.
+    /// </summary>
+    private static string ExpandModelMacros(string text)
+    {
+        StringBuilder expanded = new StringBuilder();
+        foreach (Match macro in FunctionMacroRegex().Matches(text))
+        {
+            string body = Regex.Replace(macro.Groups[3].Value, @"\\\r?\n", " ");
+            if (!body.Contains("createModel", StringComparison.Ordinal))
+            {
+                continue;
+            }
+            string[] parameters = SplitTopLevel(macro.Groups[2].Value).Select(p => p.Trim()).ToArray();
+            Regex invocation = new Regex(@"(?<![#\w])" + Regex.Escape(macro.Groups[1].Value) + @"\s*\(([^()]*)\)\s*;");
+            foreach (Match call in invocation.Matches(text))
+            {
+                string[] arguments = SplitTopLevel(call.Groups[1].Value).Select(a => a.Trim()).ToArray();
+                if (arguments.Length != parameters.Length)
+                {
+                    continue;
+                }
+                string result = body;
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    string name = Regex.Escape(parameters[i]);
+                    result = Regex.Replace(result, @"(?<!#)#\s*" + name + @"\b", $"\"{arguments[i]}\"");
+                    result = Regex.Replace(result, @"\b" + name + @"\b", arguments[i]);
+                }
+                result = Regex.Replace(result, @"\s*##\s*", "");
+                for (string folded = StringConcatRegex().Replace(result, "\"$1$2\""); folded != result; folded = StringConcatRegex().Replace(result, "\"$1$2\""))
+                {
+                    result = folded;
+                }
+                expanded.Append('\n').Append(result).Append(';');
+            }
+        }
+        return expanded.ToString();
+    }
+
     private static string LastSegment(string typeName)
     {
         int lastColons = typeName.LastIndexOf("::", StringComparison.Ordinal);
@@ -222,7 +278,7 @@ public static partial class SourceScanner
         string owner = segments[^2];
         string alias = segments[^1];
         Regex ownerDefinition = new Regex(@"\b(?:struct|class)\s+" + Regex.Escape(owner) + @"\b[^;{]*\{");
-        Regex aliasRegex = new Regex(@"(?:typedef\s+([\w:]+)\s+" + Regex.Escape(alias) + @"\s*;|using\s+" + Regex.Escape(alias) + @"\s*=\s*([\w:]+)\s*;)");
+        Regex aliasRegex = new Regex(@"(?:typedef\s+([\w:]+)(?:\s*<[^<>]*>)?\s+" + Regex.Escape(alias) + @"\s*;|using\s+" + Regex.Escape(alias) + @"\s*=\s*([\w:]+)(?:\s*<[^<>]*>)?\s*;)");
         foreach (SourceFile file in sources)
         {
             foreach (Match match in ownerDefinition.Matches(file.Text))
@@ -255,14 +311,17 @@ public static partial class SourceScanner
         Dictionary<string, int> constants = ConstantRegex().Matches(body)
             .GroupBy(m => m.Groups[1].Value)
             .ToDictionary(g => g.Key, g => int.Parse(g.First().Groups[2].Success ? g.First().Groups[2].Value : g.First().Groups[3].Value));
-        int? Resolve(string token) => int.TryParse(token, out int literal) ? literal
-            : constants.TryGetValue(token, out int value) ? value
-            : pluginConstants.TryGetValue(token, out int pluginValue) ? pluginValue : null;
+        // The struct's own constants first, then the plugin's (and the engine headers it includes).
+        foreach ((string name, int value) in pluginConstants)
+        {
+            constants.TryAdd(name, value);
+        }
 
         List<(string Id, int Index, string Fallback)>? paramEnum = ParseNamedEnum(found.EnumScopes, paramEnumNames, constants);
-        int? count = Resolve(assistant.Groups[1].Value);
-        int? inputCount = Resolve(assistant.Groups[3].Value);
-        int? firstTarget = IndexOf(paramEnum, assistant.Groups[2].Value);
+        int? count = Evaluate(assistant.Groups[1].Value, constants);
+        int? inputCount = Evaluate(assistant.Groups[3].Value, constants);
+        // The C++ only needs a number: Surge XT's VCO passes PITCH_CV (input 0) for its first target, PITCH_0 (param 0).
+        int? firstTarget = IndexOf(paramEnum, assistant.Groups[2].Value) ?? IndexOf(inputEnum, assistant.Groups[2].Value);
         int? firstDepth = IndexOf(paramEnum, depthBase.Groups[1].Value);
         int? firstInput = IndexOf(inputEnum, assistant.Groups[4].Value);
         if (count is null || inputCount is null || firstTarget is null || firstDepth is null || firstInput is null || paramEnum is null)
@@ -283,7 +342,12 @@ public static partial class SourceScanner
         for (int i = 0; i < count; i++)
         {
             (string Id, int Index, string Fallback) entry = paramEnum.FirstOrDefault(e => e.Index == firstTarget + i);
-            targets.Add(entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback);
+            // "OSC_CTRL_PARAM_0, OSC_MOD_PARAM_0 = OSC_CTRL_PARAM_0 + n": a block named at run time → "Osc ctrl param 1…n".
+            (string Id, int Index, string Fallback) block = paramEnum.LastOrDefault(e => e.Index <= firstTarget + i);
+            string? numbered = block.Id is not null && block.Id.EndsWith("_0", StringComparison.Ordinal) && !paramNames.ContainsKey(block.Id)
+                ? $"{Humanize(block.Id[..^2])} {firstTarget + i - block.Index + 1}"
+                : null;
+            targets.Add(numbered ?? (entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback));
         }
         return new ModMatrix(firstInput.Value, inputCount.Value, firstDepth.Value, targets);
     }
@@ -311,6 +375,14 @@ public static partial class SourceScanner
         foreach ((string id, int index, string fallback) in entries)
         {
             byIndex[index] = names.GetValueOrDefault(id) ?? fallback;
+        }
+        // Loop-named slots between two enum entries ("MOD_INPUT_0+3").
+        foreach ((string id, int index, string _) in entries)
+        {
+            for (int k = 1; index + k < byIndex.Length && byIndex[index + k] is null && names.TryGetValue($"{id}+{k}", out string? name); k++)
+            {
+                byIndex[index + k] = name;
+            }
         }
         ports.AddRange(byIndex.Select(s => s ?? ""));
     }
@@ -577,8 +649,21 @@ public static partial class SourceScanner
             string baseId = call.Groups[2].Value;
             string loopVar = call.Groups[3].Value;
             string argument = call.Groups[4].Value.Trim();
+            // "auto s = std::string("Modulation Signal ") + std::to_string(m + 1); configInput(MOD_INPUT_0 + m, s);"
+            Match local = Regex.Match(scope[..call.Index], @"\b(?:auto|std::string|string)\s+" + Regex.Escape(argument) + @"\s*=\s*([^;]+);", RegexOptions.RightToLeft);
+            if (Regex.IsMatch(argument, @"^\w+$") && local.Success)
+            {
+                argument = local.Groups[1].Value.Trim();
+            }
 
-            foreach ((string id, int _, string _) in entries.Where(e => e.Id == baseId || e.Id.StartsWith(baseId + "+", StringComparison.Ordinal)))
+            // "MOD_INPUT_0, NEXT = MOD_INPUT_0 + n": the slots up to the next entry are the loop's too.
+            List<string> ids = entries.Where(e => e.Id == baseId || e.Id.StartsWith(baseId + "+", StringComparison.Ordinal)).Select(e => e.Id).ToList();
+            if (ids.Count == 1 && entries.FindIndex(e => e.Id == baseId) is int at and >= 0 && at + 1 < entries.Count)
+            {
+                ids.AddRange(Enumerable.Range(1, entries[at + 1].Index - entries[at].Index - 1).Select(k => $"{baseId}+{k}"));
+            }
+
+            foreach (string id in ids)
             {
                 int i = id == baseId ? 0 : int.Parse(id[(baseId.Length + 1)..]);
                 string? name = LoopName(argument, loopVar, i, arrays);
@@ -596,6 +681,12 @@ public static partial class SourceScanner
         {
             Match indexed = Regex.Match(expression.Trim(), @"^(\w+)\s*\[\s*" + Regex.Escape(loopVar) + @"\s*\]$");
             return indexed.Success && arrays.TryGetValue(indexed.Groups[1].Value, out List<string>? values) && i < values.Count ? values[i] : null;
+        }
+
+        Match concatenated = Regex.Match(argument, @"^(?:std::)?string\s*\(\s*""((?:[^""\\]|\\.)*)""\s*\)\s*\+\s*(?:std::)?to_string\s*\(\s*" + Regex.Escape(loopVar) + @"\s*(\+\s*1\s*)?\)$");
+        if (concatenated.Success)
+        {
+            return Regex.Unescape(concatenated.Groups[1].Value) + (concatenated.Groups[2].Success ? i + 1 : i).ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         Match format = Regex.Match(argument, @"^(?:rack::)?string::f\(\s*""((?:[^""\\]|\\.)*)""\s*,\s*(.+)\)$");

@@ -239,6 +239,20 @@ public class AnalyzerTests
         Assert.All(patch.Cables, c => Assert.Equal(("Clock", "steps to the next channel"), (c.ToPort, c.SuggestedIntent)));
     }
 
+    [Fact]
+    public void SurgeOscillatorPortsAndModulationAreNamedAndTyped()
+    {
+        // Aluminium's Subsequent37-Duo demo: Surge XT Classic VCOs, registered as VCOWidget<ot_classic>::M.
+        PatchAnalysis duo = PatchDiagram.Analyze(File.ReadAllBytes(Fixtures.Path("Subsequent37-Duo.vcv")));
+        AnalyzedCable Into(string title, string port) => duo.Cables.Single(c => duo.Module(c.Cable.To.ModuleId).Title == title && c.ToPort.StartsWith(port, StringComparison.Ordinal));
+
+        Assert.Equal(SignalType.Pitch, Into("Classic VCO #2", "V/Oct").Signal);
+        // A vibrato into a modulation input is CV, even though the knob it moves is the pitch.
+        AnalyzedCable vibrato = Into("Classic VCO #1", "Mod 1 → Pitch");
+        Assert.Equal(SignalType.Cv, vibrato.Signal);
+        Assert.DoesNotContain(duo.Cables, c => c.ToPort.StartsWith("in#", StringComparison.Ordinal) || c.FromPort.StartsWith("out#", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData("VCF #1", ModuleFunction.Filter)]
     [InlineData("ADSR #2", ModuleFunction.Envelope)]

@@ -39,7 +39,7 @@ internal static class CatalogCommand
 
             try
             {
-                ScanResult scan = SourceScanner.ScanPlugin(File.ReadAllText(manifestPath), sources);
+                ScanResult scan = SourceScanner.ScanPlugin(File.ReadAllText(manifestPath), sources, IncludedHeaders(pluginDir, sourceDir, sources));
                 foreach ((string key, ModuleInfo info) in scan.Modules)
                 {
                     all[key] = info;
@@ -49,6 +49,23 @@ internal static class CatalogCommand
             catch (Exception ex) when (ex is System.Text.Json.JsonException or KeyNotFoundException)
             {
                 problems.Add($"{Path.GetFileName(pluginDir)}: unreadable plugin.json ({ex.Message})");
+            }
+        }
+
+        // A plugin no longer in the source tree (removed from the Cardinal fork…) keeps its last scanned ports: patches
+        // made in Rack still use it.
+        if (File.Exists(outputPath))
+        {
+            HashSet<string> scanned = all.Keys.Select(PluginOf).ToHashSet(StringComparer.Ordinal);
+            List<IGrouping<string, KeyValuePair<string, ModuleInfo>>> kept = PortCatalog.FromJson(File.ReadAllText(outputPath)).Modules
+                .Where(kv => !scanned.Contains(PluginOf(kv.Key))).GroupBy(kv => PluginOf(kv.Key)).ToList();
+            foreach (IGrouping<string, KeyValuePair<string, ModuleInfo>> plugin in kept)
+            {
+                foreach ((string key, ModuleInfo info) in plugin)
+                {
+                    all[key] = info;
+                }
+                problems.Add($"{plugin.Key}: no sources found, {plugin.Count()} modules kept from the previous catalog");
             }
         }
 
@@ -63,6 +80,24 @@ internal static class CatalogCommand
         }
         return 0;
     }
+
+    /// <summary>Headers outside the source folder (a bundled engine, a library) that the sources include by name.</summary>
+    private static List<SourceFile> IncludedHeaders(string pluginDir, string sourceDir, List<SourceFile> sources)
+    {
+        HashSet<string> included = sources
+            .SelectMany(s => System.Text.RegularExpressions.Regex.Matches(s.Text, @"#\s*include\s*[<""]([^>""]+)[>""]"))
+            .Select(m => Path.GetFileName(m.Groups[1].Value))
+            .ToHashSet(StringComparer.Ordinal);
+        string ownSources = Path.GetFullPath(sourceDir) + Path.DirectorySeparatorChar;
+        return Directory.EnumerateFiles(pluginDir, "*.h*", SearchOption.AllDirectories)
+            .Where(p => (p.EndsWith(".h", StringComparison.Ordinal) || p.EndsWith(".hpp", StringComparison.Ordinal))
+                && !Path.GetFullPath(p).StartsWith(ownSources, StringComparison.Ordinal) && included.Contains(Path.GetFileName(p)))
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .Select(p => new SourceFile(p, File.ReadAllText(p)))
+            .ToList();
+    }
+
+    private static string PluginOf(string key) => key[..key.IndexOf('/')];
 
     /// <summary>
     /// "catalog cardinal": which modules official Cardinal and the neilbgr edition load, from two Cardinal source trees

@@ -108,6 +108,65 @@ public class SourceScannerTests
     }
 
     [Fact]
+    public void ResolvesSurgeTemplatedWidgetsMacroSlugsAndEngineConstants()
+    {
+        string manifest = """{ "slug": "SurgeXTRack", "modules": [ { "slug": "SurgeXTOSCClassic" }, { "slug": "SurgeXTFXReverb" } ] }""";
+        string vco = """
+            template <int oscType> struct VCO : modules::XTModule
+            {
+                static constexpr int n_mod_inputs{4};
+                enum ParamIds { PITCH_0, OSC_CTRL_PARAM_0, OSC_MOD_PARAM_0 = OSC_CTRL_PARAM_0 + n_osc_params, NUM_PARAMS };
+                enum InputIds { PITCH_CV, RETRIGGER, OSC_MOD_INPUT, AUDIO_INPUT = OSC_MOD_INPUT + n_mod_inputs, NUM_INPUTS };
+                enum OutputIds { OUTPUT_L, OUTPUT_R, NUM_OUTPUTS };
+                modules::ModulationAssistant<VCO<oscType>, n_osc_params + 1, PITCH_CV, n_mod_inputs, OSC_MOD_INPUT> modAssist;
+                VCO()
+                {
+                    configParam<modules::VOctParamQuantity<60>>(PITCH_0, -5, 5, 0, "Pitch (v/oct)");
+                    configInput(PITCH_CV, "V/Oct");
+                    configInput(RETRIGGER, "Reset/Retrigger");
+                    configInput(AUDIO_INPUT, "Audio");
+                    for (int m = 0; m < n_mod_inputs; ++m)
+                    {
+                        auto s = std::string("Modulation Signal ") + std::to_string(m + 1);
+                        configInput(OSC_MOD_INPUT + m, s);
+                    }
+                    configOutput(OUTPUT_L, "Left (or Mono merged)");
+                    configOutput(OUTPUT_R, "Right");
+                }
+                static int modulatorIndexFor(int baseParam, int modulator)
+                {
+                    int offset = baseParam - PITCH_0;
+                    return OSC_MOD_PARAM_0 + offset * n_mod_inputs + modulator;
+                }
+            };
+            template <int oscType> struct VCOWidget : widgets::XTModuleWidget { typedef VCO<oscType> M; };
+            auto m = rack::createModel<vcoui::VCOWidget<ot_classic>::M, vcoui::VCOWidget<ot_classic>>(
+                "SurgeXTOSCClassic");
+            template <int fxType> struct FX : modules::XTModule
+            {
+                enum InputIds { INPUT_L, INPUT_R, NUM_INPUTS };
+                enum OutputIds { OUTPUT_L, NUM_OUTPUTS };
+                FX() { configInput(INPUT_L, "Left"); configInput(INPUT_R, "Right"); configOutput(OUTPUT_L, "Left"); }
+            };
+            template <int fxType> struct FXWidget : widgets::XTModuleWidget { typedef FX<fxType> M; };
+            #define FXMODEL(type, nm)                                                                    \
+                rack::Model *modelFX##nm = rack::createModel<fxui::FXWidget<type>::M, fxui::FXWidget<type>>( \
+                    std::string("SurgeXTFX") + #nm);
+            FXMODEL(fxt_reverb, Reverb);
+            """;
+        string engine = "const int n_osc_params = 7;";
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("VCO.h", vco) }, new[] { new SourceFile("SurgeStorage.h", engine) });
+
+        ModuleInfo classic = result.Modules["SurgeXTRack/SurgeXTOSCClassic"];
+        Assert.Equal(new[] { "V/Oct", "Reset/Retrigger", "Modulation Signal 1", "Modulation Signal 2", "Modulation Signal 3", "Modulation Signal 4", "Audio" }, classic.Inputs);
+        Assert.Equal((2, 4, 8), (classic.Modulation!.FirstInput, classic.Modulation.InputCount, classic.Modulation.FirstDepthParam));
+        Assert.Equal(new[] { "Pitch (v/oct)", "Osc ctrl param 1", "Osc ctrl param 7" }, new[] { classic.Modulation.Targets[0], classic.Modulation.Targets[1], classic.Modulation.Targets[7] });
+        Assert.Equal(new[] { "Left", "Right" }, result.Modules["SurgeXTRack/SurgeXTFXReverb"].Inputs);
+        Assert.Empty(result.Problems);
+    }
+
+    [Fact]
     public void ResolvesConstantSizesTemplateArgsAndLoopNames()
     {
         string manifest = """{ "slug": "P", "modules": [ { "slug": "Mix" }, { "slug": "Drone" } ] }""";

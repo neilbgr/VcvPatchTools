@@ -4591,8 +4591,14 @@
       "Slew limiter",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Input to Slew/Gliss",
+      "Modify Input Time: \u002B/-5v for full range"
+    ],
+    "outputs": [
+      "Slewed/Glissed Output",
+      "Gate at end of Gliss"
+    ]
   },
   "BaconMusic/HarMoNee": {
     "name": "HarMoNee",
@@ -4701,7 +4707,9 @@
     "tags": [
       "Utility"
     ],
-    "inputs": [],
+    "inputs": [
+      "Trigger Me to Quit"
+    ],
     "outputs": []
   },
   "BaconMusic/PolyGenerator": {
@@ -4722,8 +4730,27 @@
     "tags": [
       "Clock generator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Run",
+      "Reset",
+      "BPM CV"
+    ],
+    "outputs": [
+      "Base Clock Gate",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Base BPM CV",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Run",
+      "Reset"
+    ]
   },
   "BaconMusic/QuantEyes": {
     "name": "QuantEyes",
@@ -4745,8 +4772,12 @@
       "Utility",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Input Signal"
+    ],
+    "outputs": [
+      "Output (Input delayed by N samples)"
+    ]
   },
   "Befaco/ABC": {
     "name": "A*B\u002BC",
@@ -25966,9 +25997,9 @@
     ],
     "inputs": [
       "Lane 1 draw CV",
-      "",
-      "",
-      "",
+      "Lane 2 draw CV",
+      "Lane 3 draw CV",
+      "Lane 4 draw CV",
       "Write gate",
       "Clock",
       "Bar",
@@ -25979,29 +26010,29 @@
       "Reverse gate",
       "Reset",
       "Lane 1 head offset CV",
-      "",
-      "",
-      "",
+      "Lane 2 head offset CV",
+      "Lane 3 head offset CV",
+      "Lane 4 head offset CV",
       "Lane 1 thickness / velocity",
-      "",
-      "",
-      "",
+      "Lane 2 thickness / velocity",
+      "Lane 3 thickness / velocity",
+      "Lane 4 thickness / velocity",
       "Head spread CV",
       "Inputs len"
     ],
     "outputs": [
       "Lane 1 value",
-      "",
-      "",
-      "",
+      "Lane 2 value",
+      "Lane 3 value",
+      "Lane 4 value",
       "Lane 1 ink",
-      "",
-      "",
-      "",
+      "Lane 2 ink",
+      "Lane 3 ink",
+      "Lane 4 ink",
       "Lane 1 value at the offset head",
-      "",
-      "",
-      "",
+      "Lane 2 value at the offset head",
+      "Lane 3 value at the offset head",
+      "Lane 4 value at the offset head",
       "Loop",
       "Outputs len"
     ]
@@ -28437,8 +28468,23 @@
       "Polyphonic",
       "Distortion"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXChorus": {
     "name": "Chorus",
@@ -28447,8 +28493,23 @@
       "Polyphonic",
       "Chorus"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXChow": {
     "name": "Chow",
@@ -28457,8 +28518,23 @@
       "Polyphonic",
       "Distortion"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXCombulator": {
     "name": "Combulator",
@@ -28467,8 +28543,23 @@
       "Polyphonic",
       "Filter"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXDistortion": {
     "name": "Distortion",
@@ -28477,8 +28568,23 @@
       "Polyphonic",
       "Distortion"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXEnsemble": {
     "name": "Ensemble",
@@ -28487,16 +28593,46 @@
       "Polyphonic",
       "Chorus"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXExciter": {
     "name": "Exciter",
     "tags": [
       "Effect"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXFlanger": {
     "name": "Flanger",
@@ -28505,16 +28641,46 @@
       "Polyphonic",
       "Flanger"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXFrequencyShifter": {
     "name": "FrequencyShifter",
     "tags": [
       "Effect"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXNeuron": {
     "name": "Neuron",
@@ -28523,8 +28689,23 @@
       "Polyphonic",
       "Distortion"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXNimbus": {
     "name": "Nimbus",
@@ -28532,8 +28713,23 @@
       "Effect",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXPhaser": {
     "name": "Phaser",
@@ -28542,8 +28738,23 @@
       "Polyphonic",
       "Phaser"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXResonator": {
     "name": "Resonator",
@@ -28552,8 +28763,23 @@
       "Polyphonic",
       "Filter"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXReverb": {
     "name": "Reverb",
@@ -28562,8 +28788,23 @@
       "Polyphonic",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXReverb2": {
     "name": "Reverb2",
@@ -28572,8 +28813,23 @@
       "Polyphonic",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXRingMod": {
     "name": "RingMod",
@@ -28582,16 +28838,46 @@
       "Polyphonic",
       "Ring modulator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXRotarySpeaker": {
     "name": "RotarySpeaker",
     "tags": [
       "Effect"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXSpringReverb": {
     "name": "SpringReverb",
@@ -28600,8 +28886,23 @@
       "Polyphonic",
       "Reverb"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXTreeMonster": {
     "name": "TreeMonster",
@@ -28610,8 +28911,23 @@
       "Polyphonic",
       "Ring modulator"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTFXVocoder": {
     "name": "Vocoder",
@@ -28620,8 +28936,23 @@
       "Polyphonic",
       "Vocoder"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Left",
+      "Right",
+      "Left Sideband",
+      "Right Sideband",
+      "Clock/Tempo CV",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Input specific 0"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right",
+      "Extra output 0"
+    ]
   },
   "SurgeXTRack/SurgeXTLFO": {
     "name": "LFO",
@@ -28671,8 +29002,37 @@
       "Mixer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Input osc1 l",
+      "Input osc1 r",
+      "Input osc2 l",
+      "Input osc2 r",
+      "Input osc3 l",
+      "Input osc3 r",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4"
+    ],
+    "outputs": [
+      "Left",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 6,
+      "inputCount": 4,
+      "firstDepthParam": 20,
+      "targets": [
+        "Osc1 lev",
+        "Osc2 lev",
+        "Osc3 lev",
+        "Noise lev",
+        "Rm1x2 lev",
+        "Rm2x3 lev",
+        "Noise Color",
+        "Gain"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTMixerSlider": {
     "name": "Mixer with Sliders",
@@ -28680,8 +29040,37 @@
       "Mixer",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "Input osc1 l",
+      "Input osc1 r",
+      "Input osc2 l",
+      "Input osc2 r",
+      "Input osc3 l",
+      "Input osc3 r",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4"
+    ],
+    "outputs": [
+      "Left",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 6,
+      "inputCount": 4,
+      "firstDepthParam": 20,
+      "targets": [
+        "Osc1 lev",
+        "Osc2 lev",
+        "Osc3 lev",
+        "Noise lev",
+        "Rm1x2 lev",
+        "Rm2x3 lev",
+        "Noise Color",
+        "Gain"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTModMatrix": {
     "name": "ModMatrix",
@@ -28696,7 +29085,7 @@
       "Modulation Signal 4"
     ],
     "outputs": [
-      "Output 0"
+      "Modulated Target 1"
     ],
     "modulation": {
       "firstInput": 0,
@@ -28720,8 +29109,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCClassic": {
     "name": "Classic VCO",
@@ -28729,8 +29144,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCFM2": {
     "name": "FM2 VCO",
@@ -28738,8 +29179,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCFM3": {
     "name": "FM3 VCO",
@@ -28747,8 +29214,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCModern": {
     "name": "Modern VCO",
@@ -28756,8 +29249,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCSHNoise": {
     "name": "S\u0026H Noise VCO",
@@ -28765,8 +29284,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCSine": {
     "name": "Sine VCO",
@@ -28774,8 +29319,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCString": {
     "name": "String VCO",
@@ -28783,8 +29354,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCTwist": {
     "name": "Twist VCO",
@@ -28792,8 +29389,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCWavetable": {
     "name": "Wavetable VCO",
@@ -28801,8 +29424,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTOSCWindow": {
     "name": "Window VCO",
@@ -28810,8 +29459,34 @@
       "VCO",
       "Polyphonic"
     ],
-    "inputs": [],
-    "outputs": []
+    "inputs": [
+      "V/Oct",
+      "Reset/Retrigger",
+      "Modulation Signal 1",
+      "Modulation Signal 2",
+      "Modulation Signal 3",
+      "Modulation Signal 4",
+      "Audio"
+    ],
+    "outputs": [
+      "Left (or Mono merged)",
+      "Right"
+    ],
+    "modulation": {
+      "firstInput": 2,
+      "inputCount": 4,
+      "firstDepthParam": 8,
+      "targets": [
+        "Pitch (v/oct)",
+        "Osc ctrl param 1",
+        "Osc ctrl param 2",
+        "Osc ctrl param 3",
+        "Osc ctrl param 4",
+        "Osc ctrl param 5",
+        "Osc ctrl param 6",
+        "Osc ctrl param 7"
+      ]
+    }
   },
   "SurgeXTRack/SurgeXTQuadAD": {
     "name": "Quad AD",
@@ -28838,14 +29513,14 @@
       "inputCount": 4,
       "firstDepthParam": 32,
       "targets": [
-        "Attack 0",
-        "param#1",
-        "param#2",
-        "param#3",
-        "Decay 0",
-        "param#5",
-        "param#6",
-        "param#7"
+        "Attack 1",
+        "Attack 2",
+        "Attack 3",
+        "Attack 4",
+        "Decay 1",
+        "Decay 2",
+        "Decay 3",
+        "Decay 4"
       ]
     }
   },
@@ -28874,14 +29549,14 @@
       "inputCount": 4,
       "firstDepthParam": 16,
       "targets": [
-        "Rate 0",
-        "param#1",
-        "param#2",
-        "param#3",
-        "Deform 0",
-        "param#5",
-        "param#6",
-        "param#7"
+        "Rate 1",
+        "Rate 2",
+        "Rate 3",
+        "Rate 4",
+        "Deform 1",
+        "Deform 2",
+        "Deform 3",
+        "Deform 4"
       ]
     }
   },
@@ -35269,9 +35944,9 @@
       "transposition",
       "semi",
       "channel 1",
-      "",
-      "",
-      "",
+      "channel 2",
+      "channel 3",
+      "channel 4",
       "scene selection"
     ],
     "outputs": [
@@ -35290,17 +35965,17 @@
       "return2 left",
       "return2 right",
       "audio 1",
-      "",
-      "",
-      "",
-      "",
-      "",
+      "audio 2",
+      "audio 3",
+      "audio 4",
+      "audio 5",
+      "audio 6",
       "gain 1",
-      "",
-      "",
-      "",
-      "",
-      "",
+      "gain 2",
+      "gain 3",
+      "gain 4",
+      "gain 5",
+      "gain 6",
       "pan 1"
     ],
     "outputs": [

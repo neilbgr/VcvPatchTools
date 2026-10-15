@@ -404,12 +404,12 @@ Graphviz: `dot -Tsvg patch.dot > patch.svg`. Mermaid: paste the `.mmd` into any 
 
 `make catalog PLUGINS=<path to Cardinal/plugins>` scans the C++ sources of every plugin bundled with Cardinal, plus Rack's own Core plugin (`src/Rack/Core.json` and `src/Rack/src/core` next to it):
 
-- `createModel<…>("slug")`;
-- `enum InputIds/OutputIds`, including `ENUMS(X, n)` with constant expressions and template arguments;
+- `createModel<…>("slug")`, including through a widget's alias (`createModel<VCOWidget<ot_classic>::M, …>`) and through macros (`FXMODEL(fxt_reverb, Reverb)`);
+- `enum InputIds/OutputIds`, including `ENUMS(X, n)` with constant expressions and template arguments; constants also come from the headers the sources include from elsewhere in the plugin (a bundled engine);
 - `configInput` / `configOutput` names, including names built in loops;
 - for Surge XT, `ModulationAssistant<…>` (which knob each modulation input can move).
 
-What it can't resolve is listed in `catalog/scan-report.txt`.
+What it can't resolve is listed in `catalog/scan-report.txt`. A plugin whose sources are gone (removed from the Cardinal fork) keeps its entries from the previous `ports.json`, and the report says so.
 
 `make cardinal-catalog CARDINAL=<path to a Cardinal clone>` reads which modules Cardinal loads the way Cardinal does: the `initStatic__…()` calls in `plugins/plugins.cpp`, each plugin's `plugin.json` minus its `removeModule(…)` calls, and the slug fallbacks of `src/override/plugin.cpp` (`Core/AudioInterface` loads as `Cardinal/HostAudio8`, for instance). Official modules come from DISTRHO's `upstream/main` (exported by `scripts/export-cardinal-upstream.sh`, submodule manifests at the commits upstream pins), the neilbgr edition from the clone's working copy. Without a role in `roles.json`, a module's role is guessed from its `plugin.json` tags and its name, and reported as guessed.
 
