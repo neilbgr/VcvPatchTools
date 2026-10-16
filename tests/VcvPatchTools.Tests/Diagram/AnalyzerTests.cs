@@ -463,6 +463,19 @@ public class AnalyzerTests
     }
 
     [Fact]
+    public void ASingleVoiceWithoutMixerKeepsItsVcaAndFilterButNotTheMasterEffects()
+    {
+        PatchAnalysis patch = Fixtures.MatriarchJam;
+        IReadOnlyList<PatchGroup> groups = PatchGrouping.Build(patch);
+        List<string> Members(string key) => groups.Single(g => g.Key == key).Members.Select(id => patch.Module(id).Title).ToList();
+
+        // EG x VCA is an envelope, but it passes the audio through its VCA: it's in the sound path.
+        Assert.Equal(Role.Modifier, patch.Modules.Single(m => m.Title == "EG x VCA").Role);
+        Assert.Equal(new[] { "Classic VCO", "EG x VCA", "VCF" }, patch.Voices.Single().ModuleIds.Select(id => patch.Module(id).Title));
+        Assert.Equal(new[] { "Audio 2", "Delay", "Plateau" }, Members("bus").Order());
+    }
+
+    [Fact]
     public void AMixerFedByASingleVoiceStaysOnTheBus()
     {
         string json = """

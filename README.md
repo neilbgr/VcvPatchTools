@@ -139,7 +139,7 @@ From top to bottom:
 | Time & sequencing | clocks, sequencers, gate/trigger logic |
 | Pitch | quantizers, pitch processing |
 | Modulation | LFOs, envelopes, random, slew… shared by several voices |
-| Voices | one lane per voice: a sound source and what shapes it before the mixer. Sources playing the same notes (two oscillators on one keyboard zone) mixed together stay one voice, up to the mixer where different notes meet |
+| Voices | one lane per voice: a sound source and what shapes it before the mixer. Sources playing the same notes (two oscillators on one keyboard zone) mixed together stay one voice, up to the mixer where different notes meet. With no mixer (a single voice), the effects at the end of the chain go to the bus |
 | Mix & effects | mixers, bus effects, audio out |
 
 ### Columns, by signal path

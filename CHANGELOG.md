@@ -5,6 +5,11 @@ made; on release, the section is renamed to the version and becomes the GitHub r
 
 ## [Unreleased]
 
+### Fixed
+- A single voice going straight to the outputs, with no mixer, keeps its VCA and filter: an envelope passing audio
+  through its own VCA (Surge XT EG x VCA) is in the sound path, and only the effects at the end of the chain go to
+  "Mix & effects".
+
 ## [1.1.0] - 2026-10-16
 
 ### Added

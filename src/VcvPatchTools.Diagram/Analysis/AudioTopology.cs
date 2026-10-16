@@ -82,9 +82,33 @@ internal sealed class AudioTopology
         foreach (List<long> component in components)
         {
             HashSet<long> set = component.ToHashSet();
+            PeelOutputEffects(set, audio, roleById);
             List<(long From, long To)> edges = audio.Where(c => set.Contains(c.Cable.From.ModuleId) && set.Contains(c.Cable.To.ModuleId))
                 .Select(c => (c.Cable.From.ModuleId, c.Cable.To.ModuleId)).Distinct().ToList();
-            Voices.Add(GraphOrder.Topological(component.OrderBy(id => IndexOf(rackOrder, id)).ToList(), edges));
+            Voices.Add(GraphOrder.Topological(component.Where(set.Contains).OrderBy(id => IndexOf(rackOrder, id)).ToList(), edges));
+        }
+    }
+
+    /// <summary>
+    /// A voice going straight to the audio outputs, with no mixer on the way (a single-voice patch), would take the
+    /// master effects along: the effects at its end, feeding only the outputs (or each other), are bus effects.
+    /// </summary>
+    private static void PeelOutputEffects(HashSet<long> voice, List<AnalyzedCable> audio, IReadOnlyDictionary<long, Role> roleById)
+    {
+        HashSet<long> peeled = new HashSet<long>();
+        for (bool changed = true; changed;)
+        {
+            changed = false;
+            foreach (long id in voice.Where(id => roleById[id] == Role.Effect).ToList())
+            {
+                List<long> targets = audio.Where(c => c.Cable.From.ModuleId == id).Select(c => c.Cable.To.ModuleId).Distinct().ToList();
+                if (targets.Count > 0 && targets.All(t => peeled.Contains(t) || !voice.Contains(t) && roleById[t] == Role.Io))
+                {
+                    voice.Remove(id);
+                    peeled.Add(id);
+                    changed = true;
+                }
+            }
         }
     }
 

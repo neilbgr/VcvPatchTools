@@ -244,6 +244,7 @@ public sealed class PatchAnalyzer
     ///    the outside world only when everything it receives comes from the outside (Host MIDI, the musician or another
     ///    relay); otherwise another module plays it and it's a pitch/time/control utility;
     ///  - a "visual" module that also sends signals out (a piano display with outputs) is a controller, not a monitor;
+    ///  - a controller passing audio through (an envelope with its own VCA) is part of the sound path: a modifier;
     ///  - a switch takes the role of what it routes: audio makes it part of the sound path (a modifier), pitch a pitch
     ///    processor, gates a time utility, CV a controller.
     /// </summary>
@@ -263,6 +264,12 @@ public sealed class PatchAnalyzer
                 SignalType.Gate => Role.Time,
                 _ => Role.Controller,
             };
+        }
+        foreach (PatchModule module in shown.Where(m => roleById[m.Id] == Role.Controller
+            && cables.Any(c => c.Cable.To.ModuleId == m.Id && c.Signal == SignalType.Audio)
+            && cables.Any(c => c.Cable.From.ModuleId == m.Id && c.Signal == SignalType.Audio)))
+        {
+            roleById[module.Id] = Role.Modifier;
         }
         foreach (PatchModule module in shown.Where(m => roleById[m.Id] == Role.Monitor && HasOutputs(m.Id)))
         {
