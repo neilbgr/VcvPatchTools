@@ -5,6 +5,8 @@ made; on release, the section is renamed to the version and becomes the GitHub r
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-16
+
 ### Added
 - Port catalog: about 2,700 modules (about 1,700 in 1.0.0), with 39 open-source plugins Cardinal doesn't bundle, listed in
   `catalog/extra-sources.txt` at pinned commits (SickoCV, 4ms, FrozenWasteland, Nozoid, TinyTricks, dbRackModules,
@@ -29,5 +31,6 @@ First release.
 - **Convert**: patches between VCV Rack and Cardinal, with warnings for modules official Cardinal doesn't load.
 - Web app (Blazor WebAssembly, runs in the browser) and `vcvpatch` command line for Linux, Windows and macOS.
 
-[Unreleased]: https://github.com/neilbgr/VcvPatchTools/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/neilbgr/VcvPatchTools/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/neilbgr/VcvPatchTools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/neilbgr/VcvPatchTools/releases/tag/v1.0.0

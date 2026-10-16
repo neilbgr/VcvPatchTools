@@ -9,7 +9,7 @@
   <!-- The one version of every binary (CLI, web app, libraries). A release is the tag v<Version>: the release workflow
        refuses a tag that doesn't match. The SDK appends the git commit to the informational version (1.0.0+<sha>). -->
   <PropertyGroup>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Product>VCV Patch Tools</Product>
     <Authors>neilbgr</Authors>
     <Copyright>Copyright (c) 2026 neilbgr</Copyright>
