@@ -286,6 +286,12 @@ public static partial class SourceScanner
             }
         }
 
+        // "configOutput(TimeSeqModule::OUT_OUTPUTS + i, …)" (not-things' output expander): ids of another module's enum.
+        foreach ((string name, int value) in ForeignEnumValues(found, sources.Concat(headers).ToList(), constants))
+        {
+            constants.TryAdd(name, value);
+        }
+
         Dictionary<string, string> inputNames = new Dictionary<string, string>(StringComparer.Ordinal);
         Dictionary<string, string> outputNames = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (string scope in found.ConfigScopes)
@@ -1264,10 +1270,6 @@ public static partial class SourceScanner
     }
 
     /// <summary>
-    /// Integer constants usable as ENUMS(X, N) sizes: "static const int N = 5;", "constexpr int N{4};", "#define N 8",
-    /// including aliases ("NUM_OSC = DroneVoice::NUM_OSC"), resolved by name across the whole plugin.
-    /// </summary>
-    /// <summary>
     /// Values of the enums declared outside any struct, when their name is unique in the plugin: MADZINE's
     /// "enum { STAGE_TRIG_OUTPUT, STAGE_ENV_OUTPUT, STAGE_NUM_OUTPUTS };" that its modules' enums are written with.
     /// </summary>
@@ -1285,6 +1287,10 @@ public static partial class SourceScanner
         return values.GroupBy(v => v.Name).Where(g => g.Count() == 1).ToDictionary(g => g.Key, g => g.First().Value, StringComparer.Ordinal);
     }
 
+    /// <summary>
+    /// Integer constants usable as ENUMS(X, N) sizes: "static const int N = 5;", "constexpr int N{4};", "#define N 8",
+    /// including aliases ("NUM_OSC = DroneVoice::NUM_OSC"), resolved by name across the whole plugin.
+    /// </summary>
     private static Dictionary<string, int> CollectConstants(List<SourceFile> sources)
     {
         // Same name may be declared several times ("NUM_OSC = 5" in one struct, "NUM_OSC = DroneVoice::NUM_OSC" in another):
@@ -1324,6 +1330,31 @@ public static partial class SourceScanner
     ///   configInput(X + i, labels[i])                       with   labels[] = { "a", "b" }
     ///   configOutput(X + i, string::f("%s gate", labels[i]))
     /// </summary>
+    /// <summary>Values of the other modules' enum entries the config calls name: "configOutput(TimeSeqModule::OUT_OUTPUTS + i, …)".</summary>
+    private static Dictionary<string, int> ForeignEnumValues(StructSource found, List<SourceFile> sources, Dictionary<string, int> constants)
+    {
+        Dictionary<string, int> values = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (Match reference in found.ConfigScopes.SelectMany(scope => Regex.Matches(scope, @"\bconfig(?:Input|Output)\s*\(\s*(\w+)\s*::\s*(?:\w+\s*::\s*)?(\w+)")))
+        {
+            string id = reference.Groups[2].Value;
+            if (values.ContainsKey(id) || FindStruct(reference.Groups[1].Value, sources, depth: 0) is not StructSource owner)
+            {
+                continue;
+            }
+            foreach (string scope in owner.EnumScopes)
+            {
+                foreach (Match match in Regex.Matches(scope, @"\benum\s+(?:class\s+)?\w*\s*(?::\s*\w+\s*)?\{"))
+                {
+                    foreach ((string entry, int index, string _) in ParseEnumBody(BraceBody(scope, match.Index + match.Length - 1), constants).Where(e => e.Id == id))
+                    {
+                        values.TryAdd(entry, index);
+                    }
+                }
+            }
+        }
+        return values;
+    }
+
     private static void AddLoopNames(string scope, string kind, List<(string Id, int Index, string Fallback)>? entries, Dictionary<string, string> names, Dictionary<string, int>? constants = null)
     {
         if (entries is null)
@@ -1345,9 +1376,17 @@ public static partial class SourceScanner
             .GroupBy(m => m.Groups[1].Value)
             .ToDictionary(g => g.Key, g => StringLiteralRegex().Matches(g.First().Groups[2].Value).Select(m => CString(m.Groups[1].Value)).ToList());
         Dictionary<int, string> idAt = entries.GroupBy(e => e.Index).ToDictionary(g => g.Key, g => g.First().Id);
-        foreach (Match call in Regex.Matches(scope, @"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*\+\s*([^,;]+?)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*(?:;|->)"))
+        foreach (Match call in Regex.Matches(scope, @"config(Input|Output)\s*\(\s*(?:(?:\w+::)*(\w+)\s*\+\s*)?([^,;]+?)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*(?:;|->)"))
         {
-            if (call.Groups[1].Value != kind || entries.FindIndex(e => e.Id == call.Groups[2].Value) is not (int at and >= 0))
+            if (call.Groups[1].Value != kind)
+            {
+                continue;
+            }
+            // The base is an entry of the module's enum, or of another module's ("TimeSeqModule::OUT_OUTPUTS + i"), or
+            // none: "configInput(k * 2 + 1, …)" (dbRackSequencer M16S).
+            int found = call.Groups[2].Success ? entries.FindIndex(e => e.Id == call.Groups[2].Value) : -1;
+            int baseIndex = !call.Groups[2].Success ? 0 : found >= 0 ? entries[found].Index : constants.GetValueOrDefault(call.Groups[2].Value, -1);
+            if (baseIndex < 0)
             {
                 continue;
             }
@@ -1388,7 +1427,7 @@ public static partial class SourceScanner
                     {
                         known[name] = value;
                     }
-                    if (Evaluate(call.Groups[3].Value, known) is int offset && idAt.TryGetValue(entries[at].Index + offset, out string? id)
+                    if (Evaluate(call.Groups[3].Value, known) is int offset && idAt.TryGetValue(baseIndex + offset, out string? id)
                         && LoopName(argument, new Dictionary<string, int>(vars, StringComparer.Ordinal), arrays, name => LocalString(before, name)) is string portName)
                     {
                         names.TryAdd(id, portName);

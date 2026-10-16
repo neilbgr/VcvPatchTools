@@ -294,6 +294,312 @@
       "Audio Right"
     ]
   },
+  "4ms-ROMplers/AyysKing": {
+    "name": "AyysKing",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/Clap": {
+    "name": "Clap",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/ClosedHat": {
+    "name": "ClosedHat",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/Crash": {
+    "name": "Crash",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/DeeArr": {
+    "name": "DeeArr",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/KayArr": {
+    "name": "KayArr",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/KayOne": {
+    "name": "KayOne",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/Kick": {
+    "name": "Kick",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/OpenHat": {
+    "name": "OpenHat",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/OrchHits": {
+    "name": "OrchHits",
+    "tags": [
+      "Drum",
+      "synth voice"
+    ],
+    "inputs": [
+      "Sample Select CV",
+      "Pitch CV (1V/oct)",
+      "Decay CV",
+      "Trig",
+      "Volume CV",
+      "Octave CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/Percussion": {
+    "name": "Percussion",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/Ride": {
+    "name": "Ride",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/Rimshot": {
+    "name": "Rimshot",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/SeaArr": {
+    "name": "SeaArr",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/SehvenToo": {
+    "name": "SehvenToo",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/SicksOh": {
+    "name": "SicksOh",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/SinSahnix": {
+    "name": "SinSahnix",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Length CV",
+      "Drum0"
+    ],
+    "outputs": [
+      "Drum0"
+    ]
+  },
+  "4ms-ROMplers/Slap": {
+    "name": "Slap",
+    "tags": [
+      "Synth Voice"
+    ],
+    "inputs": [
+      "Pitch CV (1V/oct)",
+      "Decay CV",
+      "Trig",
+      "Volume CV",
+      "Octave CV"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "4ms-ROMplers/Snare": {
+    "name": "Snare",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
+  "4ms-ROMplers/Tom": {
+    "name": "Tom",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Sample CV",
+      "Pitch CV",
+      "Decay CV",
+      "Trig",
+      "Volume CV"
+    ],
+    "outputs": [
+      "Audio output"
+    ]
+  },
   "4msCompany/Atvert2": {
     "name": "Atvert2",
     "tags": [
@@ -2977,6 +3283,208 @@
       "#ifdef usetest                \n\t\ttest",
       "Test2",
       "#endif                \n\t\t\n\t\t\n\t\tnum"
+    ]
+  },
+  "Alikins/BigMuteButton": {
+    "name": "Big Mute Button",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Left",
+      "Right"
+    ],
+    "outputs": [
+      "Left",
+      "Right"
+    ]
+  },
+  "Alikins/ColorPanel": {
+    "name": "Color Panel",
+    "tags": [
+      "Visual"
+    ],
+    "inputs": [
+      "Red",
+      "Green",
+      "Blue"
+    ],
+    "outputs": []
+  },
+  "Alikins/GateLength": {
+    "name": "Gate Length",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Trigger input1",
+      "Trigger input2",
+      "Trigger input3",
+      "Trigger input4",
+      "Trigger input5",
+      "Gate length input1",
+      "Gate length input2",
+      "Gate length input3",
+      "Gate length input4",
+      "Gate length input5"
+    ],
+    "outputs": [
+      "Gate output1",
+      "Gate output2",
+      "Gate output3",
+      "Gate output4",
+      "Gate output5"
+    ]
+  },
+  "Alikins/HoveredValue": {
+    "name": "Hovered Value",
+    "tags": [
+      "Utility",
+      "Controller"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Param value",
+      "Scaled param value"
+    ]
+  },
+  "Alikins/IdleSwitch": {
+    "name": "Idle Switch",
+    "tags": [
+      "Utility",
+      "Switch"
+    ],
+    "inputs": [
+      "Input source",
+      "Heartbeat",
+      "Time",
+      "Pulse",
+      "Switched"
+    ],
+    "outputs": [
+      "Idle gate",
+      "Time",
+      "Idle start",
+      "Idle end",
+      "Frame count",
+      "On when idle",
+      "Off when idle"
+    ]
+  },
+  "Alikins/InjectValue": {
+    "name": "Inject Value",
+    "tags": [
+      "Utility",
+      "Controller"
+    ],
+    "inputs": [
+      "Value"
+    ],
+    "outputs": [
+      "Debug1"
+    ]
+  },
+  "Alikins/MomentaryOnButtons": {
+    "name": "Momentary On Buttons",
+    "tags": [
+      "Switch"
+    ],
+    "inputs": [
+      "Button 1",
+      "Button 2",
+      "Button 3",
+      "Button 4",
+      "Button 5",
+      "Button 6",
+      "Button 7",
+      "Button 8",
+      "Button 9",
+      "Button 10",
+      "Button 11",
+      "Button 12",
+      "Button 13"
+    ],
+    "outputs": [
+      "Button 1",
+      "Button 2",
+      "Button 3",
+      "Button 4",
+      "Button 5",
+      "Button 6",
+      "Button 7",
+      "Button 8",
+      "Button 9",
+      "Button 10",
+      "Button 11",
+      "Button 12",
+      "Button 13"
+    ]
+  },
+  "Alikins/Reference": {
+    "name": "Reference Voltages",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Minus ten",
+      "Minus five",
+      "Minus one",
+      "Zero",
+      "Plus one",
+      "Plus five",
+      "Plus ten"
+    ]
+  },
+  "Alikins/ShiftPedal": {
+    "name": "Shift Pedal",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Left shift gate",
+      "Right shift gate",
+      "Either shift gate",
+      "Left ctrl gate",
+      "Right ctrl gate",
+      "Either ctrl gate",
+      "Left alt gate",
+      "Right alt gate",
+      "Either alt gate",
+      "Left super gate",
+      "Right super gate",
+      "Either super gate"
+    ]
+  },
+  "Alikins/SpecificValue": {
+    "name": "Specific Value",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Value1"
+    ],
+    "outputs": [
+      "Value1"
+    ]
+  },
+  "Alikins/ValueSaver": {
+    "name": "Value Saver",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Value 1",
+      "Value 2",
+      "Value 3",
+      "Value 4"
+    ],
+    "outputs": [
+      "Value 1",
+      "Value 2",
+      "Value 3",
+      "Value 4"
     ]
   },
   "Aluminium/PadX": {
@@ -12971,6 +13479,94 @@
       "Audio"
     ]
   },
+  "Chiptuner/Blank10HP": {
+    "name": "Blank 10HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank12HP": {
+    "name": "Blank 12HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank16HP": {
+    "name": "Blank 16HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank1HP": {
+    "name": "Blank 1HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank20HP": {
+    "name": "Blank 20HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank26HP": {
+    "name": "Blank 26HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank2HP": {
+    "name": "Blank 2HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank32HP": {
+    "name": "Blank 32HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank3HP": {
+    "name": "Blank 3HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank4HP": {
+    "name": "Blank 4HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Chiptuner/Blank6HP": {
+    "name": "Blank 6HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
   "ChowDSP/ChowChorus": {
     "name": "ChowChorus",
     "tags": [
@@ -13194,6 +13790,408 @@
     ],
     "outputs": [
       "Audio"
+    ]
+  },
+  "Coffee/Any": {
+    "name": "Any",
+    "tags": [
+      "Utility",
+      "Logic"
+    ],
+    "inputs": [
+      "Trigger 0",
+      "Trigger 1",
+      "Trigger 2",
+      "Trigger 3",
+      "Trigger 4",
+      "Trigger 5",
+      "Trigger 6",
+      "Trigger 7"
+    ],
+    "outputs": [
+      "#1"
+    ]
+  },
+  "Coffee/Between": {
+    "name": "Between",
+    "tags": [
+      "Utility",
+      "Random",
+      "Sample and hold"
+    ],
+    "inputs": [
+      "Trigger",
+      "CV1",
+      "CV2"
+    ],
+    "outputs": [
+      "Out"
+    ]
+  },
+  "Coffee/Fork": {
+    "name": "Fork",
+    "tags": [
+      "Utility",
+      "Logic",
+      "Random",
+      "Sample and hold"
+    ],
+    "inputs": [
+      "Trig 1",
+      "Trig 2",
+      "Input A 1",
+      "Input A 2",
+      "Input B 1",
+      "Input B 2",
+      "Prob 1",
+      "Prob 2"
+    ],
+    "outputs": [
+      "Output 1",
+      "Output 2"
+    ]
+  },
+  "Coffee/Fork2": {
+    "name": "Fork2",
+    "tags": [
+      "Logic",
+      "Utility"
+    ],
+    "inputs": [
+      "Trigger",
+      "Threshold CV",
+      "CV 1",
+      "CV 2",
+      "Source CV"
+    ],
+    "outputs": [
+      "CV",
+      "Trigger 1",
+      "Trigger 2"
+    ]
+  },
+  "Coffee/HiLo": {
+    "name": "HiLo",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Trig",
+      "Input1",
+      "Input2"
+    ],
+    "outputs": [
+      "High",
+      "Low"
+    ]
+  },
+  "Coffee/Juice": {
+    "name": "Juice",
+    "tags": [
+      "Polyphonic",
+      "Utility"
+    ],
+    "inputs": [
+      "Select",
+      "Random Select Active",
+      "Prev Active",
+      "Next Active"
+    ],
+    "outputs": [
+      "O cv1 1",
+      "O cv1 2",
+      "O cv1 3",
+      "O cv1 4",
+      "O cv1 5",
+      "O cv1 6",
+      "O cv1 7",
+      "O cv1 8"
+    ]
+  },
+  "Coffee/Quant": {
+    "name": "Quant",
+    "tags": [
+      "Quantizer"
+    ],
+    "inputs": [
+      "Octave Offset",
+      "Semi Offset",
+      "V/OCT In"
+    ],
+    "outputs": [
+      "V/OCT Out"
+    ]
+  },
+  "Coffee/Set": {
+    "name": "Set",
+    "tags": [
+      "Utility",
+      "Dual"
+    ],
+    "inputs": [
+      "Scale 1 CV",
+      "Scale 2 CV",
+      "Offset 1 CV",
+      "Offset 2 CV",
+      "Input 1",
+      "Input 2"
+    ],
+    "outputs": [
+      "Output 1",
+      "Output 2",
+      "#3"
+    ]
+  },
+  "Coffee/Set2": {
+    "name": "Set2",
+    "tags": [
+      "Utility",
+      "VCA"
+    ],
+    "inputs": [
+      "Input voltage",
+      "Set 1",
+      "Set 2",
+      "Set 3",
+      "Set 4",
+      "Set 1 duration",
+      "Set 2 duration",
+      "Set 3 duration",
+      "Set 4 duration"
+    ],
+    "outputs": [
+      "out",
+      "inverse out",
+      "EOC 1",
+      "EOC 2",
+      "EOC 3",
+      "EOC 4"
+    ]
+  },
+  "Coffee/Some": {
+    "name": "Some",
+    "tags": [
+      "Utility",
+      "Random"
+    ],
+    "inputs": [
+      "Trigger",
+      "Probability",
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8"
+    ],
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8"
+    ]
+  },
+  "Coffee/Some2": {
+    "name": "Some2",
+    "tags": [
+      "Utility",
+      "Random",
+      "Logic"
+    ],
+    "inputs": [
+      "Trigger CV",
+      "Input CV",
+      "Probability CV",
+      "Selection CV"
+    ],
+    "outputs": [
+      "CV Out 1",
+      "CV Out 2",
+      "CV Out 3",
+      "CV Out 4",
+      "CV Out 5",
+      "CV Out 6",
+      "CV Out 7",
+      "CV Out 8"
+    ]
+  },
+  "Coffee/Some3": {
+    "name": "Some3",
+    "tags": [
+      "Polyphonic",
+      "Random",
+      "Utility"
+    ],
+    "inputs": [
+      "Trigger CV",
+      "Probability CV",
+      "Selection Start CV",
+      "Selection End CV",
+      "Input CV",
+      "Shift Selection Up",
+      "Shift Selection Down",
+      "Reset"
+    ],
+    "outputs": [
+      "CV Out 1"
+    ]
+  },
+  "Coffee/Tap": {
+    "name": "Tap",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Trig 1",
+      "Trig 2",
+      "Trig 3",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3"
+    ]
+  },
+  "Coffee/Together": {
+    "name": "Together",
+    "tags": [
+      "Utility",
+      "Clock modulator",
+      "Logic",
+      "Random",
+      "Sequencer"
+    ],
+    "inputs": [
+      "Trig",
+      "Reset",
+      "Nudge Trig",
+      "Step CV",
+      "Group 1 Rand Trig",
+      "Group 2 Rand Trig",
+      "Group 3 Rand Trig",
+      "Group 4 Rand Trig",
+      "Row 1 Rand Trig",
+      "Row 2 Rand Trig",
+      "Row 3 Rand Trig",
+      "Row 4 Rand Trig",
+      "Row 5 Rand Trig",
+      "Row 6 Rand Trig",
+      "Row 7 Rand Trig",
+      "Row 8 Rand Trig"
+    ],
+    "outputs": [
+      "Global out trig",
+      "Global out gate",
+      "Row 1 Trig",
+      "Row 2 Trig",
+      "Row 3 Trig",
+      "Row 4 Trig",
+      "Row 5 Trig",
+      "Row 6 Trig",
+      "Row 7 Trig",
+      "Row 8 Trig",
+      "Row 1 Gate",
+      "Row 2 Gate",
+      "Row 3 Gate",
+      "Row 4 Gate",
+      "Row 5 Gate",
+      "Row 6 Gate",
+      "Row 7 Gate",
+      "Row 8 Gate",
+      "Out Group 1",
+      "Out Group 2",
+      "Out Group 3",
+      "Out Group 4"
+    ]
+  },
+  "Coffee/Travel": {
+    "name": "Travel",
+    "tags": [
+      "Utility",
+      "Slew Limiter",
+      "Sample and hold"
+    ],
+    "inputs": [
+      "Trigger",
+      "Duration",
+      "Shape",
+      "CV1",
+      "CV2"
+    ],
+    "outputs": [
+      "Output",
+      "End of Cycle"
+    ]
+  },
+  "Coffee/Tumble": {
+    "name": "Tumble",
+    "tags": [
+      "Utility",
+      "Clock modulator",
+      "Logic",
+      "Sequencer"
+    ],
+    "inputs": [
+      "Clock Trig",
+      "Reset Trig",
+      "Stat Trig"
+    ],
+    "outputs": [
+      "Trigger 1",
+      "Trigger 2",
+      "Trigger 3",
+      "Trigger 4",
+      "Trigger 5",
+      "Trigger 6",
+      "Trigger 7",
+      "Trigger 8",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Global Trig",
+      "Global Gate",
+      "End of Cycle"
+    ]
+  },
+  "Coffee/Twinned2": {
+    "name": "Twinned2",
+    "tags": [
+      "Sequencer",
+      "Polyphonic",
+      "Random"
+    ],
+    "inputs": [
+      "Clock",
+      "Reset",
+      "AB Select",
+      "Steps",
+      "V/OCT A",
+      "V/OCT B",
+      "GATES A",
+      "GATES B",
+      "I rand 1",
+      "I rand 2",
+      "I rand 3",
+      "I rand 4"
+    ],
+    "outputs": [
+      "V/OCT Selected Out",
+      "V/OCT A Out",
+      "V/OCT B Out",
+      "EOC Trigger",
+      "B Gate",
+      "A Gate",
+      "Selected Gate"
     ]
   },
   "Core/AudioInterface": {
@@ -18555,6 +19553,671 @@
     "outputs": [
       "X",
       "Y"
+    ]
+  },
+  "DrumKit/Baronial": {
+    "name": "Baronial",
+    "tags": [
+      "Envelope generator"
+    ],
+    "inputs": [
+      "Gate",
+      "Attack time cv",
+      "Decay time cv",
+      "Sustain time cv",
+      "Sustain level cv",
+      "Release time cv"
+    ],
+    "outputs": [
+      "Out"
+    ]
+  },
+  "DrumKit/BassDrum9": {
+    "name": "Bass Drum 9",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/CR78": {
+    "name": "CR78",
+    "tags": [
+      "DRUM"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/ClosedHiHat": {
+    "name": "Closed HiHat",
+    "tags": [
+      "DRUM"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/DMX": {
+    "name": "DMX",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/Gnome": {
+    "name": "Gnome",
+    "tags": [
+      "Clock generator"
+    ],
+    "inputs": [
+      "Reset",
+      "Bpm cv",
+      "Width cv",
+      "Run cv"
+    ],
+    "outputs": [
+      "Note 1",
+      "Note 2",
+      "Note 4",
+      "Note 8",
+      "Note 16",
+      "Note a",
+      "Note b",
+      "Note c",
+      "Note d",
+      "Note e",
+      "Note f"
+    ]
+  },
+  "DrumKit/MarionetteBass": {
+    "name": "Marionette Bass",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Gate",
+      "Pitch env in",
+      "Pitch decay cv in",
+      "Pitch sustain cv in",
+      "Pitch release cv in",
+      "Amp env in",
+      "Amp attack cv in",
+      "Amp decay cv in",
+      "Amp sustain cv in",
+      "Amp release cv in",
+      "Blend cv in",
+      "Tune cv in",
+      "Suboct mix cv",
+      "Suboct wave cv"
+    ],
+    "outputs": [
+      "Out",
+      "Envelope out"
+    ]
+  },
+  "DrumKit/OpenHiHat": {
+    "name": "Open HiHat",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16",
+      "Choke cv 1",
+      "Choke cv 2",
+      "Choke cv 3",
+      "Choke cv 4",
+      "Choke cv 5",
+      "Choke cv 6",
+      "Choke cv 7",
+      "Choke cv 8",
+      "Choke cv 9",
+      "Choke cv 10",
+      "Choke cv 11",
+      "Choke cv 12",
+      "Choke cv 13",
+      "Choke cv 14",
+      "Choke cv 15",
+      "Choke cv 16",
+      "Choke gate 1",
+      "Choke gate 2",
+      "Choke gate 3",
+      "Choke gate 4",
+      "Choke gate 5",
+      "Choke gate 6",
+      "Choke gate 7",
+      "Choke gate 8",
+      "Choke gate 9",
+      "Choke gate 10",
+      "Choke gate 11",
+      "Choke gate 12",
+      "Choke gate 13",
+      "Choke gate 14",
+      "Choke gate 15",
+      "Choke gate 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/Sequencer": {
+    "name": "Sequencer",
+    "tags": [
+      "Sequencer"
+    ],
+    "inputs": [
+      "Clock",
+      "Run cv",
+      "Cycle cv",
+      "Reset",
+      "Pulse width cv",
+      "Main select",
+      "Track select 1",
+      "Track select 2",
+      "Track select 3",
+      "Track select 4",
+      "Track select 5",
+      "Track select 6",
+      "Track select 7",
+      "Track select 8"
+    ],
+    "outputs": [
+      "Gate out 1",
+      "Gate out 2",
+      "Gate out 3",
+      "Gate out 4",
+      "Gate out 5",
+      "Gate out 6",
+      "Gate out 7",
+      "Gate out 8"
+    ]
+  },
+  "DrumKit/SnareDrumN": {
+    "name": "Snare Drum N",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
+    ]
+  },
+  "DrumKit/SyntheticBassDrum": {
+    "name": "Synthetic Bass Drum",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Gate",
+      "Pitch cv",
+      "Pitch decay cv",
+      "Amp decay cv"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "DrumKit/Tomi": {
+    "name": "Tomi",
+    "tags": [
+      "Drum"
+    ],
+    "inputs": [
+      "Drum cv 1",
+      "Drum cv 2",
+      "Drum cv 3",
+      "Drum cv 4",
+      "Drum cv 5",
+      "Drum cv 6",
+      "Drum cv 7",
+      "Drum cv 8",
+      "Drum cv 9",
+      "Drum cv 10",
+      "Drum cv 11",
+      "Drum cv 12",
+      "Drum cv 13",
+      "Drum cv 14",
+      "Drum cv 15",
+      "Drum cv 16",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Tune cv 1",
+      "Tune cv 2",
+      "Tune cv 3",
+      "Tune cv 4",
+      "Tune cv 5",
+      "Tune cv 6",
+      "Tune cv 7",
+      "Tune cv 8",
+      "Tune cv 9",
+      "Tune cv 10",
+      "Tune cv 11",
+      "Tune cv 12",
+      "Tune cv 13",
+      "Tune cv 14",
+      "Tune cv 15",
+      "Tune cv 16"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2",
+      "Audio 3",
+      "Audio 4",
+      "Audio 5",
+      "Audio 6",
+      "Audio 7",
+      "Audio 8",
+      "Audio 9",
+      "Audio 10",
+      "Audio 11",
+      "Audio 12",
+      "Audio 13",
+      "Audio 14",
+      "Audio 15",
+      "Audio 16"
     ]
   },
   "ESeries/E340": {
@@ -27003,6 +28666,472 @@
       "Out ev2"
     ]
   },
+  "KautenjaDSP-PotatoChips/106": {
+    "name": "Octal 163",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Voice 1 V/Oct",
+      "Voice 2 V/Oct",
+      "Voice 3 V/Oct",
+      "Voice 4 V/Oct",
+      "Voice 1 FM",
+      "Voice 2 FM",
+      "Voice 3 FM",
+      "Voice 4 FM",
+      "Voice 1 Volume",
+      "Voice 2 Volume",
+      "Voice 3 Volume",
+      "Voice 4 Volume",
+      "Active Channels",
+      "Waveform Morph"
+    ],
+    "outputs": [
+      "Voice 1 Audio",
+      "Voice 2 Audio",
+      "Voice 3 Audio",
+      "Voice 4 Audio"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/2612": {
+    "name": "Voice 2612",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic",
+      "Synth voice"
+    ],
+    "inputs": [
+      "Algorithm",
+      "Feedback",
+      "LFO Frequency",
+      "Output saturation",
+      "Operator 1 Attack Rate"
+    ],
+    "outputs": [
+      "Audio 1",
+      "Audio 2"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/2612_Blank1": {
+    "name": "Contour 2612",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "KautenjaDSP-PotatoChips/2A03": {
+    "name": "Staircase 2A03",
+    "tags": [
+      "Digital",
+      "Noise",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Input voct 1",
+      "Input voct 2",
+      "Input voct 3",
+      "Noise Period",
+      "Input fm 1",
+      "Input fm 2",
+      "Input fm 3",
+      "Input lfsr",
+      "Input level 1",
+      "Input level 2",
+      "Input level 3",
+      "Input level 4",
+      "Input pw 1",
+      "Input pw 2",
+      "Input sync 1",
+      "Input sync 2"
+    ],
+    "outputs": [
+      "Output oscillator 1",
+      "Output oscillator 2",
+      "Output oscillator 3",
+      "Output oscillator 4"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/AY_3_8910": {
+    "name": "Trio AY",
+    "tags": [
+      "Digital",
+      "Distortion",
+      "Low-frequency oscillator",
+      "Noise",
+      "Oscillator",
+      "Polyphonic",
+      "Synth voice",
+      "Voltage-controlled amplifier"
+    ],
+    "inputs": [
+      "Input voct 1",
+      "Input voct 2",
+      "Input voct 3",
+      "Input voct 4",
+      "Envelope V/Oct",
+      "Input fm 1",
+      "Input fm 2",
+      "Input fm 3",
+      "Input fm 4",
+      "Input envelope fm",
+      "Input level 1",
+      "Input level 2",
+      "Input level 3",
+      "Input level 4",
+      "Input tone 1",
+      "Input tone 2",
+      "Input tone 3",
+      "Input tone 4",
+      "Input noise 1",
+      "Input noise 2",
+      "Input noise 3",
+      "Input noise 4",
+      "Input envelope on 1",
+      "Input envelope on 2",
+      "Input envelope on 3",
+      "Input envelope on 4",
+      "Noise Period",
+      "Input envelope mode",
+      "Input reset 1",
+      "Input reset 2",
+      "Input reset 3",
+      "Input reset 4",
+      "Input envelope reset"
+    ],
+    "outputs": [
+      "Output oscillator 1",
+      "Output oscillator 2",
+      "Output oscillator 3",
+      "Output oscillator 4"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/Blocks": {
+    "name": "Facets",
+    "tags": [
+      "Digital",
+      "Noise",
+      "Oscillator",
+      "Polyphonic",
+      "Quad"
+    ],
+    "inputs": [
+      "Voice 1 Frequency"
+    ],
+    "outputs": [
+      "Voice 1"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/FME7": {
+    "name": "Pulse FME-7",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Tone 1 V/Oct",
+      "Tone 2 V/Oct",
+      "Tone 3 V/Oct",
+      "Tone 4 V/Oct",
+      "Tone 1 FM",
+      "Tone 2 FM",
+      "Tone 3 FM",
+      "Tone 4 FM",
+      "Tone 1 Level",
+      "Tone 2 Level",
+      "Tone 3 Level",
+      "Tone 4 Level"
+    ],
+    "outputs": [
+      "Tone 1 Audio",
+      "Tone 2 Audio",
+      "Tone 3 Audio",
+      "Tone 4 Audio"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/GBS": {
+    "name": "Pocket APU",
+    "tags": [
+      "Digital",
+      "Noise",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pulse 1 V/Oct",
+      "Pulse 2 V/Oct",
+      "Wave V/Oct",
+      "Noise Period",
+      "Pulse 1 FM",
+      "Pulse 2 FM",
+      "Wave FM",
+      "LFSR",
+      "Pulse 1 Duty Cycle",
+      "Pulse 2 Duty Cycle",
+      "Waveform",
+      "Pulse 1 Volume",
+      "Pulse 2 Volume",
+      "Wave Volume",
+      "Noise Volume"
+    ],
+    "outputs": [
+      "Pulse 1 Audio",
+      "Pulse 2 Audio",
+      "Wave Audio",
+      "Noise Audio"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/MiniBoss": {
+    "name": "Operator 2612",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic",
+      "Synth voice"
+    ],
+    "inputs": [
+      "Attack Rate",
+      "Total Level",
+      "1st Decay Rate",
+      "Sustain Level",
+      "2nd Decay Rate",
+      "Release Rate",
+      "Gate",
+      "Trigger",
+      "Pitch",
+      "FM",
+      "Volume"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/POKEY": {
+    "name": "Polynomial",
+    "tags": [
+      "Digital",
+      "Noise",
+      "Oscillator",
+      "Polyphonic",
+      "Quad"
+    ],
+    "inputs": [
+      "Tone 1 V/Oct",
+      "Tone 2 V/Oct",
+      "Tone 3 V/Oct",
+      "Tone 4 V/Oct",
+      "Tone 1 FM",
+      "Tone 2 FM",
+      "Tone 3 FM",
+      "Tone 4 FM",
+      "Tone 1 Noise",
+      "Tone 2 Noise",
+      "Tone 3 Noise",
+      "Tone 4 Noise",
+      "Tone 1 Level",
+      "Tone 2 Level",
+      "Tone 3 Level",
+      "Tone 4 Level",
+      "Input control"
+    ],
+    "outputs": [
+      "Tone 1 Audio",
+      "Tone 2 Audio",
+      "Tone 3 Audio",
+      "Tone 4 Audio"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/SN76489": {
+    "name": "Tone 76489",
+    "tags": [
+      "Digital",
+      "Noise",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Input voct"
+    ],
+    "outputs": [
+      "Output oscillator 1",
+      "Output oscillator 2",
+      "Output oscillator 3",
+      "Output oscillator 4"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/Sony_S_SMP_Blank1": {
+    "name": "Silicon S-SMP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "KautenjaDSP-PotatoChips/SuperADSR": {
+    "name": "Contour",
+    "tags": [
+      "Digital",
+      "Dual",
+      "Envelope generator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Gate"
+    ],
+    "outputs": [
+      "Envelope"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/SuperEcho": {
+    "name": "Echo",
+    "tags": [
+      "Delay",
+      "Digital",
+      "Effect",
+      "Filter",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Audio (Left)",
+      "Audio (Right)",
+      "Input audio 3",
+      "Input audio 4",
+      "Input audio 5",
+      "Input audio 6",
+      "Input audio 7",
+      "Input audio 8",
+      "Delay",
+      "Feedback",
+      "Mix (Left)",
+      "Mix (Right)",
+      "Input mix 3",
+      "Input mix 4",
+      "Input mix 5",
+      "Input mix 6",
+      "Input mix 7",
+      "Input mix 8",
+      "FIR Coefficient 1"
+    ],
+    "outputs": [
+      "Audio (Left)",
+      "Audio (Right)",
+      "Output audio 3",
+      "Output audio 4",
+      "Output audio 5",
+      "Output audio 6",
+      "Output audio 7",
+      "Output audio 8"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/SuperVCA": {
+    "name": "Gaussian",
+    "tags": [
+      "Digital",
+      "Dual",
+      "Effect",
+      "Filter",
+      "Polyphonic",
+      "Voltage-controlled amplifier"
+    ],
+    "inputs": [
+      "Input filter",
+      "Volume (Left)"
+    ],
+    "outputs": [
+      "Audio (Left)"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/VRC6": {
+    "name": "Ramp VRC6",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pulse 1 V/Oct",
+      "Pulse 2 V/Oct",
+      "Saw V/Oct",
+      "Input voct 4",
+      "Pulse 1 FM",
+      "Pulse 2 FM",
+      "Saw FM",
+      "Input fm 4",
+      "Pulse 1 Duty Cycle",
+      "Pulse 2 Duty Cycle",
+      "Input pw 3",
+      "Pulse 1 Level",
+      "Pulse 2 Level",
+      "Saw Level",
+      "Input level 4",
+      "Saw Sync"
+    ],
+    "outputs": [
+      "Pulse 1",
+      "Pulse 2",
+      "Saw",
+      "Output oscillator 4"
+    ]
+  },
+  "KautenjaDSP-PotatoChips/YM2151": {
+    "name": "Voice 2151",
+    "tags": [
+      "Digital",
+      "Oscillator",
+      "Polyphonic",
+      "Synth voice"
+    ],
+    "inputs": [
+      "Pitch",
+      "Gate",
+      "Retrig",
+      "Algorithm",
+      "Feedback",
+      "Lfo",
+      "Amd",
+      "Pmd",
+      "Noise",
+      "Level",
+      "Operator 1",
+      "Operator 2",
+      "Operator 3",
+      "Operator 4",
+      "Operator 5",
+      "Operator 6",
+      "Operator 7",
+      "Operator 8",
+      "Operator 9",
+      "Operator 10",
+      "Operator 11",
+      "Operator 12",
+      "Operator 13",
+      "Operator 14",
+      "Operator 15",
+      "Operator 16",
+      "Operator 17",
+      "Operator 18",
+      "Operator 19",
+      "Operator 20",
+      "Operator 21",
+      "Operator 22",
+      "Operator 23",
+      "Operator 24",
+      "Operator 25",
+      "Operator 26",
+      "Operator 27",
+      "Operator 28"
+    ],
+    "outputs": [
+      "Left audio",
+      "Right audio"
+    ]
+  },
   "Kilpatrick-Toolbox/MIDI_CC_Note": {
     "name": "MIDI CC Note",
     "tags": [
@@ -27686,14 +29815,14 @@
       "polyphonic"
     ],
     "inputs": [
-      "Input 1",
-      "Input 2",
-      "Input 3",
-      "Input 4",
-      "Input 5",
-      "Input 6",
-      "Input 7",
-      "Input 8"
+      "Port 1",
+      "Port 2",
+      "Port 3",
+      "Port 4",
+      "Port 5",
+      "Port 6",
+      "Port 7",
+      "Port 8"
     ],
     "outputs": []
   },
@@ -27705,14 +29834,14 @@
     ],
     "inputs": [],
     "outputs": [
-      "Output 1",
-      "Output 2",
-      "Output 3",
-      "Output 4",
-      "Output 5",
-      "Output 6",
-      "Output 7",
-      "Output 8"
+      "Port 1",
+      "Port 2",
+      "Port 3",
+      "Port 4",
+      "Port 5",
+      "Port 6",
+      "Port 7",
+      "Port 8"
     ]
   },
   "LomasModules/AdvancedSampler": {
@@ -32412,6 +34541,481 @@
       "Reset"
     ]
   },
+  "Moffenzeef/BadIdea1800": {
+    "name": "Bad Idea #1800-Call-Yer-Mum",
+    "tags": [
+      "oscillator",
+      "noise",
+      "drum",
+      "hardware clone"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Bad Idea 1800-Call-Yer-Mum Audio"
+    ]
+  },
+  "Moffenzeef/BadIdea9": {
+    "name": "Bad Idea #9",
+    "tags": [
+      "oscillator",
+      "noise",
+      "drum",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Voltage Starve CV"
+    ],
+    "outputs": [
+      "Bad Idea #9"
+    ]
+  },
+  "Moffenzeef/Bobcat": {
+    "name": "Bobcat",
+    "tags": [
+      "drum",
+      "noise",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! 1 Gate",
+      "Tail 1 CV",
+      "Hiss 1 CV",
+      "Bang! 2 Gate",
+      "Tail 2 CV",
+      "Hiss 2 CV"
+    ],
+    "outputs": [
+      "Bobcat Audio"
+    ]
+  },
+  "Moffenzeef/BusMult": {
+    "name": "Bus Mult",
+    "tags": [
+      "multiple",
+      "utility",
+      "hardware clone"
+    ],
+    "inputs": [
+      "1",
+      "2"
+    ],
+    "outputs": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ]
+  },
+  "Moffenzeef/Count": {
+    "name": "Count",
+    "tags": [
+      "clock generator",
+      "clock modulator",
+      "utility",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Time CV",
+      "Width CV"
+    ],
+    "outputs": [
+      "Divided 1 Gate",
+      "Divided 2 Gate",
+      "Divided 3 Gate",
+      "Divided 4 Gate",
+      "Start Pulse Gate",
+      "Main Gate"
+    ]
+  },
+  "Moffenzeef/Deviant": {
+    "name": "Deviant",
+    "tags": [
+      "random",
+      "utility",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! 1 Gate",
+      "Top 1 CV",
+      "Bottom 1 CV",
+      "Bang! 2 Gate",
+      "Top 2 CV",
+      "Bottom 2 CV"
+    ],
+    "outputs": [
+      "Deviant 1 CV",
+      "Deviant 2 CV"
+    ]
+  },
+  "Moffenzeef/DialUp": {
+    "name": "Dial Up",
+    "tags": [
+      "drum",
+      "noise",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang Gate",
+      "Modem CV"
+    ],
+    "outputs": [
+      "Dial-Up Audio"
+    ]
+  },
+  "Moffenzeef/GMO": {
+    "name": "GMO",
+    "tags": [
+      "drum",
+      "noise",
+      "oscillator",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! Gate",
+      "Specimen CV",
+      "Speed CV",
+      "Loop Gate",
+      "Head CV",
+      "Tail CV"
+    ],
+    "outputs": [
+      "GMO Audio"
+    ]
+  },
+  "Moffenzeef/INTENSIFIES": {
+    "name": "INTENSIFIES",
+    "tags": [
+      "hardware clone",
+      "Noise",
+      "effect",
+      "distortion"
+    ],
+    "inputs": [
+      "Carrier CV",
+      "FX Volume CV",
+      "Gain CV",
+      "Modulator CV",
+      "Audio Left",
+      "Audio Right",
+      "Synth Volume CV",
+      "Engage CV",
+      "Bypass CV"
+    ],
+    "outputs": [
+      "FX Left",
+      "FX Right",
+      "Synth"
+    ]
+  },
+  "Moffenzeef/Kleztizer": {
+    "name": "Kleztizer",
+    "tags": [
+      "quantizer",
+      "sequencer"
+    ],
+    "inputs": [
+      "Key CV",
+      "Mode CV",
+      "Voicing CV",
+      "Inversion CV",
+      "Chord Select CV",
+      "Lead 1 CV",
+      "Lead 1 Octave CV",
+      "Lead 2 CV",
+      "Lead 2 Octave CV"
+    ],
+    "outputs": [
+      "Lead 1 Gate",
+      "Lead 2 Gate",
+      "Pedal",
+      "Bass",
+      "Voice 1",
+      "Voice 2",
+      "Voice 3",
+      "Lead 1",
+      "Lead 2",
+      "Button 1 Gate",
+      "Button 2 Gate",
+      "Button 3 Gate",
+      "Button 4 Gate",
+      "Button 5 Gate",
+      "Button 6 Gate",
+      "Button 7 Gate"
+    ]
+  },
+  "Moffenzeef/Kriket": {
+    "name": "Kriket",
+    "tags": [
+      "drum",
+      "noise",
+      "oscillator",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! 1",
+      "Bang! 2",
+      "Bang! 3",
+      "Bang! 4",
+      "CV"
+    ],
+    "outputs": [
+      "Kriket"
+    ]
+  },
+  "Moffenzeef/Mito": {
+    "name": "MITO",
+    "tags": [
+      "clock modulator",
+      "sequencer",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! Gate",
+      "Reset Gate",
+      "Division 1 CV",
+      "Division 2 CV",
+      "Division 3 CV",
+      "Division 4 CV",
+      "Division 5 CV",
+      "Division 6 CV",
+      "Swing CV",
+      "Width CV"
+    ],
+    "outputs": [
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6"
+    ]
+  },
+  "Moffenzeef/Moffenmix": {
+    "name": "Moffenmix",
+    "tags": [
+      "mixer",
+      "distortion",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Ch.1 Audio",
+      "Ch.2 Audio",
+      "Ch.3 Audio",
+      "Ch.4 Audio",
+      "Link Audio"
+    ],
+    "outputs": [
+      "Mix Audio"
+    ]
+  },
+  "Moffenzeef/Mongrel": {
+    "name": "Mongrel",
+    "tags": [
+      "drum",
+      "noise",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! Gate",
+      "Tail CV",
+      "Yip CV",
+      "Growl CV",
+      "Snarl Gate",
+      "Yap CV"
+    ],
+    "outputs": [
+      "Mongrel Audio"
+    ]
+  },
+  "Moffenzeef/Muskrat": {
+    "name": "Muskrat",
+    "tags": [
+      "drum",
+      "noise",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! Gate",
+      "Scratch CV",
+      "Dig CV",
+      "Chew CV",
+      "Ratswitch Gate"
+    ],
+    "outputs": [
+      "Muskrat Audio"
+    ]
+  },
+  "Moffenzeef/QuadDeviant": {
+    "name": "Quad Deviant",
+    "tags": [
+      "random",
+      "utility"
+    ],
+    "inputs": [
+      "Clock 1",
+      "Clock 2",
+      "Clock 3",
+      "Clock 4",
+      "Top CV 1",
+      "Top CV 2",
+      "Top CV 3",
+      "Top CV 4",
+      "Bottom CV 1",
+      "Bottom CV 2",
+      "Bottom CV 3",
+      "Bottom CV 4"
+    ],
+    "outputs": [
+      "Sum",
+      "Inverse Sum",
+      "Max",
+      "Min",
+      "Positive",
+      "Negative",
+      "Full Wave Rectified",
+      "Inverse Full Wave Rectified",
+      "Ch. 1",
+      "Ch. 2",
+      "Ch. 3",
+      "Ch. 4",
+      "Average",
+      "Slew"
+    ]
+  },
+  "Moffenzeef/Simplify": {
+    "name": "Simplify",
+    "tags": [
+      "sequencer",
+      "clock modulator",
+      "hardware clone"
+    ],
+    "inputs": [
+      "Bang! Gate",
+      "Reset Gate",
+      "Select CV"
+    ],
+    "outputs": [
+      "Simplify Gate"
+    ]
+  },
+  "Moffenzeef/Stargazer": {
+    "name": "Stargazer",
+    "tags": [
+      "Synth voice",
+      "oscillator",
+      "hardware clone",
+      "LFO",
+      "Random"
+    ],
+    "inputs": [
+      "1v/Oct",
+      "FM CV",
+      "Sub CV",
+      "Wave CV",
+      "Mix CV",
+      "Detune CV",
+      "Filter 1 Cutoff CV",
+      "Filter 1 Resonance CV",
+      "Alias CV",
+      "Redux CV",
+      "Filter 2 Cutoff CV",
+      "Filter 2 Resonance CV",
+      "LFO 1 Waveshape CV",
+      "LFO 1 Rate CV",
+      "LFO 1 Depth CV",
+      "LFO 2 Waveshape CV",
+      "LFO 2 Rate CV",
+      "LFO 2 Depth CV",
+      "LFO 3 Waveshape CV",
+      "LFO 3 Rate CV",
+      "LFO 3 Depth CV",
+      "Spread CV",
+      "Gain CV",
+      "Volume CV",
+      "External Audio"
+    ],
+    "outputs": [
+      "Audio Left",
+      "Audio Right",
+      "LFO 1",
+      "LFO 2",
+      "LFO 3"
+    ]
+  },
+  "Moffenzeef/Swarm": {
+    "name": "Swarm",
+    "tags": [
+      "hardware clone",
+      "clock",
+      "random",
+      "sequencer",
+      "oscillator",
+      "utility"
+    ],
+    "inputs": [
+      "Time CV",
+      "Width CV"
+    ],
+    "outputs": [
+      "Ch. 1",
+      "Ch. 2",
+      "Ch. 3",
+      "Ch. 4",
+      "Clock",
+      "VCO"
+    ]
+  },
+  "Moffenzeef/Tantz": {
+    "name": "Tantz!",
+    "tags": [
+      "sequencer",
+      "clock modulator"
+    ],
+    "inputs": [
+      "Run CV",
+      "Style CV",
+      "Swing CV",
+      "Pulsewidth CV",
+      "Kick CV",
+      "Snare CV",
+      "Hi Hat Closed CV",
+      "Clock",
+      "Hi Hat Open CV",
+      "Perc 1 CV",
+      "Perc 2 CV"
+    ],
+    "outputs": [
+      "Reset Gate",
+      "Kick Gate",
+      "Snare Gate",
+      "Hi Hat Closed Gate",
+      "Hi Hat Open Gate",
+      "Percussion 1 Gate",
+      "Percusison 2 Gate"
+    ]
+  },
+  "Moffenzeef/TheRunner": {
+    "name": "The Runner",
+    "tags": [
+      "hardware clone",
+      "oscillator",
+      "synth voice"
+    ],
+    "inputs": [
+      "Gain CV",
+      "Volume CV",
+      "Animate CV",
+      "Chorus CV",
+      "Harmonics CV",
+      "Cutoff CV",
+      "Resonance CV",
+      "1v/Oct"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
   "Mog/Network": {
     "name": "Network",
     "tags": [
@@ -33915,6 +36519,157 @@
       "Out1"
     ]
   },
+  "Ohmer/BRK": {
+    "name": "BRK (\u0022Break\u0022) expander for RKD",
+    "tags": [
+      "Clock modulator",
+      "Sequencer",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/KlokSpid": {
+    "name": "KlokSpid",
+    "tags": [
+      "Clock generator",
+      "Clock modulator"
+    ],
+    "inputs": [
+      "Master clock",
+      "CV-Ratio / trigger"
+    ],
+    "outputs": [
+      "1st clock",
+      "2nd clock",
+      "3rd clock",
+      "4th clock"
+    ]
+  },
+  "Ohmer/Metriks": {
+    "name": "Metriks",
+    "tags": [
+      "Visual"
+    ],
+    "inputs": [
+      "Signal to meter",
+      "Play/Pause",
+      "Reset"
+    ],
+    "outputs": [
+      "INput thru"
+    ]
+  },
+  "Ohmer/OhmerBlank1": {
+    "name": "1HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/OhmerBlank16": {
+    "name": "16HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/OhmerBlank2": {
+    "name": "2HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/OhmerBlank32": {
+    "name": "32HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/OhmerBlank4": {
+    "name": "4HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/OhmerBlank8": {
+    "name": "8HP blank panel",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Ohmer/PolaritySwitch": {
+    "name": "Polarity Switch",
+    "tags": [
+      "Dual",
+      "Switch",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "IN1 voltage",
+      "IN2 voltage"
+    ],
+    "outputs": [
+      "IN2 \u003E= 0: sent to this P1",
+      "IN2 \u003C 0: sent (absolute) to this N1",
+      "IN2 \u003E= 0: sent to this P2",
+      "IN2 \u003C 0: sent (absolute) to this N2"
+    ]
+  },
+  "Ohmer/RKD": {
+    "name": "RKD (Rotate Klok Divider)",
+    "tags": [
+      "Clock modulator",
+      "Sequencer"
+    ],
+    "inputs": [
+      "Rotate",
+      "Reset",
+      "Clock"
+    ],
+    "outputs": [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th"
+    ]
+  },
+  "Ohmer/SplitterModule": {
+    "name": "Splitter 1x9",
+    "tags": [
+      "Multiple",
+      "Utility",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Signal"
+    ],
+    "outputs": [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "8th"
+    ]
+  },
   "PS-PurrSoftware/Meander": {
     "name": "Meander",
     "tags": [
@@ -34615,6 +37370,201 @@
     "inputs": [],
     "outputs": []
   },
+  "QuantalAudio/Blank1": {
+    "name": "Blank Panel | 1HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "QuantalAudio/Blank3": {
+    "name": "Blank Panel | 3HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "QuantalAudio/Blank5": {
+    "name": "Blank Panel | 5HP",
+    "tags": [
+      "Blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "QuantalAudio/BufferedMult": {
+    "name": "Buffered Mult | 2HP",
+    "tags": [
+      "Multiple",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "A",
+      "B"
+    ],
+    "outputs": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3"
+    ]
+  },
+  "QuantalAudio/DaisyBlank": {
+    "name": "Daisy Mix Blank Separator | 2HP",
+    "tags": [
+      "Blank",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "QuantalAudio/DaisyChannel": {
+    "name": "Daisy Mix Channel MONO | 2HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Channel",
+      "Level CV",
+      "Daisy chain"
+    ],
+    "outputs": [
+      "Channel",
+      "Daisy chain"
+    ]
+  },
+  "QuantalAudio/DaisyChannel2": {
+    "name": "Daisy Mix Channel STEREO | 2HP",
+    "tags": [
+      "Mixer",
+      "VCA",
+      "Polyphonic",
+      "Expander"
+    ],
+    "inputs": [
+      "Channel L",
+      "Channel R",
+      "Level CV"
+    ],
+    "outputs": [
+      "Channel L",
+      "Channel R"
+    ]
+  },
+  "QuantalAudio/DaisyChannelSends2": {
+    "name": "Daisy Mix Channel Aux Sends STEREO | 2HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Channel L",
+      "Channel R"
+    ]
+  },
+  "QuantalAudio/DaisyChannelVu": {
+    "name": "Daisy Mix Channel VU | 1HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic",
+      "Visual",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "QuantalAudio/DaisyMaster": {
+    "name": "Daisy Mix Master MONO | 3HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Level CV",
+      "Daisy Channel"
+    ],
+    "outputs": [
+      "Mix"
+    ]
+  },
+  "QuantalAudio/DaisyMaster2": {
+    "name": "Daisy Mix Master STEREO | 3HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic",
+      "Expander"
+    ],
+    "inputs": [
+      "Level CV"
+    ],
+    "outputs": [
+      "Mix L",
+      "Mix R"
+    ]
+  },
+  "QuantalAudio/Horsehair": {
+    "name": "Horsehair VCO | 7HP",
+    "tags": [
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pitch",
+      "Osc A Shape CV",
+      "Osc B Shape CV",
+      "Osc A PW CV",
+      "Osc B PW CV",
+      "Mix CV"
+    ],
+    "outputs": [
+      "Sine",
+      "Osc Mix"
+    ]
+  },
+  "QuantalAudio/Mixer2": {
+    "name": "Mixer 2 | Mono-\u003EStereo | 5HP",
+    "tags": [
+      "Mixer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Mix CV",
+      "Channel 1",
+      "Channel 2"
+    ],
+    "outputs": [
+      "Mix 1",
+      "Mix 2",
+      "Channel 1",
+      "Channel 2"
+    ]
+  },
+  "QuantalAudio/UnityMix": {
+    "name": "Unity Mix | 2HP",
+    "tags": [
+      "Multiple",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "A1",
+      "A2",
+      "A3",
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "outputs": [
+      "Group A",
+      "Group B"
+    ]
+  },
   "RareBreeds_Orbits/RareBreeds_Orbits_Eugene": {
     "name": "Eugene",
     "tags": [
@@ -34766,6 +37716,538 @@
     "outputs": [
       "Gate (logical OR of all inputs/buttons)",
       "Quantized CV"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Aion": {
+    "name": "Aion",
+    "tags": [
+      "Quad",
+      "Utility",
+      "Clock modulator"
+    ],
+    "inputs": [
+      "Input trigger 1",
+      "Input trigger 2",
+      "Input trigger 3",
+      "Input trigger 4",
+      "Input reset 1",
+      "Input reset 2",
+      "Input reset 3",
+      "Input reset 4",
+      "Input run 1",
+      "Input run 2",
+      "Input run 3",
+      "Input run 4"
+    ],
+    "outputs": [
+      "Output trigger 1",
+      "Output trigger 2",
+      "Output trigger 3",
+      "Output trigger 4"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Alchemist": {
+    "name": "Alchemist",
+    "tags": [
+      "Mixer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Polyphonic",
+      "Master mix CV",
+      "Master mute CV"
+    ],
+    "outputs": [
+      "Monophonic mix",
+      "Polyphonic mix"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Alembic": {
+    "name": "Alembic",
+    "tags": [
+      "Expander"
+    ],
+    "inputs": [
+      "Input gain cv"
+    ],
+    "outputs": [
+      "Output channel"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Crucible": {
+    "name": "Crucible",
+    "tags": [
+      "Expander",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Mute all",
+      "Mute channels",
+      "Solo all",
+      "Solo channels"
+    ],
+    "outputs": []
+  },
+  "SanguineMonsters/Sanguine-Denki": {
+    "name": "Denki",
+    "tags": [
+      "Expander",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Input gain cv 1",
+      "Input gain cv 2",
+      "Input gain cv 3",
+      "Input gain cv 4",
+      "Input offset cv 1",
+      "Input offset cv 2",
+      "Input offset cv 3",
+      "Input offset cv 4"
+    ],
+    "outputs": []
+  },
+  "SanguineMonsters/Sanguine-Fortuna": {
+    "name": "Fortuna",
+    "tags": [
+      "Dual",
+      "Polyphonic",
+      "Random"
+    ],
+    "inputs": [
+      "Channel 1 signal",
+      "Channel 2 signal",
+      "Channel 1 probability",
+      "Channel 2 probability",
+      "Channel 1 trigger",
+      "Channel 2 trigger"
+    ],
+    "outputs": [
+      "Channel 1 A",
+      "Channel 2 A",
+      "Channel 1 B",
+      "Channel 2 B"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Kitsune": {
+    "name": "Kitsune",
+    "tags": [
+      "Attenuator",
+      "Quad",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4"
+    ],
+    "outputs": [
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Manus": {
+    "name": "Manus",
+    "tags": [
+      "Expander",
+      "Switch",
+      "Utility"
+    ],
+    "inputs": [
+      "Step 1",
+      "Step 2",
+      "Step 3",
+      "Input step 4",
+      "Input step 5",
+      "Input step 6",
+      "Input step 7",
+      "Input step 8"
+    ],
+    "outputs": []
+  },
+  "SanguineMonsters/Sanguine-Medusa": {
+    "name": "Medusa",
+    "tags": [
+      "Multiple",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Medusa 1",
+      "Medusa 2",
+      "Medusa 3",
+      "Medusa 4",
+      "Medusa 5",
+      "Medusa 6",
+      "Medusa 7",
+      "Medusa 8",
+      "Medusa 9",
+      "Medusa 10",
+      "Medusa 11",
+      "Medusa 12",
+      "Medusa 13",
+      "Medusa 14",
+      "Medusa 15",
+      "Medusa 16",
+      "Medusa 17",
+      "Medusa 18",
+      "Medusa 19",
+      "Medusa 20",
+      "Medusa 21",
+      "Medusa 22",
+      "Medusa 23",
+      "Medusa 24",
+      "Medusa 25",
+      "Medusa 26",
+      "Medusa 27",
+      "Medusa 28",
+      "Medusa 29",
+      "Medusa 30",
+      "Medusa 31",
+      "Medusa 32"
+    ],
+    "outputs": [
+      "Medusa 1",
+      "Medusa 2",
+      "Medusa 3",
+      "Medusa 4",
+      "Medusa 5",
+      "Medusa 6",
+      "Medusa 7",
+      "Medusa 8",
+      "Medusa 9",
+      "Medusa 10",
+      "Medusa 11",
+      "Medusa 12",
+      "Medusa 13",
+      "Medusa 14",
+      "Medusa 15",
+      "Medusa 16",
+      "Medusa 17",
+      "Medusa 18",
+      "Medusa 19",
+      "Medusa 20",
+      "Medusa 21",
+      "Medusa 22",
+      "Medusa 23",
+      "Medusa 24",
+      "Medusa 25",
+      "Medusa 26",
+      "Medusa 27",
+      "Medusa 28",
+      "Medusa 29",
+      "Medusa 30",
+      "Medusa 31",
+      "Medusa 32"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Blank": {
+    "name": "Sanguine Monsters Blank",
+    "tags": [
+      "Blank",
+      "Visual"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "SanguineMonsters/Sanguine-Monsters-Brainz": {
+    "name": "Brainz",
+    "tags": [
+      "Sequencer",
+      "Utility",
+      "Switch"
+    ],
+    "inputs": [
+      "Start/stop",
+      "Reset"
+    ],
+    "outputs": [
+      "Run",
+      "Reset",
+      "Metronome signal",
+      "Global trigger 1",
+      "Global trigger 2",
+      "Global trigger 3",
+      "Global trigger 4",
+      "Step A end",
+      "Step B end",
+      "Step C end"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Bukavac": {
+    "name": "Bukavac",
+    "tags": [
+      "Noise"
+    ],
+    "inputs": [
+      "Perlin noise speed",
+      "Perlin noise amplifier"
+    ],
+    "outputs": [
+      "Perlin noise mix",
+      "Perlin noise first octave",
+      "Perlin noise second octave",
+      "Perlin noise third octave",
+      "Perlin noise fourth octave",
+      "White noise",
+      "Pink noise",
+      "Red noise",
+      "Violet noise",
+      "Blue noise",
+      "Gray noise",
+      "Prism noise"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Chronos": {
+    "name": "Chronos",
+    "tags": [
+      "Low-frequency oscillator",
+      "Polyphonic",
+      "Quad"
+    ],
+    "inputs": [
+      "Input clock 1",
+      "Input clock 2",
+      "Input clock 3",
+      "Input clock 4",
+      "Input reset 1",
+      "Input reset 2",
+      "Input reset 3",
+      "Input reset 4",
+      "Input fm 1",
+      "Input fm 2",
+      "Input fm 3",
+      "Input fm 4",
+      "Input pwm 1",
+      "Input pwm 2",
+      "Input pwm 3",
+      "Input pwm 4"
+    ],
+    "outputs": [
+      "Output sine 1",
+      "Output sine 2",
+      "Output sine 3",
+      "Output sine 4",
+      "Output triangle 1",
+      "Output triangle 2",
+      "Output triangle 3",
+      "Output triangle 4",
+      "Output saw 1",
+      "Output saw 2",
+      "Output saw 3",
+      "Output saw 4",
+      "Output square 1",
+      "Output square 2",
+      "Output square 3",
+      "Output square 4"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Dolly-X": {
+    "name": "Dolly-X",
+    "tags": [
+      "Utility",
+      "Polyphonic",
+      "Dual"
+    ],
+    "inputs": [
+      "Input mono in1",
+      "Input mono in2",
+      "Input channels1 cv",
+      "Input channels2 cv"
+    ],
+    "outputs": [
+      "Output polyout 1",
+      "Output polyout 2"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Dungeon": {
+    "name": "Dungeon",
+    "tags": [
+      "Noise",
+      "Sample and hold",
+      "Random"
+    ],
+    "inputs": [
+      "Clock",
+      "Voltage",
+      "Slew CV"
+    ],
+    "outputs": [
+      "Noise",
+      "Voltage"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Oraculus": {
+    "name": "Oraculus",
+    "tags": [
+      "Utility",
+      "Polyphonic",
+      "Switch"
+    ],
+    "inputs": [
+      "Polyphonic",
+      "Channel select offset CV",
+      "Trigger next step",
+      "Trigger previous step",
+      "Trigger random",
+      "Trigger reset"
+    ],
+    "outputs": [
+      "Monophonic"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Raiju": {
+    "name": "Raiju",
+    "tags": [
+      "Utility",
+      "Polyphonic"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Output voltage 1",
+      "Output voltage 2",
+      "Output voltage 3",
+      "Output voltage 4",
+      "Output voltage 5",
+      "Output voltage 6",
+      "Output voltage 7",
+      "Output voltage 8",
+      "Voltage series polyphonic"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Monsters-Sphinx": {
+    "name": "Sphinx",
+    "tags": [
+      "Sequencer"
+    ],
+    "inputs": [
+      "Steps CV",
+      "Length CV",
+      "Rotation CV",
+      "Accents rotation",
+      "Accents CV",
+      "Padding CV",
+      "Clock",
+      "Reset"
+    ],
+    "outputs": [
+      "Gate",
+      "Accent",
+      "End of cycle"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Oubliette": {
+    "name": "Oubliette",
+    "tags": [
+      "Utility"
+    ],
+    "inputs": [
+      "Input null 1",
+      "Input null 2",
+      "Input null 3",
+      "Input null 4",
+      "Input null 5",
+      "Input null 6",
+      "Input null 7",
+      "Input null 8",
+      "Input null 9",
+      "Input null 10",
+      "Input null 11",
+      "Input null 12",
+      "Input null 13",
+      "Input null 14",
+      "Input null 15",
+      "Input null 16"
+    ],
+    "outputs": [
+      "Output null 1",
+      "Output null 2",
+      "Output null 3",
+      "Output null 4",
+      "Output null 5",
+      "Output null 6",
+      "Output null 7",
+      "Output null 8",
+      "Output null 9",
+      "Output null 10",
+      "Output null 11",
+      "Output null 12",
+      "Output null 13",
+      "Output null 14",
+      "Output null 15",
+      "Output null 16"
+    ]
+  },
+  "SanguineMonsters/Sanguine-SuperSwitch18": {
+    "name": "Gegenees",
+    "tags": [
+      "Switch",
+      "Random",
+      "Sequencer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Voltage",
+      "Step count",
+      "Trigger previous step",
+      "Trigger next step",
+      "Trigger random",
+      "Trigger reset"
+    ],
+    "outputs": [
+      "Output out1",
+      "Output out2",
+      "Output out3",
+      "Output out4",
+      "Output out5",
+      "Output out6",
+      "Output out7",
+      "Output out8"
+    ]
+  },
+  "SanguineMonsters/Sanguine-SuperSwitch81": {
+    "name": "Hydra",
+    "tags": [
+      "Switch",
+      "Random",
+      "Sequencer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Input in1",
+      "Input in2",
+      "Input in3",
+      "Input in4",
+      "Input in5",
+      "Input in6",
+      "Input in7",
+      "Input in8",
+      "Step count",
+      "Trigger previous step",
+      "Trigger next step",
+      "Trigger random",
+      "Trigger reset"
+    ],
+    "outputs": [
+      "Voltage"
+    ]
+  },
+  "SanguineMonsters/Sanguine-Werewolf": {
+    "name": "Werewolf",
+    "tags": [
+      "Distortion",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Gain",
+      "Fold",
+      "Left",
+      "Right"
+    ],
+    "outputs": [
+      "Left",
+      "Right"
     ]
   },
   "SanguineMutants/Funes": {
@@ -35351,6 +38833,410 @@
       "Output out 2a",
       "Output out 1b",
       "Output out 2b"
+    ]
+  },
+  "Sha-Bang-Modules/AbsorptionSpectrum": {
+    "name": "Absorption Spectrum",
+    "tags": [
+      "Blank",
+      "Visual"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/Collider": {
+    "name": "Collider",
+    "tags": [
+      "Granular",
+      "Physical modeling",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Shake",
+      "Center frequency",
+      "Frequency range",
+      "Velocity",
+      "Number of Particles"
+    ],
+    "outputs": [
+      "Velocity",
+      "Gate",
+      "Pitch (V/OCT)"
+    ]
+  },
+  "Sha-Bang-Modules/Cosmosis": {
+    "name": "Cosmosis",
+    "tags": [
+      "Visual",
+      "Sequencer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Play",
+      "Lines speed",
+      "Reset",
+      "Root note",
+      "Randomize position",
+      "Randomize radius"
+    ],
+    "outputs": [
+      "Trigger",
+      "Pitch (V/OCT)"
+    ]
+  },
+  "Sha-Bang-Modules/JeremyBlankPanel": {
+    "name": "Blank Panel",
+    "tags": [
+      "Blank",
+      "Visual"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/Neutrinode": {
+    "name": "Neutrinode",
+    "tags": [
+      "Visual",
+      "Sequencer",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Continuous / 1-shot",
+      "bpm",
+      "Move nodes",
+      "Root note"
+    ],
+    "outputs": [
+      "Trigger ALL",
+      "Pitch (V/OCT) ALL",
+      "Volts all 2",
+      "Volts all 3",
+      "Volts all 4",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Volt 1",
+      "Volt 2",
+      "Volt 3",
+      "Volt 4"
+    ]
+  },
+  "Sha-Bang-Modules/Orbitones": {
+    "name": "Orbitones",
+    "tags": [
+      "Visual",
+      "Low-frequency oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Move attractors",
+      "Global gravity"
+    ],
+    "outputs": [
+      "X",
+      "Y",
+      "-X",
+      "-Y",
+      "X velocity",
+      "Y velocity",
+      "average X",
+      "average Y",
+      "max X",
+      "max Y",
+      "min X",
+      "min Y"
+    ]
+  },
+  "Sha-Bang-Modules/Photron": {
+    "name": "Photron",
+    "tags": [
+      "Visual"
+    ],
+    "inputs": [
+      "Separate CV",
+      "Align CV",
+      "Cohesion CV",
+      "Target color CV",
+      "Waveform CV",
+      "Background CV",
+      "Draw Pattern CV",
+      "X",
+      "Y"
+    ],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/PhotronPanel": {
+    "name": "Photron Panel",
+    "tags": [
+      "Visual",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/PhotronStrip": {
+    "name": "Photron Strip",
+    "tags": [
+      "Visual",
+      "Expander"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/PolyrhythmClock": {
+    "name": "Polyrhythm Clock",
+    "tags": [
+      "Clock generator",
+      "Clock modulator",
+      "Random"
+    ],
+    "inputs": [
+      "Reset",
+      "External clock",
+      "Tuplet 1 rhythm",
+      "Tuplet 1 duration",
+      "Tuplet 2 rhythm",
+      "Tuplet 2 duration",
+      "Tuplet 3 rhythm",
+      "Tuplet 3 duration"
+    ],
+    "outputs": [
+      "Main pulse",
+      "Tuplet 1",
+      "Tuplet 2",
+      "Tuplet 3"
+    ]
+  },
+  "Sha-Bang-Modules/QubitCrusher": {
+    "name": "QubitCrusher",
+    "tags": [
+      "Digital",
+      "Distortion",
+      "Effect",
+      "Sample and hold"
+    ],
+    "inputs": [
+      "Bit rate modulation",
+      "Randomize bit rate",
+      "Sample rate modulation",
+      "Randomize sample rate",
+      "Audio"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "Sha-Bang-Modules/RandGates": {
+    "name": "Random Gate Switch",
+    "tags": [
+      "Utility",
+      "Switch",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Trigger",
+      "Trigger 2",
+      "Trigger 3",
+      "Trigger 4",
+      "Purple",
+      "Blue",
+      "Aqua",
+      "Red"
+    ],
+    "outputs": [
+      "Main"
+    ]
+  },
+  "Sha-Bang-Modules/RandRoute": {
+    "name": "Random Route Switch",
+    "tags": [
+      "Utility",
+      "Switch",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Trigger",
+      "Main"
+    ],
+    "outputs": []
+  },
+  "Sha-Bang-Modules/StochSeq": {
+    "name": "Stochastic Sequencer 1",
+    "tags": [
+      "Sequencer",
+      "Visual",
+      "Logic"
+    ],
+    "inputs": [
+      "Randomize pattern",
+      "Invert pattern",
+      "Diminish pattern",
+      "Clock",
+      "Reset",
+      "Memory Bank CV"
+    ],
+    "outputs": [
+      "#1",
+      "#2",
+      "#3",
+      "#4",
+      "#5",
+      "#6",
+      "#7",
+      "#8",
+      "#9",
+      "#10",
+      "#11",
+      "#12",
+      "#13",
+      "#14",
+      "#15",
+      "#16",
+      "#17",
+      "#18",
+      "#19",
+      "#20",
+      "#21",
+      "#22",
+      "#23",
+      "#24",
+      "#25",
+      "#26",
+      "#27",
+      "#28",
+      "#29",
+      "#30",
+      "#31",
+      "#32",
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Gate 17",
+      "Gate 18",
+      "Gate 19",
+      "Gate 20",
+      "Gate 21",
+      "Gate 22",
+      "Gate 23",
+      "Gate 24",
+      "Gate 25",
+      "Gate 26",
+      "Gate 27",
+      "Gate 28",
+      "Gate 29",
+      "Gate 30",
+      "Gate 31",
+      "Gate 32",
+      "Gates",
+      "Not Gates",
+      "Inverted Pitch (V/OCT)",
+      "Pitch (V/OCT)"
+    ]
+  },
+  "Sha-Bang-Modules/StochSeq4": {
+    "name": "Stochastic Sequencer 4",
+    "tags": [
+      "Sequencer",
+      "Visual",
+      "Logic"
+    ],
+    "inputs": [
+      "Master clock"
+    ],
+    "outputs": [
+      "Or",
+      "Xor"
+    ]
+  },
+  "Sha-Bang-Modules/StochSeq4X": {
+    "name": "Stochastic Sequencer 4 Expander",
+    "tags": [
+      "Expander",
+      "Sequencer"
+    ],
+    "inputs": [
+      "Freq",
+      "Trigger"
+    ],
+    "outputs": [
+      "Gate 1",
+      "Gate 2",
+      "Gate 3",
+      "Gate 4",
+      "Gate 5",
+      "Gate 6",
+      "Gate 7",
+      "Gate 8",
+      "Gate 9",
+      "Gate 10",
+      "Gate 11",
+      "Gate 12",
+      "Gate 13",
+      "Gate 14",
+      "Gate 15",
+      "Gate 16",
+      "Gate 17",
+      "Gate 18",
+      "Gate 19",
+      "Gate 20",
+      "Gate 21",
+      "Gate 22",
+      "Gate 23",
+      "Gate 24",
+      "Gate 25",
+      "Gate 26",
+      "Gate 27",
+      "Gate 28",
+      "Gate 29",
+      "Gate 30",
+      "Gate 31",
+      "Gate 32"
+    ]
+  },
+  "Sha-Bang-Modules/StochSeqGrid": {
+    "name": "Stochastic Sequencer Grid",
+    "tags": [
+      "Sequencer",
+      "Visual",
+      "Logic"
+    ],
+    "inputs": [
+      "Random",
+      "Diminution",
+      "External clock",
+      "Reset"
+    ],
+    "outputs": [
+      "Gates"
+    ]
+  },
+  "Sha-Bang-Modules/Talea": {
+    "name": "Talea",
+    "tags": [
+      "Arpeggiator"
+    ],
+    "inputs": [
+      "External clock",
+      "Pitch (V/OCT)",
+      "Gate"
+    ],
+    "outputs": [
+      "Pitch (V/OCT)",
+      "Gate"
     ]
   },
   "SickoCV/AdMini": {
@@ -39286,6 +43172,275 @@
     ],
     "outputs": []
   },
+  "StochasticTelegraph/BASICally": {
+    "name": "BASICally",
+    "tags": [
+      "Attenuator",
+      "Function Generator",
+      "Logic",
+      "Polyphonic",
+      "Sequencer",
+      "Sample and hold",
+      "Utility"
+    ],
+    "inputs": [
+      "IN1",
+      "IN2",
+      "IN3",
+      "IN4",
+      "Trigger to start or Gate to start/stop (See Style)",
+      "IN5",
+      "IN6",
+      "IN7",
+      "IN8",
+      "IN9"
+    ],
+    "outputs": [
+      "OUT1",
+      "OUT2",
+      "OUT3",
+      "OUT4",
+      "OUT5",
+      "OUT6"
+    ]
+  },
+  "StochasticTelegraph/Brainwash": {
+    "name": "Brainwash",
+    "tags": [
+      "Expander",
+      "Recording",
+      "Sampler"
+    ],
+    "inputs": [
+      "Gate to start/stop recording",
+      "Left",
+      "Right",
+      "Clock for recording length; Arm recording and will record for COUNT clocks",
+      "Trigger received here will arm recording for COUNT clocks"
+    ],
+    "outputs": []
+  },
+  "StochasticTelegraph/Chances": {
+    "name": "Chances",
+    "tags": [
+      "Polyphonic",
+      "Quantizer",
+      "Random",
+      "Visual"
+    ],
+    "inputs": [
+      "Triggers here will cause a new random number to be sent to the output",
+      "(Only for Input Selection STYLE.) Voltages here will select the appropriate output value"
+    ],
+    "outputs": [
+      "Emits values according to the relative chances set above"
+    ]
+  },
+  "StochasticTelegraph/Depict": {
+    "name": "Depict",
+    "tags": [
+      "Expander",
+      "Visual"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "StochasticTelegraph/Distribute": {
+    "name": "Distribute",
+    "tags": [
+      "Random",
+      "Polyphonic",
+      "Visual"
+    ],
+    "inputs": [
+      "Triggers here will cause a new random number to be sent to the output."
+    ],
+    "outputs": [
+      "Emits random voltages according to the distribution and limits."
+    ]
+  },
+  "StochasticTelegraph/Drifter": {
+    "name": "Drifter",
+    "tags": [
+      "Random",
+      "Sample and hold",
+      "Sequencer"
+    ],
+    "inputs": [
+      "Line is reset to initial shape when a trigger enters",
+      "The curve drifts when a trigger enters",
+      "The X position on the curve",
+      "Added to knob value -\u003E the maximum total drift distance per drift event",
+      "Added to knob value -\u003E the maximum x-axis drift distance per drift event",
+      "The curve drifts towards reset shape when a trigger enters"
+    ],
+    "outputs": [
+      "The Y position on the curve at IN.",
+      "Trigger each time IN changes which segment it is in."
+    ]
+  },
+  "StochasticTelegraph/Embellish": {
+    "name": "Embellish",
+    "tags": [
+      "Expander",
+      "Recording",
+      "Sampler"
+    ],
+    "inputs": [
+      "Gate to start/stop recording",
+      "Left",
+      "Right",
+      "Resets position when changed; 0V -\u003E bottom, 10V -\u003E top,"
+    ],
+    "outputs": [
+      "Position as phasor (0V -\u003E 10V), and in seconds,",
+      "Left",
+      "Right"
+    ]
+  },
+  "StochasticTelegraph/Fermata": {
+    "name": "Fermata",
+    "tags": [
+      "Blank",
+      "Utility",
+      "Visual"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "StochasticTelegraph/Fixation": {
+    "name": "Fixation",
+    "tags": [
+      "Delay",
+      "Expander",
+      "Sampler"
+    ],
+    "inputs": [
+      "Resets playback to the location specified by the combination of POSITION values.",
+      "Multiplied by the attenuverter, added to the POSITION value.",
+      "Gate to start/stop playing",
+      "Playback speed (added to knob value)",
+      "Length"
+    ],
+    "outputs": [
+      "Left",
+      "Right",
+      "Raises a trigger at the start of each play",
+      "Position as phasor (0V -\u003E 10V), and in seconds,"
+    ]
+  },
+  "StochasticTelegraph/Fuse": {
+    "name": "Fuse",
+    "tags": [
+      "Clock modulator",
+      "Utility",
+      "Voltage-controlled amplifier"
+    ],
+    "inputs": [
+      "Count is reset to zero when a trigger enters",
+      "Adds one to the count each time a trigger enters",
+      "In",
+      "Subtracts one from the count each time a trigger enters"
+    ],
+    "outputs": [
+      "Outputs a trigger when count hits LIMIT",
+      "Out"
+    ]
+  },
+  "StochasticTelegraph/Memory": {
+    "name": "Memory",
+    "tags": [
+      "Recording",
+      "Sampler"
+    ],
+    "inputs": [
+      "A trigger here wipes contents to 0.0V",
+      "Tipsy text input to load named file",
+      "Tipsy text input to save contents to named file"
+    ],
+    "outputs": [
+      "Sends a trigger when file load has completed",
+      "Sends a trigger when file save has completed",
+      "Logging of File events; connect to a TTY TEXT input",
+      "Length of recording in seconds; updates on load and reset"
+    ]
+  },
+  "StochasticTelegraph/MemoryCV": {
+    "name": "MemoryCV",
+    "tags": [
+      "Recording",
+      "Sampler"
+    ],
+    "inputs": [
+      "A trigger here wipes contents to 0.0V",
+      "Tipsy text input to load named file",
+      "Tipsy text input to save contents to named file"
+    ],
+    "outputs": [
+      "Sends a trigger when file load has completed",
+      "Sends a trigger when file save has completed",
+      "Logging of File events; connect to a TTY TEXT input",
+      "Length of recording in seconds; updates on load and reset"
+    ]
+  },
+  "StochasticTelegraph/Ruminate": {
+    "name": "Ruminate",
+    "tags": [
+      "Delay",
+      "Expander",
+      "Sampler"
+    ],
+    "inputs": [
+      "Gate to start/stop playing",
+      "Playback speed (added to knob value)",
+      "Resets position when changed; 0V -\u003E bottom, 10V -\u003E top,"
+    ],
+    "outputs": [
+      "Position as phasor (0V -\u003E 10V), and (optionally) in seconds,",
+      "Left",
+      "Right"
+    ]
+  },
+  "StochasticTelegraph/TTY": {
+    "name": "TTY",
+    "tags": [
+      "Recording",
+      "Utility",
+      "Visual"
+    ],
+    "inputs": [
+      "New values will be shown on screen",
+      "Input for Tipsy text info",
+      "New values will be shown on screen",
+      "Input for Tipsy text info",
+      "Input for Tipsy text info",
+      "New values will be shown on screen"
+    ],
+    "outputs": []
+  },
+  "StochasticTelegraph/Venn": {
+    "name": "Venn",
+    "tags": [
+      "Controller",
+      "Polyphonic",
+      "Visual"
+    ],
+    "inputs": [
+      "X position of Point - attenuated value of other input will be added",
+      "Y position of Point - attenuated value of other input will be added",
+      "Multiplied by attenuverter to alter the X position of Point",
+      "Multiplied by attenuverter to alter the Y position of Point"
+    ],
+    "outputs": [
+      "0V at edge, 10V at center, polyphonic",
+      "0V outside circle, 10V within, polyphonic",
+      "Within a circle, varies linearly from left to right, polyphonic",
+      "Within a circle, varies linearly from bottom to top, polyphonic",
+      "The current X coordinate of the point (-5V-5V or 0-10). Useful for recording point gestures and performances.",
+      "The current Y coordinate of the point (-5V-5V or 0-10). Useful for recording point gestures and performances.",
+      "Outputs values based on per-circle formulas, polyphonic"
+    ]
+  },
   "Stoermelder-P1/Affix": {
     "name": "AFFIX",
     "tags": [
@@ -42139,11 +46294,11 @@
       "BLANK"
     ],
     "inputs": [
-      "Input 1",
-      "Input 2",
-      "Input 3",
-      "Input 4",
-      "Input 5"
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated"
     ],
     "outputs": [
       "Deprecated"
@@ -44553,6 +48708,854 @@
     "outputs": [
       "Difference A",
       "Difference B"
+    ]
+  },
+  "TinyTricks/A8": {
+    "name": "Attenuator x8",
+    "tags": [
+      "utility",
+      "attenuator"
+    ],
+    "inputs": [
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4",
+      "Channel 5",
+      "Channel 6",
+      "Channel 7",
+      "Channel 8"
+    ],
+    "outputs": [
+      "Channel 1",
+      "Channel 2",
+      "Channel 3",
+      "Channel 4",
+      "Channel 5",
+      "Channel 6",
+      "Channel 7",
+      "Channel 8"
+    ]
+  },
+  "TinyTricks/MG1": {
+    "name": "Modulation Generator x1",
+    "tags": [
+      "sample and hold",
+      "utility",
+      "low-frequency oscillator",
+      "random"
+    ],
+    "inputs": [
+      "Trigger"
+    ],
+    "outputs": [
+      "Modulation 1",
+      "Modulation 2",
+      "Modulation 3",
+      "Modulation 4",
+      "Modulation 5",
+      "Modulation 6",
+      "Modulation 7",
+      "Modulation 8",
+      "Modulation 9",
+      "Modulation 10",
+      "Modulation 11",
+      "Modulation 12",
+      "Modulation 13",
+      "Modulation 14",
+      "Modulation 15",
+      "Modulation 16"
+    ]
+  },
+  "TinyTricks/MG16": {
+    "name": "Modulation Generator x16",
+    "tags": [
+      "sample and hold",
+      "utility",
+      "low-frequency oscillator"
+    ],
+    "inputs": [
+      "Trigger"
+    ],
+    "outputs": [
+      "Modulation 1",
+      "Modulation 2",
+      "Modulation 3",
+      "Modulation 4",
+      "Modulation 5",
+      "Modulation 6",
+      "Modulation 7",
+      "Modulation 8",
+      "Modulation 9",
+      "Modulation 10",
+      "Modulation 11",
+      "Modulation 12",
+      "Modulation 13",
+      "Modulation 14",
+      "Modulation 15",
+      "Modulation 16"
+    ]
+  },
+  "TinyTricks/MG8": {
+    "name": "Modulation Generator x8",
+    "tags": [
+      "sample and hold",
+      "utility",
+      "low-frequency oscillator"
+    ],
+    "inputs": [
+      "Trigger"
+    ],
+    "outputs": [
+      "Modulation 1",
+      "Modulation 2",
+      "Modulation 3",
+      "Modulation 4",
+      "Modulation 5",
+      "Modulation 6",
+      "Modulation 7",
+      "Modulation 8",
+      "Modulation 9",
+      "Modulation 10",
+      "Modulation 11",
+      "Modulation 12",
+      "Modulation 13",
+      "Modulation 14",
+      "Modulation 15",
+      "Modulation 16"
+    ]
+  },
+  "TinyTricks/RM8": {
+    "name": "Random Mute x8",
+    "tags": [
+      "utility",
+      "switch"
+    ],
+    "inputs": [
+      "Trigger",
+      "Mute CV",
+      "Channel L1",
+      "Channel L2",
+      "Channel L3",
+      "Channel L4",
+      "Channel L5",
+      "Channel L6",
+      "Channel L7",
+      "Channel L8",
+      "Channel R1",
+      "Channel R2",
+      "Channel R3",
+      "Channel R4",
+      "Channel R5",
+      "Channel R6",
+      "Channel R7",
+      "Channel R8"
+    ],
+    "outputs": [
+      "Channel L1",
+      "Channel L2",
+      "Channel L3",
+      "Channel L4",
+      "Channel L5",
+      "Channel L6",
+      "Channel L7",
+      "Channel L8",
+      "Channel R1",
+      "Channel R2",
+      "Channel R3",
+      "Channel R4",
+      "Channel R5",
+      "Channel R6",
+      "Channel R7",
+      "Channel R8"
+    ]
+  },
+  "TinyTricks/RM8S": {
+    "name": "Random Stereo Mute x8",
+    "tags": [
+      "utility",
+      "switch"
+    ],
+    "inputs": [
+      "Trigger",
+      "Mute CV",
+      "Channel L1",
+      "Channel L2",
+      "Channel L3",
+      "Channel L4",
+      "Channel L5",
+      "Channel L6",
+      "Channel L7",
+      "Channel L8",
+      "Channel R1",
+      "Channel R2",
+      "Channel R3",
+      "Channel R4",
+      "Channel R5",
+      "Channel R6",
+      "Channel R7",
+      "Channel R8"
+    ],
+    "outputs": [
+      "Channel L1",
+      "Channel L2",
+      "Channel L3",
+      "Channel L4",
+      "Channel L5",
+      "Channel L6",
+      "Channel L7",
+      "Channel L8",
+      "Channel R1",
+      "Channel R2",
+      "Channel R3",
+      "Channel R4",
+      "Channel R5",
+      "Channel R6",
+      "Channel R7",
+      "Channel R8"
+    ]
+  },
+  "TinyTricks/RW": {
+    "name": "Random Wrangler",
+    "tags": [
+      "random",
+      "noise",
+      "low-frequency oscillator",
+      "sample and hold"
+    ],
+    "inputs": [
+      "Probability weight A CV",
+      "Probability weight B CV",
+      "Probability weight C CV",
+      "Probability weight D CV",
+      "Probability weight E CV",
+      "Probability weight F CV",
+      "Probability weight G CV",
+      "Probability weight H CV",
+      "Probability weight I CV",
+      "Trigger",
+      "Rate CV",
+      "Smoothing amount CV"
+    ],
+    "outputs": [
+      "Noise"
+    ]
+  },
+  "TinyTricks/RX8": {
+    "name": "Random Mix x8",
+    "tags": [
+      "switch",
+      "random",
+      "utility"
+    ],
+    "inputs": [
+      "Audio l 1",
+      "Audio l 2",
+      "Audio l 3",
+      "Audio l 4",
+      "Audio l 5",
+      "Audio l 6",
+      "Audio l 7",
+      "Audio l 8",
+      "Audio r 1",
+      "Audio r 2",
+      "Audio r 3",
+      "Audio r 4",
+      "Audio r 5",
+      "Audio r 6",
+      "Audio r 7",
+      "Audio r 8",
+      "Trigger",
+      "Speed of change CV",
+      "Jitter of change CV"
+    ],
+    "outputs": [
+      "Mix l",
+      "Mix r"
+    ]
+  },
+  "TinyTricks/SH16": {
+    "name": "Sample and hold x16",
+    "tags": [
+      "sample and hold",
+      "utility",
+      "random"
+    ],
+    "inputs": [
+      "Trigger"
+    ],
+    "outputs": [
+      "Hold 1",
+      "Hold 2",
+      "Hold 3",
+      "Hold 4",
+      "Hold 5",
+      "Hold 6",
+      "Hold 7",
+      "Hold 8",
+      "Hold 9",
+      "Hold 10",
+      "Hold 11",
+      "Hold 12",
+      "Hold 13",
+      "Hold 14",
+      "Hold 15",
+      "Hold 16"
+    ]
+  },
+  "TinyTricks/SN1": {
+    "name": "Simplex Noise LFO",
+    "tags": [
+      "low-frequency oscillator",
+      "random"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Jitter CV"
+    ],
+    "outputs": [
+      "Noise 1",
+      "Noise 2",
+      "Noise 3",
+      "Noise 4",
+      "Noise 5",
+      "Noise 6",
+      "Noise 7",
+      "Noise 8"
+    ]
+  },
+  "TinyTricks/SN8": {
+    "name": "Simplex Noise LFO x8",
+    "tags": [
+      "low-frequency oscillator",
+      "random"
+    ],
+    "inputs": [
+      "Speed CV",
+      "Jitter CV"
+    ],
+    "outputs": [
+      "Noise 1",
+      "Noise 2",
+      "Noise 3",
+      "Noise 4",
+      "Noise 5",
+      "Noise 6",
+      "Noise 7",
+      "Noise 8"
+    ]
+  },
+  "TinyTricks/SNOSC": {
+    "name": "Simplex Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Sync",
+      "X CV",
+      "Y CV",
+      "Scale CV",
+      "Detail CV",
+      "Mirror trigger"
+    ],
+    "outputs": [
+      "Oscillator",
+      "End of cycle"
+    ]
+  },
+  "TinyTricks/TT-A": {
+    "name": "Arithmetic",
+    "tags": [
+      "utility",
+      "poly"
+    ],
+    "inputs": [
+      "A",
+      "B"
+    ],
+    "outputs": [
+      "A\u002BB",
+      "Average",
+      "A-B",
+      "B-A",
+      "A/B",
+      "B/A",
+      "A*B",
+      "A^B",
+      "1/A",
+      "1/B",
+      "-A",
+      "-B"
+    ]
+  },
+  "TinyTricks/TT-L": {
+    "name": "Logic",
+    "tags": [
+      "utility",
+      "logic",
+      "poly"
+    ],
+    "inputs": [
+      "A",
+      "B"
+    ],
+    "outputs": [
+      "AND",
+      "OR",
+      "XOR",
+      "NOR",
+      "A\u003CB",
+      "A\u003EB",
+      "A\u003C=B",
+      "A\u003E=B",
+      "A=B",
+      "A!=B",
+      "\u00ACA",
+      "\u00ACB"
+    ]
+  },
+  "TinyTricks/TTSAW": {
+    "name": "Saw Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta CV",
+      "Sync"
+    ],
+    "outputs": [
+      "Oscillator",
+      "End of cycle"
+    ]
+  },
+  "TinyTricks/TTSAWPLUS": {
+    "name": "Sawtooth\u002B Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta (smoothness) CV",
+      "Detuning CV"
+    ],
+    "outputs": [
+      "Osc"
+    ]
+  },
+  "TinyTricks/TTSIN": {
+    "name": "Sine Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta CV",
+      "Sync"
+    ],
+    "outputs": [
+      "Oscillator",
+      "End of cycle"
+    ]
+  },
+  "TinyTricks/TTSINPLUS": {
+    "name": "Sine\u002B Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta (smoothness) CV",
+      "Detuning CV"
+    ],
+    "outputs": [
+      "Osc"
+    ]
+  },
+  "TinyTricks/TTSQR": {
+    "name": "Square Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta CV",
+      "Sync"
+    ],
+    "outputs": [
+      "Oscillator",
+      "End of cycle"
+    ]
+  },
+  "TinyTricks/TTSQRPLUS": {
+    "name": "Square\u002B Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta (smoothness) CV",
+      "Detuning CV"
+    ],
+    "outputs": [
+      "Osc"
+    ]
+  },
+  "TinyTricks/TTTRI": {
+    "name": "Triangle Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta CV",
+      "Sync"
+    ],
+    "outputs": [
+      "Oscillator",
+      "End of cycle"
+    ]
+  },
+  "TinyTricks/TTTRIPLUS": {
+    "name": "Triangle\u002B Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Theta (smoothness) CV",
+      "Detuning CV"
+    ],
+    "outputs": [
+      "Osc"
+    ]
+  },
+  "TinyTricks/WAVE": {
+    "name": "Wavetable Oscillator",
+    "tags": [
+      "oscillator",
+      "poly"
+    ],
+    "inputs": [
+      "Tuning CV",
+      "Fine tuning CV",
+      "Main wavetable position CV",
+      "Top capture",
+      "Top capture",
+      "Top capture",
+      "Sync",
+      "Osc 2 detune amount CV",
+      "Osc 2 wavetable position CV",
+      "Osc 3 detune amount CV",
+      "Osc 2 wavetable position CV",
+      "Capture trigger",
+      "Mirror trigger"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "TriggerFish-Elements/Tf303Oscillator": {
+    "name": "303 Oscillator",
+    "tags": [
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pitch (1V/octave)",
+      "Slide gate",
+      "Slide time CV",
+      "Frequency modulation (exponential or through-zero linear)",
+      "Square shape CV",
+      "Saw / square morph CV",
+      "Hard sync"
+    ],
+    "outputs": [
+      "Post-slide pitch CV",
+      "Audio"
+    ]
+  },
+  "TriggerFish-Elements/Tf303VoiceCore": {
+    "name": "303 Voice Core",
+    "tags": [
+      "Filter",
+      "Envelope generator",
+      "Voltage-controlled amplifier",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Audio",
+      "Cutoff (1V/octave)",
+      "Attenuverted exponential cutoff CV",
+      "AC-coupled linear filter FM",
+      "Resonance CV",
+      "Articulation gate",
+      "Accent CV",
+      "VCA CV"
+    ],
+    "outputs": [
+      "Low-pass audio",
+      "VCA audio"
+    ]
+  },
+  "TriggerFish-Elements/Tf4072VoiceCore": {
+    "name": "4072 Voice Core",
+    "tags": [
+      "Filter",
+      "Envelope generator",
+      "Voltage-controlled amplifier",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Filter audio",
+      "VCA audio override (normalled from filter)",
+      "Filter cutoff (1V/octave)",
+      "Filter modulation",
+      "Resonance modulation",
+      "VCA modulation",
+      "Envelope gate",
+      "Envelope trigger/retrigger"
+    ],
+    "outputs": [
+      "4072 low-pass",
+      "4019 VCA",
+      "Filter envelope",
+      "Amplifier envelope"
+    ]
+  },
+  "TriggerFish-Elements/TfElectricPiano": {
+    "name": "Electric Piano",
+    "tags": [
+      "Synth voice",
+      "Polyphonic",
+      "Physical modeling"
+    ],
+    "inputs": [
+      "Pitch (1V/octave)",
+      "Key gate",
+      "Strike velocity (0V to 10V)",
+      "Polyphonic pitch modulation (EXP, linear through-zero FM, or phase)",
+      "Polyphonic note retrigger (for MIDI channel reassignment and legato)",
+      "Sustain pedal gate"
+    ],
+    "outputs": [
+      "Individual pickup direct polyphonic audio",
+      "Shared amplifier left audio",
+      "Shared amplifier right audio"
+    ]
+  },
+  "TriggerFish-Elements/TfEventMerge2": {
+    "name": "Event Merge 2",
+    "tags": [
+      "Utility",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "A pitch",
+      "A gate",
+      "A trigger",
+      "A velocity",
+      "A accent",
+      "B pitch",
+      "B gate",
+      "B trigger",
+      "B velocity",
+      "B accent"
+    ],
+    "outputs": [
+      "Pitch",
+      "Gate",
+      "Trigger",
+      "Velocity",
+      "Accent"
+    ]
+  },
+  "TriggerFish-Elements/TfProgSequencer": {
+    "name": "Prog Sequencer",
+    "tags": [
+      "Sequencer",
+      "Controller"
+    ],
+    "inputs": [
+      "24 PPQN master clock",
+      "Reset",
+      "Run gate (low pauses; normalled high)"
+    ],
+    "outputs": [
+      "Polyphonic 1 V/oct pitch",
+      "Polyphonic gate",
+      "Polyphonic trigger",
+      "Polyphonic velocity",
+      "Polyphonic accent",
+      "CV 1",
+      "CV 2",
+      "CV 3"
+    ]
+  },
+  "TriggerFish-Elements/TfReverb": {
+    "name": "Room Reverb",
+    "tags": [
+      "Reverb",
+      "Effect",
+      "Physical modeling"
+    ],
+    "inputs": [
+      "Mono or polyphonic source audio",
+      "Listener X slow CV",
+      "Decay CV",
+      "Damping CV",
+      "Pre-delay CV",
+      "Listener Y slow CV",
+      "Early / late balance CV",
+      "Dry / wet mix CV"
+    ],
+    "outputs": [
+      "Left audio",
+      "Right audio"
+    ]
+  },
+  "TriggerFish-Elements/TfScenePack4": {
+    "name": "Scene Pack 4",
+    "tags": [
+      "Utility",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Source bundle 1",
+      "Source 2",
+      "Source 3",
+      "Source 4"
+    ],
+    "outputs": [
+      "Packed source audio"
+    ]
+  },
+  "TriggerFish-Elements/TfSlop": {
+    "name": "Slop",
+    "tags": [
+      "Noise"
+    ],
+    "inputs": [
+      "1V/octave pitch"
+    ],
+    "outputs": [
+      "Detuned 1V/octave pitch"
+    ]
+  },
+  "TriggerFish-Elements/TfSlop4": {
+    "name": "Slop4",
+    "tags": [
+      "Noise"
+    ],
+    "inputs": [
+      "Channel 1 1V/octave pitch",
+      "Channel 2 1V/octave pitch",
+      "Channel 3 1V/octave pitch",
+      "Channel 4 1V/octave pitch"
+    ],
+    "outputs": [
+      "Channel 1 detuned 1V/octave pitch",
+      "Channel 2 detuned 1V/octave pitch",
+      "Channel 3 detuned 1V/octave pitch",
+      "Channel 4 detuned 1V/octave pitch"
+    ]
+  },
+  "TriggerFish-Elements/TfTransport": {
+    "name": "Transport",
+    "tags": [
+      "Clock generator",
+      "Controller"
+    ],
+    "inputs": [],
+    "outputs": [
+      "24 PPQN master clock",
+      "Run gate",
+      "Reset"
+    ]
+  },
+  "TriggerFish-Elements/TfUnisonOscillator": {
+    "name": "Unison Oscillator",
+    "tags": [
+      "Oscillator",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pitch (1V/octave)",
+      "Pulse-width CV",
+      "Spread CV",
+      "Stereo-width CV"
+    ],
+    "outputs": [
+      "Mono unison mix",
+      "Left unison mix",
+      "Right unison mix"
+    ]
+  },
+  "TriggerFish-Elements/TfVCA": {
+    "name": "TFVCA",
+    "tags": [
+      "Voltage-controlled amplifier"
+    ],
+    "inputs": [
+      "Audio",
+      "Linear CV",
+      "Exponential CV"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "TriggerFish-Elements/TfVDPO": {
+    "name": "VDPO",
+    "tags": [
+      "Oscillator"
+    ],
+    "inputs": [
+      "1V/octave pitch",
+      "Audio",
+      "Damping modulation"
+    ],
+    "outputs": [
+      "Audio"
+    ]
+  },
+  "TriggerFish-Elements/TfWavefoldOscillator": {
+    "name": "Wavefold Oscillator",
+    "tags": [
+      "Oscillator",
+      "Waveshaper",
+      "Polyphonic"
+    ],
+    "inputs": [
+      "Pitch (1V/octave)",
+      "Frequency modulation (exponential or through-zero linear)",
+      "Wave CV (sine / triangle morph)",
+      "Fold CV",
+      "Symmetry CV",
+      "External audio to folder (replaces internal oscillator at folder input)"
+    ],
+    "outputs": [
+      "Internal oscillator before folding",
+      "Folder output (internal oscillator or external audio input)"
     ]
   },
   "Valley/Amalgam": {
@@ -48859,6 +53862,198 @@
       "Main"
     ]
   },
+  "cvly/brst": {
+    "name": "brst",
+    "tags": [
+      "poly",
+      "sample and hold",
+      "sequencer",
+      "switch"
+    ],
+    "inputs": [
+      "Gate",
+      "CV"
+    ],
+    "outputs": [
+      "Step 1 CV",
+      "Step 2 CV",
+      "Step 3 CV",
+      "Step 4 CV",
+      "Step 5 CV",
+      "Step 6 CV",
+      "Step 7 CV",
+      "Step 8 CV",
+      "Step 1 Gate",
+      "Step 2 Gate",
+      "Step 3 Gate",
+      "Step 4 Gate",
+      "Step 5 Gate",
+      "Step 6 Gate",
+      "Step 7 Gate",
+      "Step 8 Gate"
+    ]
+  },
+  "cvly/bss": {
+    "name": "bss",
+    "tags": [
+      "poly",
+      "quantizer",
+      "sample and hold",
+      "utility"
+    ],
+    "inputs": [
+      "CV",
+      "Gate"
+    ],
+    "outputs": [
+      "CV"
+    ]
+  },
+  "cvly/crcl": {
+    "name": "crcl",
+    "tags": [
+      "quantizer",
+      "poly",
+      "sample and hold",
+      "sequencer"
+    ],
+    "inputs": [
+      "CV",
+      "Trigger",
+      "Reset",
+      "Root"
+    ],
+    "outputs": [
+      "CV",
+      "Trigger"
+    ]
+  },
+  "cvly/ntrvlc": {
+    "name": "ntrvlc",
+    "tags": [
+      "quantizer",
+      "poly",
+      "sequencer"
+    ],
+    "inputs": [
+      "Seq 1 clock",
+      "Seq 2 clock",
+      "Seq 3 clock",
+      "Seq 4 clock",
+      "Reset"
+    ],
+    "outputs": [
+      "Poly",
+      "Seq 1 CV",
+      "Seq 2 CV",
+      "Seq 3 CV",
+      "Seq 4 CV"
+    ]
+  },
+  "cvly/ntrvlx": {
+    "name": "ntrvlx",
+    "tags": [
+      "expander"
+    ],
+    "inputs": [],
+    "outputs": [
+      "Seq 1 trigger",
+      "Seq 2 trigger",
+      "Seq 3 trigger",
+      "Seq 4 trigger"
+    ]
+  },
+  "cvly/spc": {
+    "name": "spc",
+    "tags": [
+      "quantizer",
+      "poly",
+      "utility"
+    ],
+    "inputs": [
+      "CV",
+      "Gate"
+    ],
+    "outputs": [
+      "Poly"
+    ]
+  },
+  "cvly/stpr": {
+    "name": "stpr",
+    "tags": [
+      "sequencer",
+      "switch"
+    ],
+    "inputs": [
+      "Clock",
+      "Reset",
+      "Step 0 trigger",
+      "Step 1 trigger",
+      "Step 2 trigger",
+      "Step 3 trigger",
+      "Step 4 trigger",
+      "Step 5 trigger",
+      "Step 6 trigger",
+      "Step 7 trigger"
+    ],
+    "outputs": [
+      "CV"
+    ]
+  },
+  "cvly/txt": {
+    "name": "txt",
+    "tags": [
+      "expander",
+      "utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "cvly/vbrt": {
+    "name": "vbrt",
+    "tags": [
+      "multiple",
+      "lfo",
+      "poly"
+    ],
+    "inputs": [
+      "Channel 1 pitch",
+      "Channel 2 pitch",
+      "Channel 3 pitch",
+      "Channel 4 pitch",
+      "Channel 5 pitch",
+      "Channel 6 pitch",
+      "Channel 7 pitch",
+      "Channel 8 pitch",
+      "Channel 1 scale",
+      "Channel 2 scale",
+      "Channel 3 scale",
+      "Channel 4 scale",
+      "Channel 5 scale",
+      "Channel 6 scale",
+      "Channel 7 scale",
+      "Channel 8 scale"
+    ],
+    "outputs": [
+      "Channel 1 mono",
+      "Channel 2 mono",
+      "Channel 3 mono",
+      "Channel 4 mono",
+      "Channel 5 mono",
+      "Channel 6 mono",
+      "Channel 7 mono",
+      "Channel 8 mono",
+      "Poly output"
+    ]
+  },
+  "cvly/whl": {
+    "name": "whl",
+    "tags": [
+      "blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
   "dBiz/Bench": {
     "name": "Bench",
     "tags": [
@@ -50253,15 +55448,15 @@
       "Polyphonic"
     ],
     "inputs": [
-      "Mod a",
-      "Mod b",
-      "Mod c",
+      "Mod CV A",
+      "Mod CV B",
+      "Mod CV C",
       "Preset Select (0.1V per step)"
     ],
     "outputs": [
-      "Out a",
-      "Mod b",
-      "Mod c",
+      "CV A",
+      "CV B",
+      "CV C",
       "Knob 1",
       "Knob 2",
       "Knob 3"
@@ -52284,38 +57479,38 @@
       "Utility"
     ],
     "inputs": [
-      "#1",
-      "#2",
-      "#3",
-      "#4",
-      "#5",
-      "#6",
-      "#7",
-      "#8",
-      "#9",
-      "#10",
-      "#11",
-      "#12",
-      "#13",
-      "#14",
-      "#15",
-      "#16",
-      "#17",
-      "#18",
-      "#19",
-      "#20",
-      "#21",
-      "#22",
-      "#23",
-      "#24",
-      "#25",
-      "#26",
-      "#27",
-      "#28",
-      "#29",
-      "#30",
-      "#31",
-      "#32"
+      "L/Mon Chn 1",
+      "Right Chn 1",
+      "L/Mon Chn 2",
+      "Right Chn 2",
+      "L/Mon Chn 3",
+      "Right Chn 3",
+      "L/Mon Chn 4",
+      "Right Chn 4",
+      "L/Mon Chn 5",
+      "Right Chn 5",
+      "L/Mon Chn 6",
+      "Right Chn 6",
+      "L/Mon Chn 7",
+      "Right Chn 7",
+      "L/Mon Chn 8",
+      "Right Chn 8",
+      "L/Mon Chn 9",
+      "Right Chn 9",
+      "L/Mon Chn 10",
+      "Right Chn 10",
+      "L/Mon Chn 11",
+      "Right Chn 11",
+      "L/Mon Chn 12",
+      "Right Chn 12",
+      "L/Mon Chn 13",
+      "Right Chn 13",
+      "L/Mon Chn 14",
+      "Right Chn 14",
+      "L/Mon Chn 15",
+      "Right Chn 15",
+      "L/Mon Chn 16",
+      "Right Chn 16"
     ],
     "outputs": [
       "Left Poly",
@@ -54794,15 +59989,279 @@
     ],
     "inputs": [],
     "outputs": [
-      "#1",
-      "#2",
-      "#3",
-      "#4",
-      "#5",
-      "#6",
-      "#7",
-      "#8"
+      "Output 1",
+      "Output 2",
+      "Output 3",
+      "Output 4",
+      "Output 5",
+      "Output 6",
+      "Output 7",
+      "Output 8"
     ]
+  },
+  "pachde-one/pachde-copper": {
+    "name": "Copper",
+    "tags": [
+      "Visual",
+      "Controller",
+      "Polyphonic",
+      "Utility",
+      "Expander"
+    ],
+    "inputs": [
+      "Hue",
+      "Saturation",
+      "Lightness",
+      "Alpha (transparency)"
+    ],
+    "outputs": [
+      "Red",
+      "Green",
+      "Blue",
+      "Hue",
+      "Saturation",
+      "Lightness",
+      "Alpha (transparency)",
+      "Polyphonic color component"
+    ]
+  },
+  "pachde-one/pachde-copper-mini": {
+    "name": "Copper-mini",
+    "tags": [
+      "Visual",
+      "Controller",
+      "Utility",
+      "Expander"
+    ],
+    "inputs": [
+      "Hue",
+      "Saturation",
+      "Lightness",
+      "Alpha (transparency)"
+    ],
+    "outputs": [
+      "Red",
+      "Green",
+      "Blue",
+      "Hue",
+      "Saturation",
+      "Lightness",
+      "Alpha (transparency)",
+      "Polyphonic color component"
+    ]
+  },
+  "pachde-one/pachde-fancybox": {
+    "name": "FancyBox",
+    "tags": [
+      "Visual",
+      "Utility"
+    ],
+    "inputs": [
+      "fill Hue",
+      "fill Saturation",
+      "fill Lightness",
+      "fill Alpha",
+      "fill fade",
+      "Linear start Hue",
+      "Linear start Saturation",
+      "Linear start Lightness",
+      "Linear start Alpha",
+      "Linear start fade",
+      "Linear x1",
+      "Linear y1",
+      "Linear end Hue",
+      "Linear end Saturation",
+      "Linear end Lightness",
+      "Linear end Alpha",
+      "Linear end fade",
+      "Linear x2",
+      "Linear y2",
+      "Radial inner Hue",
+      "Radial inner Saturation",
+      "Radial inner Lightness",
+      "Radial inner Alpha",
+      "Radial inner fade",
+      "Radial cx",
+      "Radial cy",
+      "Radial outer Hue",
+      "Radial outer Saturation",
+      "Radial outer Lightness",
+      "Radial outer Alpha",
+      "Radial outer fade",
+      "Radial radius",
+      "Box inner Hue",
+      "Box inner Saturation",
+      "Box inner Lightness",
+      "Box inner Alpha",
+      "Box inner_fade",
+      "Box shrink x",
+      "Box shrink y",
+      "Box outer Hue",
+      "Box outer Saturation",
+      "Box outer Lightness",
+      "Box outer Alpha",
+      "Box outer fade",
+      "Box radius",
+      "Box feather",
+      "N"
+    ],
+    "outputs": [
+      "N"
+    ]
+  },
+  "pachde-one/pachde-guide": {
+    "name": "Guide",
+    "tags": [
+      "visual",
+      "utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "pachde-one/pachde-imagine": {
+    "name": "Imagine",
+    "tags": [
+      "Visual",
+      "Sampler",
+      "Sequencer",
+      "Controller"
+    ],
+    "inputs": [
+      "Play/Pause trigger",
+      "Reset head position trigger",
+      "Read head X position",
+      "Read head Y position",
+      "Read head speed",
+      "Minimum g/t time"
+    ],
+    "outputs": [
+      "x",
+      "y",
+      "Voltage",
+      "Gate",
+      "Trigger",
+      "Red",
+      "Green",
+      "Blue",
+      "Test out"
+    ]
+  },
+  "pachde-one/pachde-info": {
+    "name": "Info",
+    "tags": [
+      "Visual",
+      "Blank",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "pachde-one/pachde-mini-fancybox": {
+    "name": "FancyBox Mini",
+    "tags": [
+      "Visual",
+      "Utility"
+    ],
+    "inputs": [
+      "fill Hue",
+      "fill Saturation",
+      "fill Lightness",
+      "fill Alpha",
+      "fill fade",
+      "Linear start Hue",
+      "Linear start Saturation",
+      "Linear start Lightness",
+      "Linear start Alpha",
+      "Linear start fade",
+      "Linear x1",
+      "Linear y1",
+      "Linear end Hue",
+      "Linear end Saturation",
+      "Linear end Lightness",
+      "Linear end Alpha",
+      "Linear end fade",
+      "Linear x2",
+      "Linear y2",
+      "Radial inner Hue",
+      "Radial inner Saturation",
+      "Radial inner Lightness",
+      "Radial inner Alpha",
+      "Radial inner fade",
+      "Radial cx",
+      "Radial cy",
+      "Radial outer Hue",
+      "Radial outer Saturation",
+      "Radial outer Lightness",
+      "Radial outer Alpha",
+      "Radial outer fade",
+      "Radial radius",
+      "Box inner Hue",
+      "Box inner Saturation",
+      "Box inner Lightness",
+      "Box inner Alpha",
+      "Box inner_fade",
+      "Box shrink x",
+      "Box shrink y",
+      "Box outer Hue",
+      "Box outer Saturation",
+      "Box outer Lightness",
+      "Box outer Alpha",
+      "Box outer fade",
+      "Box radius",
+      "Box feather",
+      "N"
+    ],
+    "outputs": [
+      "N"
+    ]
+  },
+  "pachde-one/pachde-null": {
+    "name": "Null",
+    "tags": [
+      "Visual",
+      "Blank",
+      "Utility"
+    ],
+    "inputs": [
+      "Flicker"
+    ],
+    "outputs": []
+  },
+  "pachde-one/pachde-paneltone": {
+    "name": "PanelTone",
+    "tags": [
+      "visual",
+      "utility"
+    ],
+    "inputs": [
+      "Go trigger"
+    ],
+    "outputs": []
+  },
+  "pachde-one/pachde-rui": {
+    "name": "Rui",
+    "tags": [
+      "Visual",
+      "Utility"
+    ],
+    "inputs": [
+      "Cable opacity",
+      "Cable tension",
+      "Bright",
+      "Bloom"
+    ],
+    "outputs": [
+      "Out volt"
+    ]
+  },
+  "pachde-one/pachde-skiff": {
+    "name": "Skiff",
+    "tags": [
+      "Visual",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
   },
   "rackwindows/bitshiftgain": {
     "name": "Dual BSG",
@@ -57549,6 +63008,160 @@
     "outputs": [
       "X",
       "Y"
+    ]
+  },
+  "wiqid-anomalies/2at": {
+    "name": "dual attenuverter",
+    "tags": [
+      "attenuator",
+      "dual",
+      "poly",
+      "vca"
+    ],
+    "inputs": [
+      "a",
+      "b"
+    ],
+    "outputs": [
+      "a",
+      "b"
+    ]
+  },
+  "wiqid-anomalies/dadras": {
+    "name": "dadras",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
+    ]
+  },
+  "wiqid-anomalies/expanse": {
+    "name": "expanse",
+    "tags": [
+      "blank"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "wiqid-anomalies/fullscope": {
+    "name": "full scope black edition",
+    "tags": [
+      "visual"
+    ],
+    "inputs": [
+      "x",
+      "y",
+      "color cv",
+      "time cv",
+      "rotation cv"
+    ],
+    "outputs": []
+  },
+  "wiqid-anomalies/halvorsen": {
+    "name": "halvorsen",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
+    ]
+  },
+  "wiqid-anomalies/languor": {
+    "name": "languor",
+    "tags": [
+      "lfo",
+      "multiple",
+      "random"
+    ],
+    "inputs": [
+      "speed cv",
+      "shape cv",
+      "scale cv"
+    ],
+    "outputs": [
+      "halvorsen x",
+      "halvorsen y",
+      "halvorsen z",
+      "halvorsen t",
+      "dadras x",
+      "dadras y",
+      "dadras z",
+      "dadras t",
+      "lorenz x",
+      "lorenz y",
+      "lorenz z",
+      "lorenz t",
+      "average x",
+      "average y",
+      "average z",
+      "average t"
+    ]
+  },
+  "wiqid-anomalies/lorenz": {
+    "name": "lorenz",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
+    ]
+  },
+  "wiqid-anomalies/sakarya": {
+    "name": "sakarya",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
+    ]
+  },
+  "wiqid-anomalies/slf": {
+    "name": "sprott-linz f",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
+    ]
+  },
+  "wiqid-anomalies/thomas": {
+    "name": "thomas",
+    "tags": [
+      "lfo",
+      "random"
+    ],
+    "inputs": [],
+    "outputs": [
+      "x",
+      "y",
+      "z",
+      "t factor"
     ]
   }
 }

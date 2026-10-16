@@ -673,7 +673,7 @@ public class SourceScannerTests
     [Fact]
     public void NamesPortsOfNestedLoopsAndLoopsOverSeparateEntries()
     {
-        string manifest = """{ "slug": "P", "modules": [ { "slug": "X2" }, { "slug": "LFN" }, { "slug": "Foundry" } ] }""";
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "X2" }, { "slug": "LFN" }, { "slug": "Foundry" }, { "slug": "M2S" } ] }""";
         string source = """
             template<size_t MSIZE>
             struct XX : Module {
@@ -701,6 +701,18 @@ public class SourceScannerTests
                 }
             };
             Model* modelFoundry = createModel<Foundry, FoundryWidget>("Foundry");
+            struct M2S : Module {
+                enum InputId { INPUTS_LEN = 4 };
+                M2S() {
+                    config(0, INPUTS_LEN, 0, 0);
+                    for (int k = 0; k < 2; k++) {
+                        std::string label = std::to_string(k + 1);
+                        configInput(k * 2, "Left " + label);
+                        configInput(k * 2 + 1, "Right " + label);
+                    }
+                }
+            };
+            Model* modelM2S = createModel<M2S, M2SWidget>("M2S");
             """;
 
         ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("all.cpp", source) });
@@ -709,6 +721,35 @@ public class SourceScannerTests
         Assert.Equal(new[] { "EQ Gain", "EQ Gain", "EQ Gain" }, result.Modules["P/LFN"].Inputs);
         // %c a letter; %f is only known at run time: the generic name stays.
         Assert.Equal(new[] { "Track A clock", "Track B clock", "Speed 1", "Speed 2" }, result.Modules["P/Foundry"].Inputs);
+        // An index computed without a base entry.
+        Assert.Equal(new[] { "Left 1", "Right 1", "Left 2", "Right 2" }, result.Modules["P/M2S"].Inputs);
+    }
+
+    [Fact]
+    public void NamesPortsByAnotherModulesEnum()
+    {
+        // not-things' TimeSeq output expander: its outputs are only a count, named with the main module's enum.
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "seq" }, { "slug": "seq-output" } ] }""";
+        string source = """
+            struct SeqModule : Module {
+                enum OutputId { ENUMS(OUT_OUTPUTS, 2), OUT_RUN, NUM_OUTPUTS };
+                SeqModule() { config(0, 0, NUM_OUTPUTS, 0); }
+            };
+            Model* modelSeq = createModel<SeqModule, SeqWidget>("seq");
+            struct SeqOutputModule : Module {
+                SeqOutputModule() {
+                    config(0, 0, 2, 0);
+                    for (int i = 0; i < 2; i++) {
+                        configOutput(SeqModule::OUT_OUTPUTS + i, string::f("Output %d", i + 1));
+                    }
+                }
+            };
+            Model* modelSeqOutput = createModel<SeqOutputModule, SeqOutputWidget>("seq-output");
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("all.cpp", source) });
+
+        Assert.Equal(new[] { "Output 1", "Output 2" }, result.Modules["P/seq-output"].Outputs);
     }
 
     [Fact]
