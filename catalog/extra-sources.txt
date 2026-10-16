@@ -1,5 +1,5 @@
 # Open-source plugins not bundled with Cardinal whose port names the catalog also reads.
-# slug  repository  commit (pinned: bump on purpose, then `make catalog`)
+# slug  repository  commit (pinned: bump on purpose, then `make catalog`)  [submodules to fetch, comma-separated]
 dbRackModules       https://github.com/docb/dbRackModules                     5e20b4e3c9cfed4d30537f6d9e7859198e617d14
 VostokInstruments   https://github.com/Vostok-Instruments/Vostok_VCVRack      2a838dc14ef93b7fa37e9c9771057a6aab32da22
 squinkylabs-plug1   https://github.com/kockie69/SquinkyVCV-main               3701a8c8931e5e8073e00cd5632db3966befe54f
@@ -10,3 +10,15 @@ SubmarineFree       https://github.com/david-c14/SubmarineFree                48
 shapetaker          https://github.com/joshpanzarella/shapetaker-vcv          b42dff6d0f26c0bb06da025045ad3f10e945eec6
 Bastl               https://github.com/hemmer/bastl-vcv                       b3e94b2965ea2a5d51eccef30ba6bb9b467504e6
 Ahornberg           https://github.com/Ahornberg/Ahornberg-VCV-Modules        3a9441f594d6a7cc8b6f11c19ff81d95ff8977ad
+SynthKit            https://github.com/jerrysievert/synthkit                  0d4aba35a9a3b0988c3e66172ddfa964ada3dbbe
+not-things          https://github.com/not-things-modular/not-things-vcv      6dcb62b058abd713901db36255d1f1927a1b77aa
+GP                  https://github.com/GPrackmodules/GPrackmodules            27fcdf09906a87b890d6933905e8d30da1b88cf0
+KRTPluginA          https://github.com/jackokring/KRTPluginA                  ef1eaec5e0b23a8ca175d2f9c034f4f7d1c6b897
+FrozenWasteland     https://github.com/almostEric/FrozenWasteland             608d49dc365eb2fd4734e58ee5fd356ce03919ff
+Nozoid              https://github.com/ch-nry/VCV_nozori                      97cefe3c98d01060446395d4e18f11c4028bb4d4
+4msCompany          https://github.com/4ms/4ms-vcv                            a60049a442a3a6ad7e3dae43dbc1b3b1ffd78abc  lib/CoreModules
+MADZINE             https://github.com/mmmmmmmadman/MADZINE-VCV               63659c591ec92be7e9bfeb99d91d080addaabdcf
+dbRackSequencer     https://github.com/docb/dbRackSequencer                   6af434fc44a3c0ebb93057545dc9e73e46dff252
+Mental              https://github.com/Strum/Strums_Mental_VCV_Modules        8241b5ec4aa8e5743e25e6fae96d0b85486deb3b
+SickoCV             https://github.com/sickozell/SickoCV                      b3504b2c41f22454379823faa980606d35d83f70
+SanguineMutants     https://github.com/Bloodbat/SanguineMutants               46bb511fd592564e14374bd6ddde8fc9329a0206

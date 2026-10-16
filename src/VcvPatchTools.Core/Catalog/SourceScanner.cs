@@ -101,6 +101,10 @@ public static partial class SourceScanner
         cleaned = cleaned.Select(s => s.Text.Contains("#define", StringComparison.Ordinal) ? s with { Text = ExpandExpressionMacros(s.Text) } : s).ToList();
         List<SourceFile> headers = (includedHeaders ?? Array.Empty<SourceFile>()).Select(s => new SourceFile(s.Path, StripComments(s.Text))).ToList();
         Dictionary<string, int> constants = CollectConstants(cleaned.Concat(headers).ToList());
+        foreach ((string name, int value) in FileScopeEnumValues(cleaned.Concat(headers)))
+        {
+            constants.TryAdd(name, value);
+        }
 
         Dictionary<string, (string Type, string? TemplateArgs)> structBySlug = new Dictionary<string, (string Type, string? TemplateArgs)>(StringComparer.Ordinal);
         Dictionary<string, SourceFile> registeredIn = new Dictionary<string, SourceFile>(StringComparer.Ordinal);
@@ -147,6 +151,8 @@ public static partial class SourceScanner
             }
         }
 
+        Dictionary<string, (List<string> Inputs, List<string> Outputs)> metaModules = MetaModuleInfos(cleaned, headers);
+
         if (!manifest.RootElement.TryGetProperty("modules", out JsonElement modulesElement))
         {
             return new ScanResult(result, problems);
@@ -163,7 +169,12 @@ public static partial class SourceScanner
             List<string> inputs = new List<string>();
             List<string> outputs = new List<string>();
             ModMatrix? modulation = null;
-            if (!structBySlug.TryGetValue(slug, out (string Type, string? TemplateArgs) registration))
+            if (metaModules.TryGetValue(slug, out (List<string> Inputs, List<string> Outputs) described))
+            {
+                inputs.AddRange(described.Inputs);
+                outputs.AddRange(described.Outputs);
+            }
+            else if (!structBySlug.TryGetValue(slug, out (string Type, string? TemplateArgs) registration))
             {
                 problems.Add($"{pluginSlug}/{slug}: no createModel<...>(\"{slug}\") registration found");
             }
@@ -190,7 +201,9 @@ public static partial class SourceScanner
         }
         StructSource? found = FindStruct(LastSegment(typeName), sources, depth: 0)
             ?? FindAliasedStruct(typeName, sources)
-            ?? (AliasTarget(LastSegment(typeName), sources) is string aliasedType ? FindStruct(aliasedType, sources, depth: 0) : null);
+            ?? (AliasTarget(LastSegment(typeName), sources) is string aliasedType ? FindStruct(aliasedType, sources, depth: 0) : null)
+            // Declared in a header outside src/ (not-things' include/modules/solim.hpp), constructed in src/.
+            ?? FindStruct(LastSegment(typeName), sources.Concat(headers).ToList(), depth: 0);
         if (found is null)
         {
             return false;
@@ -216,6 +229,25 @@ public static partial class SourceScanner
             constants[name] = value;
         }
 
+        // The MetaModule hub and its expanders: "config(… ElementCount::count<Info>() …)", Info an alias of an info struct.
+        Match counted = Regex.Match(string.Join("\n", found.ConfigScopes), @"\bElementCount\s*::\s*count\s*<\s*(\w+)\s*>");
+        if (counted.Success)
+        {
+            string info = counted.Groups[1].Value;
+            string scope = string.Join("\n", found.ConfigScopes.Append(found.FileText));
+            Match alias = Regex.Match(scope, @"\busing\s+" + Regex.Escape(info) + @"\s*=\s*(?:\w+::)*(\w+)\s*;|#\s*define\s+" + Regex.Escape(info) + @"\s+(?:\w+::)*(\w+)");
+            if (alias.Success)
+            {
+                info = alias.Groups[1].Success ? alias.Groups[1].Value : alias.Groups[2].Value;
+            }
+            if (MetaModuleInfo(info, sources.Concat(headers)) is (string _, List<string> jacksIn, List<string> jacksOut))
+            {
+                inputs.AddRange(jacksIn);
+                outputs.AddRange(jacksOut);
+                return true;
+            }
+        }
+
         List<(string Id, int Index, string Fallback)>? inputEnum = ParseNamedEnum(found.EnumScopes, inputEnumNames, constants);
         List<(string Id, int Index, string Fallback)>? outputEnum = ParseNamedEnum(found.EnumScopes, outputEnumNames, constants);
         // Otherwise, the enums config(PARAMS, INPUTS, OUTPUTS, LIGHTS) closes, whatever their names (Venom's ExpInputId,
@@ -224,9 +256,9 @@ public static partial class SourceScanner
         {
             Match config = found.ConfigScopes.Select(scope => ConfigCountsRegex().Match(scope)).FirstOrDefault(m => m.Success) ?? Match.Empty;
             List<string> scopes = found.EnumScopes.Concat(found.HeaderScopes).ToList();
-            if (config.Success
-                && EnumClosedBy(LastSegment(config.Groups[2].Value), scopes, constants) is { } closedInputs
-                && EnumClosedBy(LastSegment(config.Groups[3].Value), scopes, constants) is { } closedOutputs)
+            List<(string Id, int Index, string Fallback)>? closedInputs = config.Success ? EnumClosedBy(LastSegment(config.Groups[2].Value), scopes, constants) : null;
+            List<(string Id, int Index, string Fallback)>? closedOutputs = config.Success ? EnumClosedBy(LastSegment(config.Groups[3].Value), scopes, constants) : null;
+            if (closedInputs is not null || closedOutputs is not null)
             {
                 (inputEnum, outputEnum) = (closedInputs, closedOutputs);
             }
@@ -240,6 +272,17 @@ public static partial class SourceScanner
                     // A module that never calls config() has no ports (Notes, a wire manager…).
                     return !found.ConfigScopes.Any(scope => Regex.IsMatch(scope, @"\b(?:config|\w+Config)\s*\(|\bconfig(?:Input|Output)\s*\("));
                 }
+            }
+        }
+        // One side named by an enum, the other by a count only: "config(NUM_PARAMS, NUM_INPUTS, 8, NUM_LIGHTS)".
+        if (inputEnum is null || outputEnum is null)
+        {
+            Match counts = found.ConfigScopes.Select(scope => ConfigCountsRegex().Match(scope)).FirstOrDefault(m => m.Success) ?? Match.Empty;
+            if (counts.Success)
+            {
+                List<string> scopes = found.EnumScopes.Concat(found.HeaderScopes).ToList();
+                inputEnum ??= EnumClosedBy(LastSegment(counts.Groups[2].Value), scopes, constants);
+                outputEnum ??= EnumClosedBy(LastSegment(counts.Groups[3].Value), scopes, constants);
             }
         }
 
@@ -257,8 +300,8 @@ public static partial class SourceScanner
 
         foreach (string scope in found.ConfigScopes)
         {
-            AddLoopNames(scope, "Input", inputEnum, inputNames);
-            AddLoopNames(scope, "Output", outputEnum, outputNames);
+            AddLoopNames(scope, "Input", inputEnum, inputNames, constants);
+            AddLoopNames(scope, "Output", outputEnum, outputNames, constants);
         }
 
         Fill(inputs, inputEnum, inputNames);
@@ -491,6 +534,62 @@ public static partial class SourceScanner
             }
         }
         return local;
+    }
+
+    /// <summary>
+    /// 4ms MetaModule modules ("rack::Model *modelOctave = GenericModule&lt;OctaveInfo&gt;::create();"): OctaveInfo, in the
+    /// core-modules library, has the slug and an Elements array in panel order (OctaveKnob{{…, "Octave", ""}},
+    /// AnalogJackInput4ms{{…, "CV", ""}}…); the generic wrapper numbers inputs and outputs in that order.
+    /// </summary>
+    private static Dictionary<string, (List<string> Inputs, List<string> Outputs)> MetaModuleInfos(List<SourceFile> sources, List<SourceFile> headers)
+    {
+        Dictionary<string, (List<string> Inputs, List<string> Outputs)> modules = new Dictionary<string, (List<string>, List<string>)>(StringComparer.Ordinal);
+        HashSet<string> infos = sources.SelectMany(s => Regex.Matches(s.Text, @"\bGenericModule\s*<\s*(?:\w+::)*(\w+)\s*>\s*::\s*create\s*\(")).Select(m => m.Groups[1].Value).ToHashSet(StringComparer.Ordinal);
+        foreach (string info in infos)
+        {
+            if (MetaModuleInfo(info, sources.Concat(headers)) is (string slug, List<string> inputs, List<string> outputs))
+            {
+                modules.TryAdd(slug, (inputs, outputs));
+            }
+        }
+        return modules;
+    }
+
+    /// <summary>A MetaModule info struct's slug and jacks, in panel order.</summary>
+    private static (string Slug, List<string> Inputs, List<string> Outputs)? MetaModuleInfo(string info, IEnumerable<SourceFile> files)
+    {
+        foreach (SourceFile file in files)
+        {
+            Match definition = Regex.Match(file.Text, @"\bstruct\s+" + Regex.Escape(info) + @"\b[^;{]*\{");
+            if (!definition.Success)
+            {
+                continue;
+            }
+            string body = BraceBody(file.Text, definition.Index + definition.Length - 1);
+            Match slug = Regex.Match(body, @"\bslug\s*(?:\{\s*|=\s*)""([^""]+)""");
+            Match elements = Regex.Match(body, @"\bElements\s*(?:=\s*)?\{\s*\{");
+            if (!slug.Success || !elements.Success)
+            {
+                return null;
+            }
+            List<string> inputs = new List<string>();
+            List<string> outputs = new List<string>();
+            string array = BraceBody(body, elements.Index + elements.Length - 1);
+            foreach (Match element in Regex.Matches(array, @"\b(\w+)\s*\{\s*\{[^""{}]*""((?:[^""\\]|\\.)*)"""))
+            {
+                string type = element.Groups[1].Value;
+                if (Regex.IsMatch(type, @"Jack\w*In(put)?|In(put)?\w*Jack"))
+                {
+                    inputs.Add(CString(element.Groups[2].Value));
+                }
+                else if (Regex.IsMatch(type, @"Jack\w*Out(put)?|Out(put)?\w*Jack"))
+                {
+                    outputs.Add(CString(element.Groups[2].Value));
+                }
+            }
+            return (slug.Groups[1].Value, inputs, outputs);
+        }
+        return null;
     }
 
     /// <summary>String constants by name, the first definition winning.</summary>
@@ -1046,6 +1145,11 @@ public static partial class SourceScanner
                 }
                 // "OSC_INPUT, CV_INPUT = OSC_INPUT + 4": the slots skipped belong to the entry before (a range).
                 int gap = value.Value - next;
+                // "enum OutputId { POLY_OUTPUT = 8, OUTPUTS_LEN };": the first 8 ports have no name in the enum.
+                if (gap > 0 && gap <= 256 && entries.Count == 0)
+                {
+                    entries.AddRange(Enumerable.Range(0, value.Value).Select(i => (i.ToString(System.Globalization.CultureInfo.InvariantCulture), i, $"#{i + 1}")));
+                }
                 if (gap > 0 && gap <= 256 && entries.Count > 0 && entries[^1].Index == next - 1)
                 {
                     string rangeId = entries[^1].Id.Split('+')[0];
@@ -1163,6 +1267,24 @@ public static partial class SourceScanner
     /// Integer constants usable as ENUMS(X, N) sizes: "static const int N = 5;", "constexpr int N{4};", "#define N 8",
     /// including aliases ("NUM_OSC = DroneVoice::NUM_OSC"), resolved by name across the whole plugin.
     /// </summary>
+    /// <summary>
+    /// Values of the enums declared outside any struct, when their name is unique in the plugin: MADZINE's
+    /// "enum { STAGE_TRIG_OUTPUT, STAGE_ENV_OUTPUT, STAGE_NUM_OUTPUTS };" that its modules' enums are written with.
+    /// </summary>
+    private static Dictionary<string, int> FileScopeEnumValues(IEnumerable<SourceFile> sources)
+    {
+        List<(string Name, int Value)> values = new List<(string Name, int Value)>();
+        foreach (SourceFile file in sources)
+        {
+            string fileScope = WithoutStructBodies(file.Text);
+            foreach (Match match in Regex.Matches(fileScope, @"\benum\s+(?:class\s+)?\w*\s*(?::\s*\w+\s*)?\{"))
+            {
+                values.AddRange(ParseEnumBody(BraceBody(fileScope, match.Index + match.Length - 1)).Where(e => !e.Id.Contains('+') && !char.IsDigit(e.Id[0])).Select(e => (e.Id, e.Index)));
+            }
+        }
+        return values.GroupBy(v => v.Name).Where(g => g.Count() == 1).ToDictionary(g => g.Key, g => g.First().Value, StringComparer.Ordinal);
+    }
+
     private static Dictionary<string, int> CollectConstants(List<SourceFile> sources)
     {
         // Same name may be declared several times ("NUM_OSC = 5" in one struct, "NUM_OSC = DroneVoice::NUM_OSC" in another):
@@ -1202,12 +1324,90 @@ public static partial class SourceScanner
     ///   configInput(X + i, labels[i])                       with   labels[] = { "a", "b" }
     ///   configOutput(X + i, string::f("%s gate", labels[i]))
     /// </summary>
-    private static void AddLoopNames(string scope, string kind, List<(string Id, int Index, string Fallback)>? entries, Dictionary<string, string> names)
+    private static void AddLoopNames(string scope, string kind, List<(string Id, int Index, string Fallback)>? entries, Dictionary<string, string> names, Dictionary<string, int>? constants = null)
     {
         if (entries is null)
         {
             return;
         }
+        AddLoopNamesCore(scope, kind, entries, names);
+        AddNestedLoopNames(scope, kind, entries, names, constants ?? new Dictionary<string, int>());
+    }
+
+    /// <summary>
+    /// Any index expression over the enclosing loops, by port position: "MOD_INPUT + k * MSIZE + j" in two loops
+    /// (dbRackModules X4: "Mod %d %d"), "Comp::EQ0_INPUT + i" over separate entries EQ0_INPUT, EQ1_INPUT… (SquinkyLabs LFN).
+    /// Names already found win.
+    /// </summary>
+    private static void AddNestedLoopNames(string scope, string kind, List<(string Id, int Index, string Fallback)> entries, Dictionary<string, string> names, Dictionary<string, int> constants)
+    {
+        Dictionary<string, List<string>> arrays = StringArrayRegex().Matches(scope)
+            .GroupBy(m => m.Groups[1].Value)
+            .ToDictionary(g => g.Key, g => StringLiteralRegex().Matches(g.First().Groups[2].Value).Select(m => CString(m.Groups[1].Value)).ToList());
+        Dictionary<int, string> idAt = entries.GroupBy(e => e.Index).ToDictionary(g => g.Key, g => g.First().Id);
+        foreach (Match call in Regex.Matches(scope, @"config(Input|Output)\s*\(\s*(?:\w+::)*(\w+)\s*\+\s*([^,;]+?)\s*,\s*((?:[^;()]|\((?:[^;()]|\([^;()]*\))*\))+)\)\s*(?:;|->)"))
+        {
+            if (call.Groups[1].Value != kind || entries.FindIndex(e => e.Id == call.Groups[2].Value) is not (int at and >= 0))
+            {
+                continue;
+            }
+            string before = scope[..call.Index];
+            // The loops the index uses, innermost last: "for (int k = 0; k < MSIZE; k++)".
+            List<(string Var, int First, int Last, int Step)> loops = new List<(string, int, int, int)>();
+            foreach (string variable in Regex.Matches(call.Groups[3].Value, @"\b[A-Za-z_]\w*\b").Select(m => m.Value).Distinct())
+            {
+                Match header = Regex.Match(before, @"\bfor\s*\(\s*(?:\w+\s+)*" + Regex.Escape(variable) + @"\s*=\s*([^;]+);\s*" + Regex.Escape(variable) + @"\s*(<=?)\s*([^;]+);\s*(?:" + Regex.Escape(variable) + @"\s*\+\+|\+\+\s*" + Regex.Escape(variable) + @"|" + Regex.Escape(variable) + @"\s*\+=\s*(\d+))\s*\)", RegexOptions.RightToLeft);
+                if (!header.Success)
+                {
+                    if (constants.ContainsKey(variable))
+                    {
+                        continue;
+                    }
+                    loops.Clear();
+                    break;
+                }
+                if (Evaluate(header.Groups[1].Value, constants) is not int first || Evaluate(header.Groups[3].Value, constants) is not int bound)
+                {
+                    loops.Clear();
+                    break;
+                }
+                loops.Add((variable, first, header.Groups[2].Value == "<=" ? bound : bound - 1, header.Groups[4].Success ? int.Parse(header.Groups[4].Value, System.Globalization.CultureInfo.InvariantCulture) : 1));
+            }
+            if (loops.Count == 0 || loops.Aggregate(1L, (n, l) => n * Math.Max(0, (l.Last - l.First) / l.Step + 1)) > 4096)
+            {
+                continue;
+            }
+
+            string argument = call.Groups[4].Value.Trim();
+            void Visit(int depth, Dictionary<string, int> vars)
+            {
+                if (depth == loops.Count)
+                {
+                    Dictionary<string, int> known = new Dictionary<string, int>(constants, StringComparer.Ordinal);
+                    foreach ((string name, int value) in vars)
+                    {
+                        known[name] = value;
+                    }
+                    if (Evaluate(call.Groups[3].Value, known) is int offset && idAt.TryGetValue(entries[at].Index + offset, out string? id)
+                        && LoopName(argument, new Dictionary<string, int>(vars, StringComparer.Ordinal), arrays, name => LocalString(before, name)) is string portName)
+                    {
+                        names.TryAdd(id, portName);
+                    }
+                    return;
+                }
+                (string variable, int first, int last, int step) = loops[depth];
+                for (int value = first; value <= last; value += step)
+                {
+                    vars[variable] = value;
+                    Visit(depth + 1, vars);
+                }
+            }
+            Visit(0, new Dictionary<string, int>(StringComparer.Ordinal));
+        }
+    }
+
+    private static void AddLoopNamesCore(string scope, string kind, List<(string Id, int Index, string Fallback)> entries, Dictionary<string, string> names)
+    {
         Dictionary<string, List<string>> arrays = StringArrayRegex().Matches(scope)
             .GroupBy(m => m.Groups[1].Value)
             .ToDictionary(g => g.Key, g => StringLiteralRegex().Matches(g.First().Groups[2].Value).Select(m => CString(m.Groups[1].Value)).ToList());
@@ -1277,12 +1477,23 @@ public static partial class SourceScanner
         return local.Success ? local.Groups[1].Value.Trim() : null;
     }
 
-    private static string? LoopName(string argument, string loopVar, int i, Dictionary<string, List<string>> arrays, Func<string, string?>? locals = null)
+    private static string? LoopName(string argument, string loopVar, int i, Dictionary<string, List<string>> arrays, Func<string, string?>? locals = null) =>
+        LoopName(argument, new Dictionary<string, int>(StringComparer.Ordinal) { [loopVar] = i }, arrays, locals);
+
+    /// <summary>A port name built from loop variables (one or nested loops: "Mod %d %d" with k + 1, j + 1).</summary>
+    private static string? LoopName(string argument, Dictionary<string, int> vars, Dictionary<string, List<string>> arrays, Func<string, string?>? locals = null)
     {
+        string Number(int value) => value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        // "std::string label = "Bit " + std::to_string(k + 1); configOutput(k, label);"
+        if (Regex.IsMatch(argument, @"^\w+$") && !vars.ContainsKey(argument) && locals?.Invoke(argument) is string local && !local.Contains(argument, StringComparison.Ordinal))
+        {
+            return LoopName(local, vars, arrays);
+        }
         string? Label(string expression)
         {
-            Match indexed = Regex.Match(expression.Trim(), @"^(\w+)\s*\[\s*" + Regex.Escape(loopVar) + @"\s*\]$");
-            return indexed.Success && arrays.TryGetValue(indexed.Groups[1].Value, out List<string>? values) && i < values.Count ? values[i] : null;
+            Match indexed = Regex.Match(expression.Trim(), @"^(\w+)\s*\[(.+)\]$");
+            return indexed.Success && arrays.TryGetValue(indexed.Groups[1].Value, out List<string>? values)
+                && Evaluate(indexed.Groups[2].Value, vars) is int index && index >= 0 && index < values.Count ? values[index] : null;
         }
 
         // "Gate #" + std::to_string(i + 1), "OR " + std::to_string((15 - i) + 1), "Reset " + std::string(colors[i])
@@ -1297,7 +1508,7 @@ public static partial class SourceScanner
             Match number = Regex.Match(term, @"^(?:std::)?to_string\s*\((.*)\)$");
             if (number.Success)
             {
-                return Evaluate(number.Groups[1].Value, new Dictionary<string, int> { [loopVar] = i })?.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                return Evaluate(number.Groups[1].Value, vars) is int value ? Number(value) : null;
             }
             Match wrapped = Regex.Match(term, @"^(?:std::)?string\s*\((.*)\)$");
             if (wrapped.Success)
@@ -1328,37 +1539,57 @@ public static partial class SourceScanner
             return joined;
         }
 
+        // string::f("Mod %d %d", k + 1, j + 1), string::f("%s gate", labels[i])
         Match format = Regex.Match(argument, @"^(?:rack::)?string::f\(\s*""((?:[^""\\]|\\.)*)""\s*,\s*(.+)\)$");
         if (format.Success)
         {
             string pattern = CString(format.Groups[1].Value);
-            string formatArg = format.Groups[2].Value.Trim();
-            if (Regex.IsMatch(formatArg, @"^" + Regex.Escape(loopVar) + @"\s*\+\s*1$"))
+            List<string> formatArgs = SplitTopLevelOn(format.Groups[2].Value, ',');
+            int next = 0;
+            bool failed = false;
+            // %d / %i / %u numbers, %s strings, %c a letter ("Track %c clock", i + 'A'); anything else (%f…) is only known
+            // at run time.
+            string result = Regex.Replace(pattern, @"%%|%[-+ 0#]*\d*(?:\.\d+)?([a-zA-Z])", placeholder =>
             {
-                return Regex.Replace(pattern, "%d|%i", (i + 1).ToString(System.Globalization.CultureInfo.InvariantCulture));
-            }
-            if (formatArg == loopVar)
-            {
-                return Regex.Replace(pattern, "%d|%i", i.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            }
-            string? label = Label(formatArg);
-            return label is null ? null : pattern.Replace("%s", label);
+                if (placeholder.Value == "%%")
+                {
+                    return "%";
+                }
+                if (next >= formatArgs.Count)
+                {
+                    failed = true;
+                    return placeholder.Value;
+                }
+                string formatArg = Regex.Replace(formatArgs[next++].Trim(), @"'(.)'", c => Number(c.Groups[1].Value[0]));
+                string? text = placeholder.Groups[1].Value switch
+                {
+                    "d" or "i" or "u" => Evaluate(formatArg, vars) is int value ? Number(value) : null,
+                    "c" => Evaluate(formatArg, vars) is int code and > 31 and < 127 ? ((char)code).ToString() : null,
+                    "s" => Term(formatArg),
+                    _ => null,
+                };
+                failed |= text is null;
+                return text ?? placeholder.Value;
+            });
+            return failed ? null : result;
         }
         return Label(argument);
     }
 
-    /// <summary>"PITCH_INPUT" → "Pitch", "CLK_OUTPUTS" → "Clk".</summary>
     /// <summary>"CV_INPUTS", 2 → "Cv 3"; "OSC_CTRL_PARAM_0", 6 → "Osc ctrl param 7".</summary>
     private static string RangeName(string rangeId, int offset) =>
         $"{Humanize(Regex.Replace(rangeId, "_0$", ""))} {offset + 1}";
 
     /// <summary>The count closing an enum, not a port: NUM_INPUTS, INPUTS_LEN, OUTPUT_COUNT, OUTPUTS_END, nINPUTS…</summary>
     private static bool IsEnumEnd(string name) =>
-        Regex.IsMatch(name, @"^(NUM_\w+|Count|\w*?(INPUTS?|OUTPUTS?|PARAMS?|LIGHTS?)_(LEN|COUNT|END|NUM)|n(INPUTS|OUTPUTS|PARAMS|LIGHTS))$");
+        Regex.IsMatch(name, @"^(NUM_\w+|Count|\w*[a-z0-9]Count|\w*?(INPUTS?|OUTPUTS?|PARAMS?|LIGHTS?)_(LEN|COUNT|END|NUM)|n(INPUTS|OUTPUTS|PARAMS|LIGHTS))$");
 
+    /// <summary>"PITCH_INPUT" → "Pitch", "CLK_OUTPUTS" → "Clk".</summary>
     public static string Humanize(string identifier)
     {
         string trimmed = Regex.Replace(identifier, @"_(INPUTS?|OUTPUTS?)$", "");
+        // Cardinal's "kHostTimeRolling": the k of constants isn't a word.
+        trimmed = Regex.Replace(trimmed, @"^k(?=[A-Z])", "");
         // DHE's PascalCase ids: "StepCurvatureCv" → "Step curvature cv".
         trimmed = Regex.Replace(trimmed, @"(?<=[a-z])(?=[A-Z])", "_");
         string spaced = trimmed.Replace('_', ' ').ToLowerInvariant().Trim();

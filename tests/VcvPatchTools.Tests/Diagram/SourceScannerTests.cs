@@ -576,6 +576,142 @@ public class SourceScannerTests
     }
 
     [Fact]
+    public void ResolvesFourMsMetaModuleInfos()
+    {
+        string manifest = """{ "slug": "4msCompany", "modules": [ { "slug": "Octave" }, { "slug": "MMAudioExpander" } ] }""";
+        string octave = """
+            #include "CoreModules/4ms/info/Octave_info.hh"
+            rack::Model* modelOctave = GenericModule<OctaveInfo>::create();
+            """;
+        string octaveInfo = """
+            struct OctaveInfo : ModuleInfoBase {
+                static constexpr std::string_view slug{"Octave"};
+                static constexpr std::array<Element, 4> Elements{{
+                    OctaveKnob{{to_mm<72>(28.8), to_mm<72>(46.77), Center, "Octave", ""}, 0.5f},
+                    AnalogJackInput4ms{{to_mm<72>(28.8), to_mm<72>(216.85), Center, "CV", ""}},
+                    GateJackInput4ms{{to_mm<72>(28.8), to_mm<72>(265.04), Center, "Input", ""}},
+                    AnalogJackOutput4ms{{to_mm<72>(28.8), to_mm<72>(313.23), Center, "Out", ""}},
+                }};
+            };
+            struct MMAudioExpanderInfo : ModuleInfoBase {
+                static constexpr std::string_view slug{"MMAudioExpander"};
+                static constexpr std::array<Element, 2> Elements{{
+                    AnalogJackInput4ms{{0, 0, Center, "Out9", ""}},
+                    AnalogJackOutput4ms{{0, 0, Center, "In7", ""}},
+                }};
+            };
+            """;
+        string expander = """
+            struct AudioExpanderModule : MetaModuleHubBase {
+                using Info = MMAudioExpanderInfo;
+                AudioExpanderModule() { auto cnt = ElementCount::count<Info>(); config(cnt.num_params, cnt.num_inputs, cnt.num_outputs, cnt.num_lights); }
+            };
+            rack::Model *modelMMAudioExpander = rack::createModel<AudioExpanderModule, AudioExpanderWidget>("MMAudioExpander");
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("src/models/Octave.cc", octave), new SourceFile("src/expanders/audio_expander.cc", expander) },
+            new[] { new SourceFile("lib/CoreModules/4ms/info/Octave_info.hh", octaveInfo) });
+
+        Assert.Equal(new[] { "CV", "Input" }, result.Modules["4msCompany/Octave"].Inputs);
+        Assert.Equal(new[] { "Out" }, result.Modules["4msCompany/Octave"].Outputs);
+        Assert.Equal(new[] { "Out9" }, result.Modules["4msCompany/MMAudioExpander"].Inputs);
+        Assert.Empty(result.Problems);
+    }
+
+    [Fact]
+    public void ResolvesEnumsAcrossFilesCountsAndLeadingSlots()
+    {
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "solim" }, { "slug": "F" }, { "slug": "AD" }, { "slug": "Out8" }, { "slug": "HostTime" } ] }""";
+        // A struct declared in include/, constructed in src/.
+        string solimHeader = "struct SolimModule : NTModule { enum InputId { ENUMS(IN_INPUTS, 2), NUM_INPUTS }; enum OutputId { OUT_OUTPUT, NUM_OUTPUTS }; SolimModule(); };";
+        string solim = """
+            #include "modules/solim.hpp"
+            SolimModule::SolimModule() { config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS); configInput(IN_INPUTS + 1, "Input 2"); }
+            Model* modelSolim = createModel<SolimModule, SolimWidget>("solim");
+            """;
+        // Ports written with a file-scope enum of another header.
+        string stage = "enum { STAGE_TRIG_OUTPUT, STAGE_ENV_OUTPUT, STAGE_NUM_OUTPUTS };";
+        string f = """
+            struct F : Module {
+                enum InputIds { NUM_INPUTS };
+                enum OutputIds { TRIG_OUTPUT = STAGE_TRIG_OUTPUT, OUT_OUTPUT = STAGE_ENV_OUTPUT, NUM_OUTPUTS = STAGE_NUM_OUTPUTS };
+                F() { config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS); configOutput(OUT_OUTPUT, "Stage envelope"); }
+            };
+            Model* modelF = createModel<F, FWidget>("F");
+            // The first ports have no enum name, a loop names them by index.
+            struct AD : Module {
+                enum InputId { CLK_INPUT, INPUTS_LEN };
+                enum OutputId { POLY_OUTPUT = 2, OUTPUTS_LEN };
+                AD() {
+                    for (int k = 0; k < 2; k++) { std::string label = "Bit " + std::to_string(k + 1); configOutput(k, label); }
+                    configOutput(POLY_OUTPUT, "All Bits");
+                }
+            };
+            Model* modelAD = createModel<AD, ADWidget>("AD");
+            // Inputs by enum, outputs by count.
+            struct Out8 : Module { enum InputId { RUN_INPUT, NUM_INPUTS }; Out8() { config(NUM_PARAMS, NUM_INPUTS, 3, NUM_LIGHTS); } };
+            Model* modelOut8 = createModel<Out8, Out8Widget>("Out8");
+            // Cardinal's k-prefixed ids, closed by kHostTimeCount.
+            struct HostTime : Module {
+                enum HostTimeIds { kHostTimeRolling, kHostTimeReset, kHostTimeCount };
+                HostTime() { config(NUM_PARAMS, NUM_INPUTS, kHostTimeCount, kHostTimeCount); }
+            };
+            Model* modelHostTime = createModel<HostTime, HostTimeWidget>("HostTime");
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest,
+            new[] { new SourceFile("src/solim.cpp", solim), new SourceFile("src/StageCurve.hpp", stage), new SourceFile("src/all.cpp", f) },
+            new[] { new SourceFile("include/modules/solim.hpp", solimHeader) });
+
+        Assert.Equal(new[] { "In 1", "Input 2" }, result.Modules["P/solim"].Inputs);
+        Assert.Equal(new[] { "Trig", "Stage envelope" }, result.Modules["P/F"].Outputs);
+        Assert.Equal(new[] { "Bit 1", "Bit 2", "All Bits" }, result.Modules["P/AD"].Outputs);
+        Assert.Equal(new[] { "#1", "#2", "#3" }, result.Modules["P/Out8"].Outputs);
+        Assert.Equal(new[] { "Host time rolling", "Host time reset" }, result.Modules["P/HostTime"].Outputs);
+    }
+
+    [Fact]
+    public void NamesPortsOfNestedLoopsAndLoopsOverSeparateEntries()
+    {
+        string manifest = """{ "slug": "P", "modules": [ { "slug": "X2" }, { "slug": "LFN" }, { "slug": "Foundry" } ] }""";
+        string source = """
+            template<size_t MSIZE>
+            struct XX : Module {
+                enum InputId { ENUMS(MOD_INPUT, MSIZE * MSIZE), INPUTS_LEN };
+                XX() {
+                    for (int k = 0; k < MSIZE; k++)
+                        for (int j = 0; j < MSIZE; j++)
+                            configInput(MOD_INPUT + k * MSIZE + j, rack::string::f("Mod %d %d", k + 1, j + 1));
+                }
+            };
+            #define X2 XX<2>
+            Model* modelX2 = createModel<X2, X2Widget>("X2");
+            struct LFN : Module {
+                enum InputIds { EQ0_INPUT, EQ1_INPUT, EQ2_INPUT, NUM_INPUTS };
+                LFN() { for (int i = 0; i < 3; ++i) { configInput(EQ0_INPUT + i, "EQ Gain"); } }
+            };
+            Model* modelLFN = createModel<LFN, LFNWidget>("LFN");
+            struct Foundry : Module {
+                enum InputIds { ENUMS(CLOCK_INPUTS, 2), ENUMS(SPEED_INPUTS, 2), NUM_INPUTS };
+                Foundry() {
+                    for (int i = 0; i < 2; i++) {
+                        configInput(CLOCK_INPUTS + i, string::f("Track %c clock", i + 'A'));
+                        configInput(SPEED_INPUTS + i, string::f("%f speed", 1.0f * i));
+                    }
+                }
+            };
+            Model* modelFoundry = createModel<Foundry, FoundryWidget>("Foundry");
+            """;
+
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("all.cpp", source) });
+
+        Assert.Equal(new[] { "Mod 1 1", "Mod 1 2", "Mod 2 1", "Mod 2 2" }, result.Modules["P/X2"].Inputs);
+        Assert.Equal(new[] { "EQ Gain", "EQ Gain", "EQ Gain" }, result.Modules["P/LFN"].Inputs);
+        // %c a letter; %f is only known at run time: the generic name stays.
+        Assert.Equal(new[] { "Track A clock", "Track B clock", "Speed 1", "Speed 2" }, result.Modules["P/Foundry"].Inputs);
+    }
+
+    [Fact]
     public void ResolvesConstantSizesTemplateArgsAndLoopNames()
     {
         string manifest = """{ "slug": "P", "modules": [ { "slug": "Mix" }, { "slug": "Drone" } ] }""";

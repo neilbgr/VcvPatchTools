@@ -53,7 +53,7 @@ internal static class CatalogCommand
             }
 
             List<SourceFile> sources = Directory.EnumerateFiles(sourceDir, "*.*", SearchOption.AllDirectories)
-                .Where(p => p.EndsWith(".cpp", StringComparison.Ordinal) || p.EndsWith(".hpp", StringComparison.Ordinal) || p.EndsWith(".h", StringComparison.Ordinal))
+                .Where(p => IsSource(p) || IsHeader(p))
                 .Select(p => new SourceFile(p, File.ReadAllText(p)))
                 .ToList();
 
@@ -119,7 +119,7 @@ internal static class CatalogCommand
             .ToHashSet(StringComparer.Ordinal);
         string ownSources = Path.GetFullPath(sourceDir) + Path.DirectorySeparatorChar;
         return Directory.EnumerateFiles(pluginDir, "*.h*", SearchOption.AllDirectories)
-            .Where(p => (p.EndsWith(".h", StringComparison.Ordinal) || p.EndsWith(".hpp", StringComparison.Ordinal))
+            .Where(p => IsHeader(p)
                 && !Path.GetFullPath(p).StartsWith(ownSources, StringComparison.Ordinal) && included.Contains(Path.GetFileName(p)))
             .OrderBy(p => p, StringComparer.Ordinal)
             .Select(p => new SourceFile(p, File.ReadAllText(p)))
@@ -134,7 +134,7 @@ internal static class CatalogCommand
     {
         string ownSources = Path.GetFullPath(sourceDir) + Path.DirectorySeparatorChar;
         Dictionary<string, List<string>> outsideByName = Directory.EnumerateFiles(pluginDir, "*.*", SearchOption.AllDirectories)
-            .Where(p => (p.EndsWith(".h", StringComparison.Ordinal) || p.EndsWith(".hpp", StringComparison.Ordinal)) && !Path.GetFullPath(p).StartsWith(ownSources, StringComparison.Ordinal))
+            .Where(p => IsHeader(p) && !Path.GetFullPath(p).StartsWith(ownSources, StringComparison.Ordinal))
             .GroupBy(Path.GetFileName)
             .ToDictionary(g => g.Key!, g => g.ToList(), StringComparer.Ordinal);
         static string? Implementation(string header) =>
@@ -179,6 +179,12 @@ internal static class CatalogCommand
             return null;
         }
     }
+
+    // 4ms writes .cc / .hh.
+    private static bool IsSource(string path) => path.EndsWith(".cpp", StringComparison.Ordinal) || path.EndsWith(".cc", StringComparison.Ordinal);
+
+    private static bool IsHeader(string path) =>
+        path.EndsWith(".h", StringComparison.Ordinal) || path.EndsWith(".hpp", StringComparison.Ordinal) || path.EndsWith(".hh", StringComparison.Ordinal);
 
     private static string PluginOf(string key) => key[..key.IndexOf('/')];
 
