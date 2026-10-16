@@ -411,7 +411,7 @@ Graphviz: `dot -Tsvg patch.dot > patch.svg`. Mermaid: paste the `.mmd` into any 
 - enums of any name, found through the counts given to `config(…)` (`venomConfig(PARAMS_LEN, INPUTS_LEN, …)`), or plain counts (`config(0, deviceCount, 0, 0)`: ports known by index, `#1`… as Rack shows them, unless a loop names them); a module that never calls `config()` has no ports; DHE-style modules (every one a `Module` in its own folder, `struct InputId { enum { … } }` in a header next to it, ranges written with macros);
 - `configInput` / `configOutput` names, including qualified ids (`Plateau::LEFT_INPUT`) and names built in loops (`"Gate #" + std::to_string(i + 1)`, `step_name + "curvature CV"`, `"Reset " + std::string(colors[i])`, `i += 2` steps); C string literals decoded as the compiler does (`"\xcf\x80"` is π, adjacent literals joined); an empty name shows as `#n`, as in Rack;
 - SquinkyLabs-style composites (`using Comp = MixM<WidgetComposite>;`, enums in a header outside `src/`);
-- for Surge XT, `ModulationAssistant<…>` (which knob each modulation input can move).
+- for Surge XT, `ModulationAssistant<…>` (which knob each modulation input can move), and the VCOs' knob names, which come from the Surge engine (`ClassicOscillator::init_ctrltypes()`: Shape, Width 1…; Modern's mode-dependent knob shows its options, "Triangle / Square / Sine").
 
 What it can't resolve is listed in `catalog/scan-report.txt` (modules `ports.overrides.json` names are left out). A plugin whose sources are gone (removed from the Cardinal fork) keeps its entries from the previous `ports.json`, and the report says so. When two folders hold the same plugin, the newest version is read.
 

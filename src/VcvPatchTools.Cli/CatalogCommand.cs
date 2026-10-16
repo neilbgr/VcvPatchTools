@@ -59,7 +59,8 @@ internal static class CatalogCommand
 
             try
             {
-                ScanResult scan = SourceScanner.ScanPlugin(File.ReadAllText(manifestPath), sources, IncludedHeaders(pluginDir, sourceDir, sources));
+                List<SourceFile> headers = IncludedHeaders(pluginDir, sourceDir, sources);
+                ScanResult scan = SourceScanner.ScanPlugin(File.ReadAllText(manifestPath), sources, headers, EngineSources(pluginDir, sourceDir, headers));
                 foreach ((string key, ModuleInfo info) in scan.Modules)
                 {
                     all[key] = info;
@@ -123,6 +124,44 @@ internal static class CatalogCommand
             .OrderBy(p => p, StringComparer.Ordinal)
             .Select(p => new SourceFile(p, File.ReadAllText(p)))
             .ToList();
+    }
+
+    /// <summary>
+    /// A bundled engine's implementation, two levels deep: the .cpp next to each header the sources include, the headers
+    /// those include and their .cpp (Surge XT: dsp/Oscillator.h → Oscillator.cpp → oscillators/ClassicOscillator.h and .cpp).
+    /// </summary>
+    private static List<SourceFile> EngineSources(string pluginDir, string sourceDir, List<SourceFile> headers)
+    {
+        string ownSources = Path.GetFullPath(sourceDir) + Path.DirectorySeparatorChar;
+        Dictionary<string, List<string>> outsideByName = Directory.EnumerateFiles(pluginDir, "*.*", SearchOption.AllDirectories)
+            .Where(p => (p.EndsWith(".h", StringComparison.Ordinal) || p.EndsWith(".hpp", StringComparison.Ordinal)) && !Path.GetFullPath(p).StartsWith(ownSources, StringComparison.Ordinal))
+            .GroupBy(Path.GetFileName)
+            .ToDictionary(g => g.Key!, g => g.ToList(), StringComparer.Ordinal);
+        static string? Implementation(string header) =>
+            Path.ChangeExtension(header, ".cpp") is string cpp && File.Exists(cpp) ? cpp : null;
+
+        HashSet<string> engine = new HashSet<string>(StringComparer.Ordinal);
+        List<string> level = headers.Select(h => h.Path).Select(Implementation).OfType<string>().ToList();
+        for (int depth = 0; depth < 2 && level.Count > 0; depth++)
+        {
+            List<string> next = new List<string>();
+            foreach (string cpp in level.Where(engine.Add))
+            {
+                foreach (System.Text.RegularExpressions.Match include in System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(cpp), @"#\s*include\s*""([^""]+)"""))
+                {
+                    foreach (string header in outsideByName.GetValueOrDefault(Path.GetFileName(include.Groups[1].Value)) ?? new List<string>())
+                    {
+                        if (engine.Add(header) && Implementation(header) is string implementation)
+                        {
+                            next.Add(implementation);
+                        }
+                    }
+                }
+            }
+            level = next;
+        }
+        engine.UnionWith(level);
+        return engine.OrderBy(p => p, StringComparer.Ordinal).Select(p => new SourceFile(p, File.ReadAllText(p))).ToList();
     }
 
     /// <summary>Slug and version of a plugin.json (null when unreadable).</summary>

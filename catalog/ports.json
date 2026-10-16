@@ -34692,13 +34692,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Shape",
+        "Wrap",
+        "Mask",
+        "Threshold",
+        "Bitcrush",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -34727,13 +34727,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Shape",
+        "Width 1",
+        "Width 2",
+        "Sub Mix",
+        "Sync",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -34762,13 +34762,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "M1 Amount",
+        "M1 Ratio",
+        "M2 Amount",
+        "M2 Ratio",
+        "M1/2 Offset",
+        "M1/2 Phase",
+        "Feedback"
       ]
     }
   },
@@ -34797,13 +34797,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "M1 Amount",
+        "M1 Ratio",
+        "M2 Amount",
+        "M2 Ratio",
+        "M3 Amount",
+        "M3 Frequency",
+        "Feedback"
       ]
     }
   },
@@ -34832,13 +34832,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Sawtooth",
+        "Pulse",
+        "Triangle / Square / Sine",
+        "Width",
+        "Sync",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -34867,13 +34867,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Correlation",
+        "Width",
+        "Low Cut",
+        "High Cut",
+        "Sync",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -34902,13 +34902,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Shape",
+        "Feedback",
+        "Behavior",
+        "Low Cut",
+        "High Cut",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -34937,13 +34937,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Exciter",
+        "Exciter Level",
+        "String 1 Decay",
+        "String 2 Decay",
+        "String 2 Detune",
+        "String Balance",
+        "Stiffness"
       ]
     }
   },
@@ -34972,13 +34972,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Engine",
+        "Harmonics",
+        "Timbre",
+        "Morph",
+        "Aux Mix",
+        "LPG Response",
+        "LPG Decay"
       ]
     }
   },
@@ -35007,13 +35007,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Morph",
+        "Skew Vertical",
+        "Saturate",
+        "Formant",
+        "Skew Horizontal",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },
@@ -35042,13 +35042,13 @@
       "firstDepthParam": 8,
       "targets": [
         "Pitch (v/oct)",
-        "Osc ctrl param 1",
-        "Osc ctrl param 2",
-        "Osc ctrl param 3",
-        "Osc ctrl param 4",
-        "Osc ctrl param 5",
-        "Osc ctrl param 6",
-        "Osc ctrl param 7"
+        "Morph",
+        "Formant",
+        "Window",
+        "Low Cut",
+        "High Cut",
+        "Unison Detune",
+        "Unison Voices"
       ]
     }
   },

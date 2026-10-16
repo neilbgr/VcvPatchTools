@@ -137,6 +137,10 @@ public class SourceScannerTests
                 VCO()
                 {
                     configParam<modules::VOctParamQuantity<60>>(PITCH_0, -5, 5, 0, "Pitch (v/oct)");
+                    for (int i = 0; i < n_osc_params + 1; ++i)
+                    {
+                        configParam<modules::SurgeParameterParamQuantity>(OSC_CTRL_PARAM_0 + i, 0, 1, oscstorage->p[i].get_value_f01());
+                    }
                     configInput(PITCH_CV, "V/Oct");
                     configInput(RETRIGGER, "Reset/Retrigger");
                     configInput(AUDIO_INPUT, "Audio");
@@ -171,14 +175,88 @@ public class SourceScannerTests
             """;
         string engine = "const int n_osc_params = 7;";
 
-        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("VCO.h", vco) }, new[] { new SourceFile("SurgeStorage.h", engine) });
+        ScanResult result = SourceScanner.ScanPlugin(manifest, new[] { new SourceFile("VCO.h", vco) }, new[] { new SourceFile("SurgeStorage.h", engine) }, surgeEngine);
 
         ModuleInfo classic = result.Modules["SurgeXTRack/SurgeXTOSCClassic"];
         Assert.Equal(new[] { "V/Oct", "Reset/Retrigger", "Modulation Signal 1", "Modulation Signal 2", "Modulation Signal 3", "Modulation Signal 4", "Audio" }, classic.Inputs);
         Assert.Equal((2, 4, 8), (classic.Modulation!.FirstInput, classic.Modulation.InputCount, classic.Modulation.FirstDepthParam));
-        Assert.Equal(new[] { "Pitch (v/oct)", "Osc ctrl param 1", "Osc ctrl param 7" }, new[] { classic.Modulation.Targets[0], classic.Modulation.Targets[1], classic.Modulation.Targets[7] });
+        // The engine names the classic oscillator's knobs; past its 3 test names, the generic ones.
+        Assert.Equal(new[] { "Pitch (v/oct)", "Shape", "Width 1", "Ratio", "Osc ctrl param 4" }, classic.Modulation.Targets.Take(5));
         Assert.Equal(new[] { "Left", "Right" }, result.Modules["SurgeXTRack/SurgeXTFXReverb"].Inputs);
         Assert.Empty(result.Problems);
+    }
+
+    private static readonly SourceFile[] surgeEngine =
+    {
+        new SourceFile("dsp/Oscillator.cpp", """
+            Oscillator *spawn_osc(int osctype, SurgeStorage *storage, OscillatorStorage *oscdata, pdata *localcopy, unsigned char *onto)
+            {
+                switch (osctype)
+                {
+                case ot_classic:
+                    return new (onto) ClassicOscillator(storage, oscdata, localcopy);
+                case ot_window:
+                {
+                    // misconfigured: a sine instead
+                    if (storage && storage->WindowWT.size == 0)
+                        return new (onto) SineOscillator(storage, oscdata, localcopy);
+                    return new (onto) WindowOscillator(storage, oscdata, localcopy);
+                }
+                case ot_modern:
+                    return new (onto) ModernOscillator(storage, oscdata, localcopy);
+                case ot_sine:
+                default:
+                    return new (onto) SineOscillator(storage, oscdata, localcopy);
+                }
+            }
+            """),
+        new SourceFile("dsp/oscillators/ClassicOscillator.h", "class ClassicOscillator { enum co_params { co_shape = 0, co_width1, co_ratio }; };"),
+        new SourceFile("dsp/oscillators/ClassicOscillator.cpp", """
+            void ClassicOscillator::init_ctrltypes()
+            {
+                oscdata->p[co_width1].set_name("Width 1");
+                oscdata->p[co_shape].set_name("Shape");
+                if (oscdata->p[co_ratio].absolute)
+                {
+                    oscdata->p[co_ratio].set_name("Frequency");
+                }
+                else
+                {
+                    oscdata->p[co_ratio].set_name("Ratio");
+                }
+            }
+            """),
+        new SourceFile("dsp/oscillators/WindowOscillator.cpp", """void WindowOscillator::init_ctrltypes() { oscdata->p[win_morph].set_name("Morph"); }"""),
+        new SourceFile("dsp/oscillators/WindowOscillator.h", "enum win_params { win_morph = 0 };"),
+        new SourceFile("dsp/oscillators/ModernOscillator.h", """
+            enum mo_params { mo_saw_mix = 0, mo_tri_mix };
+            const char mo_multitype_names[3][16] = {"Triangle", "Square", "Sine"};
+            """),
+        new SourceFile("dsp/oscillators/ModernOscillator.cpp", """
+            static struct ModernTriName : public ParameterDynamicNameFunction
+            {
+                const char *getName(const Parameter *p) const override { return mo_multitype_names[p->deform_type & 0xF]; }
+            } dpwTriName;
+            void ModernOscillator::init_ctrltypes()
+            {
+                oscdata->p[mo_saw_mix].set_name("Sawtooth");
+                oscdata->p[mo_tri_mix].set_name("--DYNAMIC-NAME--");
+                oscdata->p[mo_tri_mix].dynamicName = &dpwTriName;
+            }
+            """),
+    };
+
+    [Fact]
+    public void ReadsSurgeOscillatorParameterNamesFromTheEngine()
+    {
+        IReadOnlyDictionary<string, IReadOnlyList<string>> names = SurgeOscillators.ParameterNames(surgeEngine);
+
+        // In enum order; the default branch's name (the last one) when a condition picks it.
+        Assert.Equal(new[] { "Shape", "Width 1", "Ratio" }, names["ot_classic"]);
+        // ot_window's real class, not the sine it falls back to.
+        Assert.Equal(new[] { "Morph" }, names["ot_window"]);
+        // A name the patch picks: its options.
+        Assert.Equal(new[] { "Sawtooth", "Triangle / Square / Sine" }, names["ot_modern"]);
     }
 
     [Fact]

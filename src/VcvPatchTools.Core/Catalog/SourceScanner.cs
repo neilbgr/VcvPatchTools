@@ -85,7 +85,10 @@ public static partial class SourceScanner
     /// Headers the sources include from elsewhere in the plugin (a bundled engine: Surge XT's n_osc_params is in
     /// SurgeStorage.h): only their constants are read, the sources' own ones win.
     /// </param>
-    public static ScanResult ScanPlugin(string pluginJson, IReadOnlyList<SourceFile> sources, IReadOnlyList<SourceFile>? includedHeaders = null)
+    /// <param name="engineSources">
+    /// A bundled engine's sources, for names the plugin takes from it at run time (Surge XT's oscillator parameters).
+    /// </param>
+    public static ScanResult ScanPlugin(string pluginJson, IReadOnlyList<SourceFile> sources, IReadOnlyList<SourceFile>? includedHeaders = null, IReadOnlyList<SourceFile>? engineSources = null)
     {
         List<string> problems = new List<string>();
         Dictionary<string, ModuleInfo> result = new Dictionary<string, ModuleInfo>(StringComparer.Ordinal);
@@ -101,6 +104,11 @@ public static partial class SourceScanner
 
         Dictionary<string, (string Type, string? TemplateArgs)> structBySlug = new Dictionary<string, (string Type, string? TemplateArgs)>(StringComparer.Ordinal);
         Dictionary<string, SourceFile> registeredIn = new Dictionary<string, SourceFile>(StringComparer.Ordinal);
+        // VCOWidget<ot_classic>::M: the widget's argument, Surge XT's oscillator type.
+        Dictionary<string, string> widgetArgsBySlug = new Dictionary<string, string>(StringComparer.Ordinal);
+        IReadOnlyDictionary<string, IReadOnlyList<string>> oscillatorNames = engineSources is null
+            ? new Dictionary<string, IReadOnlyList<string>>()
+            : SurgeOscillators.ParameterNames(engineSources);
         Dictionary<string, string> pluginStrings = StringConstants(cleaned);
         foreach (SourceFile file in cleaned)
         {
@@ -131,6 +139,10 @@ public static partial class SourceScanner
                 if (structBySlug.TryAdd(slug, registration))
                 {
                     registeredIn[slug] = file;
+                    if (match.Groups[3].Success && match.Groups[2].Success)
+                    {
+                        widgetArgsBySlug[slug] = match.Groups[2].Value.Trim();
+                    }
                 }
             }
         }
@@ -156,7 +168,8 @@ public static partial class SourceScanner
                 problems.Add($"{pluginSlug}/{slug}: no createModel<...>(\"{slug}\") registration found");
             }
             else if (LocalFirst(cleaned, registeredIn[slug]) is List<SourceFile> ordered
-                && !TryResolvePorts(registration.Type, ordered, headers, constants, TemplateArgs(registration, ordered, constants), inputs, outputs, out modulation))
+                && !TryResolvePorts(registration.Type, ordered, headers, constants, TemplateArgs(registration, ordered, constants), inputs, outputs, out modulation,
+                    widgetArgsBySlug.TryGetValue(slug, out string? widgetArgs) ? oscillatorNames.GetValueOrDefault(widgetArgs) : null))
             {
                 problems.Add($"{pluginSlug}/{slug}: struct '{registration.Type}' has no resolvable InputIds/OutputIds enum");
             }
@@ -167,7 +180,7 @@ public static partial class SourceScanner
         return new ScanResult(result, problems);
     }
 
-    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, List<SourceFile> headers, Dictionary<string, int> constants, Dictionary<string, int> templateArgs, List<string> inputs, List<string> outputs, out ModMatrix? modulation)
+    private static bool TryResolvePorts(string typeName, List<SourceFile> sources, List<SourceFile> headers, Dictionary<string, int> constants, Dictionary<string, int> templateArgs, List<string> inputs, List<string> outputs, out ModMatrix? modulation, IReadOnlyList<string>? engineParamNames = null)
     {
         modulation = null;
         // Blank panels register Rack's own Module: no ports (unless the plugin has a "Module" of its own, as DHE does).
@@ -250,7 +263,7 @@ public static partial class SourceScanner
 
         Fill(inputs, inputEnum, inputNames);
         Fill(outputs, outputEnum, outputNames);
-        modulation = FindModMatrix(found, inputEnum, constants);
+        modulation = FindModMatrix(found, inputEnum, constants, engineParamNames);
         if (modulation is not null)
         {
             // Surge XT's usual name for its modulation inputs, unless the source names them ("Mod 0" on QuadAD).
@@ -695,7 +708,7 @@ public static partial class SourceScanner
     /// Surge XT's ModulationAssistant&lt;T, COUNT, FIRST_PARAM, N_MOD_INPUTS, FIRST_MOD_INPUT&gt; plus
     /// modulatorIndexFor() "return DEPTH_0 + offset * n_mod_inputs + modulator;" describe the depth matrix.
     /// </summary>
-    private static ModMatrix? FindModMatrix(StructSource found, List<(string Id, int Index, string Fallback)>? inputEnum, Dictionary<string, int> pluginConstants)
+    private static ModMatrix? FindModMatrix(StructSource found, List<(string Id, int Index, string Fallback)>? inputEnum, Dictionary<string, int> pluginConstants, IReadOnlyList<string>? engineParamNames = null)
     {
         string body = found.ConfigScopes[0];
         Match assistant = ModulationAssistantRegex().Match(body);
@@ -735,11 +748,25 @@ public static partial class SourceScanner
             }
         }
 
+        // Surge XT's VCO: "configParam<…>(OSC_CTRL_PARAM_0 + i, 0, 1, oscstorage->p[i].get_value_f01())": that block's
+        // knobs are the engine's oscillator parameters, named by the oscillator type.
+        Match engineBlock = Regex.Match(string.Join("\n", found.ConfigScopes), @"configParam\w*(?:\s*<[^;]*?>)?\s*\(\s*(\w+)\s*\+\s*(\w+)\s*,[^;]*\boscstorage\s*->\s*p\s*\[\s*\2\s*\]");
+        string? EngineName(string? id)
+        {
+            if (engineParamNames is null || id is null || !engineBlock.Success)
+            {
+                return null;
+            }
+            string block = engineBlock.Groups[1].Value;
+            int offset = id == block ? 0 : id.StartsWith(block + "+", StringComparison.Ordinal) ? int.Parse(id[(block.Length + 1)..], System.Globalization.CultureInfo.InvariantCulture) : -1;
+            return offset >= 0 && offset < engineParamNames.Count && engineParamNames[offset].Length > 0 ? engineParamNames[offset] : null;
+        }
+
         List<string> targets = new List<string>();
         for (int i = 0; i < count; i++)
         {
             (string Id, int Index, string Fallback) entry = paramEnum.FirstOrDefault(e => e.Index == firstTarget + i);
-            targets.Add(entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback);
+            targets.Add(EngineName(entry.Id) ?? (entry.Id is null ? $"param#{firstTarget + i}" : paramNames.GetValueOrDefault(entry.Id) ?? entry.Fallback));
         }
         return new ModMatrix(firstInput.Value, inputCount.Value, firstDepth.Value, targets);
     }
@@ -1339,6 +1366,9 @@ public static partial class SourceScanner
     }
 
     /// <summary>Returns the text between the brace at openIndex and its matching closing brace.</summary>
+    /// <summary>The text between the brace at <paramref name="openIndex"/> and its match.</summary>
+    public static string BraceBodyAt(string text, int openIndex) => BraceBody(text, openIndex);
+
     private static string BraceBody(string text, int openIndex)
     {
         int level = 0;
