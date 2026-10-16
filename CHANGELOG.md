@@ -5,6 +5,8 @@ made; on release, the section is renamed to the version and becomes the GitHub r
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-16
+
 ### Fixed
 - A single voice going straight to the outputs, with no mixer, keeps its VCA and filter: an envelope passing audio
   through its own VCA (Surge XT EG x VCA) is in the sound path, and only the effects at the end of the chain go to
@@ -36,6 +38,7 @@ First release.
 - **Convert**: patches between VCV Rack and Cardinal, with warnings for modules official Cardinal doesn't load.
 - Web app (Blazor WebAssembly, runs in the browser) and `vcvpatch` command line for Linux, Windows and macOS.
 
-[Unreleased]: https://github.com/neilbgr/VcvPatchTools/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/neilbgr/VcvPatchTools/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/neilbgr/VcvPatchTools/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/neilbgr/VcvPatchTools/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/neilbgr/VcvPatchTools/releases/tag/v1.0.0
