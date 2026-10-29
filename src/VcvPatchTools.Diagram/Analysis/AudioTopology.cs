@@ -8,7 +8,8 @@ namespace VcvPatchTools.Diagram.Analysis;
 ///   insert / send-return: fed by a module M (through a "send" output, or a loop) and feeding back into M
 ///                         (through a "return" input) → belongs to M, wherever M is;
 ///   voice:                linked by audio cables to a source without going through a mixer, unless that mixer only
-///                         gathers sources playing the same notes (the oscillators of one keyboard zone…);
+///                         gathers sources playing the same notes (the oscillators of one keyboard zone…) or is a
+///                         submix of one voice going back into it;
 ///   bus:                  everything else (after a mixer).
 /// </summary>
 internal sealed class AudioTopology
@@ -44,7 +45,8 @@ internal sealed class AudioTopology
         Union();
 
         // A mixer fed only by voices playing the same notes (two oscillators on one keyboard zone) mixes one voice:
-        // the voice goes on through it, up to where different notes meet. Repeat for mixers of mixers.
+        // the voice goes on through it, up to where different notes meet. So does a submix of one voice whose mix
+        // goes back into it (a switch picking the oscillators mixed or one at a time). Repeat for mixers of mixers.
         HashSet<PortRef?> OriginsOf(long root) => parent.Keys
             .Where(id => Find(id) == root && roleById[id] == Role.Source)
             .Select(pitchOrigin)
@@ -63,7 +65,9 @@ internal sealed class AudioTopology
                 // voice is that voice going to the bus, and one fed by a plain processor mixes something else in.
                 List<HashSet<PortRef?>> perVoice = feeders.Select(Find).Distinct().Select(OriginsOf).ToList();
                 List<PortRef?> origins = perVoice.SelectMany(o => o).Distinct().ToList();
-                if (perVoice.Count >= 2 && perVoice.All(o => o.Count > 0) && origins.Count == 1 && origins[0] is not null)
+                List<long> targets = audio.Where(c => c.Cable.From.ModuleId == mixer).Select(c => c.Cable.To.ModuleId).Distinct().ToList();
+                bool submix = perVoice.Count == 1 && targets.Count > 0 && targets.All(t => parent.ContainsKey(t) && Find(t) == Find(feeders[0]));
+                if (submix || perVoice.Count >= 2 && perVoice.All(o => o.Count > 0) && origins.Count == 1 && origins[0] is not null)
                 {
                     parent[mixer] = mixer;
                     Union();

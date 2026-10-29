@@ -212,6 +212,75 @@ public class AnalyzerTests
         Assert.Equal(expected, MidiLearn.Name(module, index, port));
     }
 
+    [Theory]
+    [InlineData("Faders2", 1, true, "Fader 2", "Cutoff")]
+    [InlineData("Faders2", 0, false, "Fader 1", "Fader 1")]
+    [InlineData("Fader", 0, false, "Fader", "Fader")]
+    [InlineData("Buttons", 1, true, "Button 2", "Cutoff")]
+    [InlineData("PadX", 0, true, "Lane (poly)", "Cutoff (poly)")]
+    [InlineData("PadX", 2, false, "Lane 3", "Cutoff 3")]
+    public void TypedLabelsNameThePortsAsTheModuleDoes(string model, int index, bool input, string port, string expected)
+    {
+        PatchModule module = new PatchModule(1, "Aluminium", model, 0, 0)
+        {
+            Labels = model == "PadX" ? new[] { "Cutoff" } : new[] { "", "Cutoff" },
+        };
+
+        Assert.Equal(expected, PortLabels.Name(module, index, port, input));
+    }
+
+    [Fact]
+    public void ALabelOnAnotherPluginsModuleIsNotAPortName()
+    {
+        PatchModule module = new PatchModule(1, "Fundamental", "VCO", 0, 0) { Labels = new[] { "Cutoff" } };
+
+        Assert.Equal("Sin", PortLabels.Name(module, 0, "Sin", input: false));
+    }
+
+    [Fact]
+    public void CablesFromAFaderAreNamedByItsLabel()
+    {
+        string json = """
+            {
+              "version": "2.6.0",
+              "modules": [
+                { "id": 1, "plugin": "Aluminium", "model": "Faders2", "pos": [0, 0], "data": { "faders": [{ "label": "" }, { "label": "Cutoff" }] } },
+                { "id": 2, "plugin": "Fundamental", "model": "VCF", "pos": [10, 0] }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 0, "inputModuleId": 2, "inputId": 1 },
+                { "id": 2, "outputModuleId": 1, "outputId": 1, "inputModuleId": 2, "inputId": 0 }
+              ]
+            }
+            """;
+
+        PatchAnalysis patch = PatchDiagram.Analyze(Encoding.UTF8.GetBytes(json));
+
+        Assert.Equal(new[] { "Fader 1", "Cutoff" }, patch.Cables.OrderBy(c => c.Cable.Id).Select(c => c.FromPort));
+    }
+
+    [Fact]
+    public void AnIntentKeepsTheCaseOfATypedLabel()
+    {
+        string json = """
+            {
+              "version": "2.6.0",
+              "modules": [
+                { "id": 1, "plugin": "Cardinal", "model": "HostMIDICC", "pos": [0, 0], "data": { "ccs": [16, 17] } },
+                { "id": 2, "plugin": "Aluminium", "model": "Faders2", "pos": [10, 0], "data": { "faders": [{ "label": "ATTCK" }, { "label": "" }] } }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 0, "inputModuleId": 2, "inputId": 0 },
+                { "id": 2, "outputModuleId": 1, "outputId": 1, "inputModuleId": 2, "inputId": 1 }
+              ]
+            }
+            """;
+
+        PatchAnalysis patch = PatchDiagram.Analyze(Encoding.UTF8.GetBytes(json));
+
+        Assert.Equal(new[] { "hand control of ATTCK", "hand control of fader 2" }, patch.Cables.OrderBy(c => c.Cable.Id).Select(c => c.SuggestedIntent));
+    }
+
     [Fact]
     public void ALearnedControllerIsTypedByWhereItGoesNotByItsUsualMeaning()
     {
@@ -500,6 +569,43 @@ public class AnalyzerTests
 
         Assert.Equal(Band.Bus, single.Modules.Single(m => m.Module.Model == "Mixer").Band);
         Assert.Equal(Band.Voice, single.Modules.Single(m => m.Module.Model == "VCF").Band);
+    }
+
+    [Fact]
+    public void AMixerWhoseMixGoesBackIntoItsVoiceIsPartOfIt()
+    {
+        // Moog Matriarch style: a switch picks either the oscillators mixed together or one of them at a time.
+        string json = """
+            {
+              "modules": [
+                { "id": 1, "plugin": "Core", "model": "MIDIToCVInterface", "pos": [0, 0] },
+                { "id": 2, "plugin": "Fundamental", "model": "VCO", "pos": [10, 0] },
+                { "id": 3, "plugin": "Fundamental", "model": "VCO", "pos": [20, 0] },
+                { "id": 4, "plugin": "Fundamental", "model": "SequentialSwitch2", "pos": [30, 0] },
+                { "id": 5, "plugin": "Fundamental", "model": "Mixer", "pos": [40, 0] },
+                { "id": 6, "plugin": "Fundamental", "model": "SequentialSwitch2", "pos": [50, 0] },
+                { "id": 7, "plugin": "Fundamental", "model": "VCF", "pos": [60, 0] },
+                { "id": 8, "plugin": "Core", "model": "AudioInterface2", "pos": [70, 0] }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 0, "inputModuleId": 2, "inputId": 0, "color": "#ffd452" },
+                { "id": 2, "outputModuleId": 1, "outputId": 0, "inputModuleId": 3, "inputId": 0, "color": "#ffd452" },
+                { "id": 3, "outputModuleId": 2, "outputId": 2, "inputModuleId": 4, "inputId": 2, "color": "#ff5252" },
+                { "id": 4, "outputModuleId": 3, "outputId": 2, "inputModuleId": 4, "inputId": 3, "color": "#ff5252" },
+                { "id": 5, "outputModuleId": 2, "outputId": 2, "inputModuleId": 5, "inputId": 0, "color": "#ff5252" },
+                { "id": 6, "outputModuleId": 3, "outputId": 2, "inputModuleId": 5, "inputId": 1, "color": "#ff5252" },
+                { "id": 7, "outputModuleId": 4, "outputId": 0, "inputModuleId": 6, "inputId": 2, "color": "#ff5252" },
+                { "id": 8, "outputModuleId": 5, "outputId": 0, "inputModuleId": 6, "inputId": 3, "color": "#ff5252" },
+                { "id": 9, "outputModuleId": 6, "outputId": 0, "inputModuleId": 7, "inputId": 3, "color": "#ff5252" },
+                { "id": 10, "outputModuleId": 7, "outputId": 0, "inputModuleId": 8, "inputId": 0, "color": "#ff5252" }
+              ]
+            }
+            """;
+
+        PatchAnalysis patch = PatchDiagram.Analyze(Encoding.UTF8.GetBytes(json));
+
+        Assert.Contains(patch.Modules.Single(m => m.Module.Model == "Mixer").Module.Id, patch.Voices.Single().ModuleIds);
+        Assert.Equal(Band.Voice, patch.Modules.Single(m => m.Module.Model == "Mixer").Band);
     }
 
     [Fact]

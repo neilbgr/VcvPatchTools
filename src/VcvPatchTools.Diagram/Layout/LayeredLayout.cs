@@ -62,15 +62,17 @@ public static class LayeredLayout
         List<List<string>> order = Barycenter.Order(InitialOrder(stacks.Boxes, columns, routing.TrackColumn), routing.Segments, e => laneOf[e]);
 
         // Cables leaving from the same output port(s) form a trunk: one exit on the box, one first turn, then they branch.
+        // A docked expander's cables leave from its base with the expander's port ids: its port name tells them apart.
         Dictionary<EdgeKey, string> trunkOf = merged.ToDictionary(
             g => g.Key,
-            g => $"{g.Key.From}|{g.Key.Signal}|" + string.Join(",", g.Select(c => $"{c.Cable.From.ModuleId}:{c.Cable.From.PortId}").Distinct().Order(StringComparer.Ordinal)));
+            g => $"{g.Key.From}|{g.Key.Signal}|" + string.Join(",", g.Select(c => $"{c.Cable.From.ModuleId}:{c.Cable.From.PortId}:{c.FromPort}").Distinct().Order(StringComparer.Ordinal)));
         Dictionary<string, double> heightOf = BoxHeights(stacks.AnchorOf.Keys, merged, trunkOf);
         Placement placement = PlaceRows(lanes, laneOf, order, routing, stacks, columns, heightOf, merged);
         Ports ports = PlacePorts(merged, trunkOf, routing.Plans, placement);
         List<Turn> turns = FindTurns(routing.Plans, ports.Levels);
+        turns.AddRange(SideLoopTurns(merged, routing.Plans, ports, placement.Positions));
         Tabs tabs = new Tabs(merged, routing.Plans, ports, portTabs, placement.Positions);
-        Gaps gaps = new Gaps(turns, tabs, columns.Drawn, turn => turn.Part == 0 && !routing.Plans[turn.Key].Feedback ? trunkOf[turn.Key] : null);
+        Gaps gaps = new Gaps(turns, tabs, columns.Drawn, turn => turn.Part == 0 && !turn.Feedback ? trunkOf[turn.Key] : null);
 
         List<DiagramBand> bands = placement.Bands;
         // The watchers' column, clear of their port tabs; the horizontal bands stop short of it.
@@ -495,8 +497,22 @@ public static class LayeredLayout
     }
 
     /// <summary>
-    /// Port tabs: one per cable line arriving, one per trunk leaving (cables plugged into a stacked insert's side loop
-    /// have none). They take room in the gaps, next to the boxes.
+    /// A host and its stacked insert share a column: the send runs down in the gap on the right of it, the return up in
+    /// the gap on the left, in channels of their own like any other cable.
+    /// </summary>
+    private static IEnumerable<Turn> SideLoopTurns(List<IGrouping<EdgeKey, AnalyzedCable>> merged, Dictionary<EdgeKey, Plan> plans, Ports ports, Dictionary<string, (int Column, double Y)> positions)
+    {
+        foreach (EdgeKey key in merged.Select(g => g.Key).Where(k => !plans.ContainsKey(k)))
+        {
+            int column = positions[key.From].Column;
+            bool send = positions[key.To].Y > positions[key.From].Y;
+            yield return new Turn(send ? column : column - 1, key, 0, ports.OutY[key], ports.InY[key], false);
+        }
+    }
+
+    /// <summary>
+    /// Port tabs: one per cable line arriving, one per trunk leaving. A stacked insert's side loop only has them on its
+    /// host (send out on the right, return in on the left). They take room in the gaps, next to the boxes.
     /// </summary>
     private sealed class Tabs
     {
@@ -509,12 +525,20 @@ public static class LayeredLayout
 
         public Tabs(List<IGrouping<EdgeKey, AnalyzedCable>> merged, Dictionary<EdgeKey, Plan> plans, Ports ports, bool portTabs, Dictionary<string, (int Column, double Y)> positions)
         {
-            foreach (IGrouping<EdgeKey, AnalyzedCable> edge in merged.Where(g => portTabs && plans.ContainsKey(g.Key)))
+            foreach (IGrouping<EdgeKey, AnalyzedCable> edge in merged.Where(g => portTabs))
             {
-                string arriving = PortTabs.Text(edge.Select(c => c.ToPort), edge.Key.Signal);
-                string leaving = PortTabs.Text(edge.Select(c => c.FromPort), edge.Key.Signal);
-                inTabs[edge.Key] = new PortTab(false, ports.InY[edge.Key], PortTabs.Width(arriving), arriving, edge.Key.Signal, string.Join("\n", edge.Select(c => c.ToPort).Distinct()));
-                outTabs[edge.Key] = new PortTab(true, ports.OutY[edge.Key], PortTabs.Width(leaving), leaving, edge.Key.Signal, string.Join("\n", edge.Select(c => c.FromPort).Distinct()));
+                bool sideLoop = !plans.ContainsKey(edge.Key);
+                bool send = positions[edge.Key.To].Y > positions[edge.Key.From].Y;
+                if (!sideLoop || !send)
+                {
+                    string arriving = PortTabs.Text(edge.Select(c => c.ToPort), edge.Key.Signal);
+                    inTabs[edge.Key] = new PortTab(false, ports.InY[edge.Key], PortTabs.Width(arriving), arriving, edge.Key.Signal, string.Join("\n", edge.Select(c => c.ToPort).Distinct()));
+                }
+                if (!sideLoop || send)
+                {
+                    string leaving = PortTabs.Text(edge.Select(c => c.FromPort), edge.Key.Signal);
+                    outTabs[edge.Key] = new PortTab(true, ports.OutY[edge.Key], PortTabs.Width(leaving), leaving, edge.Key.Signal, string.Join("\n", edge.Select(c => c.FromPort).Distinct()));
+                }
             }
             inWidths = inTabs.GroupBy(t => positions[t.Key.To].Column).ToDictionary(g => g.Key, g => g.Max(t => t.Value.Width));
             outWidths = outTabs.GroupBy(t => positions[t.Key.From].Column).ToDictionary(g => g.Key, g => g.Max(t => t.Value.Width));
@@ -809,12 +833,13 @@ public static class LayeredLayout
             {
                 // Host and its insert, stacked in one column: a side loop, down on the right (send), up on the left (return).
                 bool down = to.Y > from.Y;
-                double sx = down ? from.X + from.Width : from.X;
-                double ex = down ? to.X + to.Width + ArrowLength : to.X - ArrowLength;
-                double side = down ? 36 : -36;
-                path = string.Create(CultureInfo.InvariantCulture,
-                    $"M {sx:0.#} {y1:0.#} C {sx + side:0.#} {y1:0.#}, {ex + side:0.#} {y2:0.#}, {ex:0.#} {y2:0.#}");
-                labelX = sx + (side * 0.75);
+                double sx = down ? from.X + from.Width + outTab(group.Key) : from.X;
+                double ex = down ? to.X + to.Width + ArrowLength : to.X - inTab(group.Key) - ArrowLength;
+                // Out to its channel, along it, back in: square like every other cable.
+                int outward = down ? 1 : -1;
+                double channel = channels[(group.Key, 0)];
+                path = $"M {Num(sx)} {Num(y1)}" + Bend(channel, y1, y2, outward, -outward) + $" H {Num(ex)}";
+                labelX = channel;
                 labelY = (y1 + y2) / 2;
             }
 

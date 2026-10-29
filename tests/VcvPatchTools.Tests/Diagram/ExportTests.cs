@@ -194,6 +194,43 @@ public class ExportTests
     }
 
     [Fact]
+    public void ASendReturnLoopHasItsOwnTabsOnItsHost()
+    {
+        // Venom's MixSend expander, docked on the mixer: its send and return ports have the same ids as the mixer's own.
+        string json = """
+            {
+              "modules": [
+                { "id": 1, "plugin": "Fundamental", "model": "VCO", "pos": [0, 0] },
+                { "id": 2, "plugin": "Venom", "model": "Mix4Stereo", "pos": [10, 0], "rightModuleId": 3 },
+                { "id": 3, "plugin": "Venom", "model": "MixSend", "pos": [20, 0], "leftModuleId": 2, "rightModuleId": 4 },
+                { "id": 4, "plugin": "Valley", "model": "Plateau", "pos": [25, 0], "leftModuleId": 3 },
+                { "id": 5, "plugin": "Cardinal", "model": "HostAudio2", "pos": [40, 0] }
+              ],
+              "cables": [
+                { "id": 1, "outputModuleId": 1, "outputId": 2, "inputModuleId": 2, "inputId": 0, "color": "#ff5252" },
+                { "id": 2, "outputModuleId": 2, "outputId": 0, "inputModuleId": 5, "inputId": 0, "color": "#ff5252" },
+                { "id": 3, "outputModuleId": 3, "outputId": 0, "inputModuleId": 4, "inputId": 0, "color": "#ff5252" },
+                { "id": 4, "outputModuleId": 4, "outputId": 0, "inputModuleId": 3, "inputId": 0, "color": "#ff5252" }
+              ]
+            }
+            """;
+        PatchAnalysis patch = PatchDiagram.Analyze(System.Text.Encoding.UTF8.GetBytes(json));
+        DiagramLayout loop = PatchDiagram.Layout(patch, "Send", PatchDiagram.GroupKeys(patch));
+        DiagramNode mixer = loop.Nodes.Single(n => n.ModuleId == 2);
+        DiagramEdge send = loop.Edges.Single(e => e.ToTitle == "Plateau");
+        DiagramEdge back = loop.Edges.Single(e => e.FromTitle == "Plateau");
+
+        PortTab mix = mixer.Tabs.Single(t => t.Output && t.Tooltip == "Left Mix");
+        PortTab sendTab = mixer.Tabs.Single(t => t.Output && t.Tooltip == "Mix Aux Send › Left send");
+        PortTab returnTab = mixer.Tabs.Single(t => !t.Output && t.Tooltip == "Mix Aux Send › Left return");
+        Assert.NotEqual(mix.Y, sendTab.Y);
+        Assert.StartsWith($"M {mixer.X + mixer.Width + sendTab.Width:0.#} {sendTab.Y:0.#} ", send.Path);
+        Assert.EndsWith($"{returnTab.Y:0.#} H {mixer.X - returnTab.Width - LayeredLayout.ArrowLength:0.#}", back.Path);
+        // Square, like every other cable.
+        Assert.DoesNotContain(" C ", send.Path + back.Path);
+    }
+
+    [Fact]
     public void CustomIntentReplacesSuggestion()
     {
         long cableId = layout.Edges.First(e => e.FromTitle == "LLFO").CableIds.Single();

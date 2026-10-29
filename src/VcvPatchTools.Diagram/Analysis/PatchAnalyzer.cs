@@ -137,19 +137,26 @@ public sealed class PatchAnalyzer
         return byId;
     }
 
+    private string OutputName(PatchModule module, int index) => PortLabels.Name(module, index, ports.OutputName(module.Plugin, module.Model, index), input: false);
+
+    private string InputName(PatchModule module, int index) => PortLabels.Name(module, index, ports.InputName(module.Plugin, module.Model, index), input: true);
+
     private List<AnalyzedCable> TypeCables(PatchDocument patch, Dictionary<long, PatchModule> byId, Dictionary<long, long> baseOf, Dictionary<long, string> titles, Dictionary<long, Role> roleById, List<string> diagnostics)
     {
         List<AnalyzedCable> cables = new List<AnalyzedCable>();
+        // Whether each cable's input port carries a typed label, by index in cables.
+        List<bool> labeledInputs = new List<bool>();
         List<(PortRef Plugged, AnalyzedCable Cable)> plugged = new List<(PortRef, AnalyzedCable)>();
         foreach (PatchCable original in patch.Cables.Where(c => byId.ContainsKey(c.From.ModuleId) && byId.ContainsKey(c.To.ModuleId)))
         {
             // Ports are named on the module they're on (an expander's prefixed with its name), the cable then attaches to the base.
             PatchModule fromModule = byId[original.From.ModuleId];
             PatchModule toModule = byId[original.To.ModuleId];
-            string fromPort = PortOn(fromModule, MidiLearn.Name(fromModule, original.From.PortId, ports.OutputName(fromModule.Plugin, fromModule.Model, original.From.PortId)), baseOf);
-            string toPort = PortOn(toModule, MidiLearn.Name(toModule, original.To.PortId, ports.InputName(toModule.Plugin, toModule.Model, original.To.PortId)), baseOf);
+            string fromPort = PortOn(fromModule, MidiLearn.Name(fromModule, original.From.PortId, OutputName(fromModule, original.From.PortId)), baseOf);
+            string toPort = PortOn(toModule, MidiLearn.Name(toModule, original.To.PortId, InputName(toModule, original.To.PortId)), baseOf);
+            bool labeledTo = PortLabels.IsLabeled(toModule, original.To.PortId, input: true);
             // The signal is typed from what the port is, not from what its controller usually does.
-            string typedFromPort = PortOn(fromModule, MidiLearn.Name(fromModule, original.From.PortId, ports.OutputName(fromModule.Plugin, fromModule.Model, original.From.PortId), meaning: false), baseOf);
+            string typedFromPort = PortOn(fromModule, MidiLearn.Name(fromModule, original.From.PortId, OutputName(fromModule, original.From.PortId), meaning: false), baseOf);
             // A modulation-matrix input is shown with the knobs it moves ("Mod 1 → Pitch -3%"), but it's typed as itself.
             string typedToPort = toPort;
             PatchCable cable = original with
@@ -180,9 +187,10 @@ public sealed class PatchAnalyzer
 
             string intent = routes.Count > 0
                 ? IntentSuggester.SuggestMod(titles[from.Id], roleById[from.Id], routes)
-                : IntentSuggester.Suggest(signal, titles[from.Id], fromPort.Split(" › ")[^1], titles[to.Id], toPort.Split(" › ")[^1], roleById[from.Id], roleById[to.Id]);
+                : IntentSuggester.Suggest(signal, titles[from.Id], fromPort.Split(" › ")[^1], titles[to.Id], toPort.Split(" › ")[^1], roleById[from.Id], roleById[to.Id], labeledTo);
             AnalyzedCable analyzed = new AnalyzedCable(cable, fromPort, toPort, signal, intent) { Routes = routes };
             cables.Add(analyzed);
+            labeledInputs.Add(labeledTo);
             plugged.Add((original.To, analyzed));
         }
 
@@ -203,7 +211,7 @@ public sealed class PatchAnalyzer
                 cables[i] = cable with
                 {
                     Signal = passed,
-                    SuggestedIntent = IntentSuggester.Suggest(passed, titles[from], cable.FromPort.Split(" › ")[^1], titles[cable.Cable.To.ModuleId], cable.ToPort.Split(" › ")[^1], roleById[from], roleById[cable.Cable.To.ModuleId]),
+                    SuggestedIntent = IntentSuggester.Suggest(passed, titles[from], cable.FromPort.Split(" › ")[^1], titles[cable.Cable.To.ModuleId], cable.ToPort.Split(" › ")[^1], roleById[from], roleById[cable.Cable.To.ModuleId], labeledInputs[i]),
                 };
                 changed = true;
             }

@@ -55,6 +55,7 @@ public static class PatchReader
                 // A module's data is its own: an object for most, a string for some (Ildaeil keeps a Carla XML project).
                 LearnedNotes = Integers((module["data"] as JsonObject)?["notes"]),
                 LearnedCcs = Integers((module["data"] as JsonObject)?["ccs"]),
+                Labels = Labels(module["data"] as JsonObject),
             });
         }
 
@@ -104,6 +105,22 @@ public static class PatchReader
     {
         string json = node.ToJsonString();
         return json.Length <= 80 ? json : json[..77] + "...";
+    }
+
+    private static List<string> Labels(JsonObject? data)
+    {
+        if (data is null)
+        {
+            return new List<string>();
+        }
+        if (PatchJson.String(data["label"]) is string label)
+        {
+            return new List<string> { label };
+        }
+        JsonArray? channels = (data["faders"] ?? data["buttons"]) as JsonArray;
+        return channels is null
+            ? new List<string>()
+            : channels.Select(c => PatchJson.String((c as JsonObject)?["label"]) ?? "").ToList();
     }
 
     private static List<int> Integers(JsonNode? node) =>

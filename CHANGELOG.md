@@ -5,6 +5,19 @@ made; on release, the section is renamed to the version and becomes the GitHub r
 
 ## [Unreleased]
 
+### Added
+- Aluminium Fader, Faders2, Faders4 and Buttons: named ports, the Performance role, and listed as bundled with the
+  neilbgr edition of Cardinal.
+- The ports of Aluminium's Fader, Faders2, Faders4, Buttons and PadX take the label typed on their panel, as the module
+  itself names them ("Fader 2" becomes "Cutoff").
+
+### Fixed
+- A mixer fed by a single voice whose mix goes back into that voice is part of it, not of the bus: a switch picking
+  either the oscillators mixed together or one of them at a time (Moog Matriarch style) keeps both paths in the voice.
+- A docked expander's outputs (Venom's Mix Aux Send) no longer leave from the same spot as its base's outputs with the
+  same port numbers: the send has its own exit, and a send/return loop has its own tabs on its host. The loop is drawn
+  square in its own channels, like every other cable, instead of curved.
+
 ## [1.1.1] - 2026-10-16
 
 ### Fixed

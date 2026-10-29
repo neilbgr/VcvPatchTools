@@ -17,6 +17,12 @@ public sealed record PatchModule(long Id, string Plugin, string Model, int Colum
     public IReadOnlyList<int> LearnedNotes { get; init; } = Array.Empty<int>();
 
     public IReadOnlyList<int> LearnedCcs { get; init; } = Array.Empty<int>();
+
+    /// <summary>
+    /// Labels typed on the panel, "" when left blank: one per fader (data.faders) or button (data.buttons), or the
+    /// module's single data.label (Aluminium's PadX).
+    /// </summary>
+    public IReadOnlyList<string> Labels { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>A port on a module: Output ports are cable sources, Input ports are cable destinations.</summary>

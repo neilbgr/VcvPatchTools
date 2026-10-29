@@ -3487,6 +3487,42 @@
       "Value 4"
     ]
   },
+  "Aluminium/Buttons": {
+    "name": "Buttons",
+    "tags": [
+      "Controller",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Aluminium/Fader": {
+    "name": "Fader",
+    "tags": [
+      "Controller",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Aluminium/Faders2": {
+    "name": "Faders2",
+    "tags": [
+      "Controller",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
+  "Aluminium/Faders4": {
+    "name": "Faders4",
+    "tags": [
+      "Controller",
+      "Utility"
+    ],
+    "inputs": [],
+    "outputs": []
+  },
   "Aluminium/PadX": {
     "name": "PadX",
     "tags": [

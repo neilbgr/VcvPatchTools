@@ -35,6 +35,29 @@ public class PatchReaderTests
     }
 
     [Fact]
+    public void ReadsTheLabelsTypedOnAModule()
+    {
+        string json = """
+            {
+              "modules": [
+                { "id": 1, "plugin": "Aluminium", "model": "Faders2", "data": { "faders": [{ "label": "Cutoff" }, { "label": "" }] } },
+                { "id": 2, "plugin": "Aluminium", "model": "Buttons", "data": { "buttons": [{ "color": 0 }, { "label": "Sub" }] } },
+                { "id": 3, "plugin": "Aluminium", "model": "PadX", "data": { "label": "Drums" } },
+                { "id": 4, "plugin": "Fundamental", "model": "VCO" }
+              ],
+              "cables": []
+            }
+            """;
+
+        PatchDocument patch = PatchReader.Read(Encoding.UTF8.GetBytes(json));
+
+        Assert.Equal(new[] { "Cutoff", "" }, patch.Module(1).Labels);
+        Assert.Equal(new[] { "", "Sub" }, patch.Module(2).Labels);
+        Assert.Equal(new[] { "Drums" }, patch.Module(3).Labels);
+        Assert.Empty(patch.Module(4).Labels);
+    }
+
+    [Fact]
     public void ReadsRawJsonPatch()
     {
         string json = """

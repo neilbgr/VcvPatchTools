@@ -1,5 +1,9 @@
 {
   "AS/DelayPlusStereoFx": "Effect",
+  "Aluminium/Buttons": "Performance",
+  "Aluminium/Fader": "Performance",
+  "Aluminium/Faders2": "Performance",
+  "Aluminium/Faders4": "Performance",
   "Aluminium/Pads": "Io",
   "Aluminium/Zones": "Io",
   "AmbientModules/Lunar50Drone": "Source",

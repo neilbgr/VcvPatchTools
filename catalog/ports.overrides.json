@@ -292,5 +292,47 @@
       "Solo 3",
       "Solo 4"
     ]
+  },
+  "Aluminium/Fader": {
+    "inputs": [
+      "Fader"
+    ],
+    "outputs": [
+      "Fader"
+    ]
+  },
+  "Aluminium/Faders2": {
+    "inputs": [
+      "Fader 1",
+      "Fader 2"
+    ],
+    "outputs": [
+      "Fader 1",
+      "Fader 2"
+    ]
+  },
+  "Aluminium/Faders4": {
+    "inputs": [
+      "Fader 1",
+      "Fader 2",
+      "Fader 3",
+      "Fader 4"
+    ],
+    "outputs": [
+      "Fader 1",
+      "Fader 2",
+      "Fader 3",
+      "Fader 4"
+    ]
+  },
+  "Aluminium/Buttons": {
+    "inputs": [
+      "Button 1",
+      "Button 2"
+    ],
+    "outputs": [
+      "Button 1",
+      "Button 2"
+    ]
   }
 }

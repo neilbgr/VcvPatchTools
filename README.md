@@ -206,6 +206,7 @@ Click a box (web app) to unfold it into its modules, in a lane of its own. The C
 
 - **Surge XT modulation**: Surge XT modules have "Modulation Signal n" inputs that can be assigned to any knob. The tool reads which knob each input moves and by how much (`Mod 1 → Cutoff +35%`), or reports when an input moves nothing.
 - **MIDI learn**: the cells of MIDI gate and CC modules (Rack's MIDI to Gate / MIDI CC to CV and their CV to MIDI counterparts, Cardinal's Host MIDI Gate / CC) are named by the note or controller they learned in the patch: `Gate 13 · A2`, `Cell 2 · CC 74 (cutoff)`.
+- **Typed labels**: the ports of Aluminium's Fader, Faders2, Faders4, Buttons and PadX take the label typed on their panel, as the module itself names them: `Fader 2` becomes `Cutoff`, PadX's `Lane 3` becomes `Drums 3`.
 - **Scopes and displays** are hidden by default (they explain nothing about the sound). "Scopes & displays" shows them as a 👁 badge on the box they watch, or as boxes in a column on the right, each next to what it watches, with thin dashed cables.
 
   <picture>
