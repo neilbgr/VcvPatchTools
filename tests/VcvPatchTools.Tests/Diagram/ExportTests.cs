@@ -117,6 +117,15 @@ public class ExportTests
         Assert.Equal(expected, PortTabs.Short(port, signal));
     }
 
+    [Theory]
+    [InlineData(new[] { "Mix Aux Send › Left send", "Mix Aux Send › Right send" }, "L/R send")]
+    [InlineData(new[] { "Right Mix", "Left Mix" }, "L/R Mix")]
+    [InlineData(new[] { "Left channel 2", "Right channel 2" }, "L/R Ch 2")]
+    [InlineData(new[] { "Right", "Left" }, "L/R")]
+    [InlineData(new[] { "Left", "Right channel 2" }, "L, R Ch 2")]
+    [InlineData(new[] { "Left channel 1", "Right channel 1", "Left channel 2", "Right channel 2" }, "4 × audio")]
+    public void StereoPairsShareOneTabName(string[] ports, string expected) => Assert.Equal(expected, PortTabs.Text(ports, SignalType.Audio));
+
     [Fact]
     public void CablesPlugIntoNamedTabs()
     {

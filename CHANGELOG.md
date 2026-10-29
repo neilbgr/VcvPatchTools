@@ -10,6 +10,7 @@ made; on release, the section is renamed to the version and becomes the GitHub r
   neilbgr edition of Cardinal.
 - The ports of Aluminium's Fader, Faders2, Faders4, Buttons and PadX take the label typed on their panel, as the module
   itself names them ("Fader 2" becomes "Cutoff").
+- A port tab for a stereo pair reads "L/R send", "L/R Ch 2"… instead of "2 × audio".
 
 ### Fixed
 - A mixer fed by a single voice whose mix goes back into that voice is part of it, not of the bus: a switch picking

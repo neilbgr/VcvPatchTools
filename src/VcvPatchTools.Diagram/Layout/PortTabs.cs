@@ -23,12 +23,28 @@ public static partial class PortTabs
         ("Amount", "Amt"), ("Attack", "Att"), ("Release", "Rel"), ("Sustain", "Sus"), ("Trigger", "Trig"),
     };
 
-    /// <summary>What a tab reads for the cables of one line: their port, the ports if short enough, else how many.</summary>
+    /// <summary>
+    /// What a tab reads for the cables of one line: their port, the ports if short enough ("L send" and "R send" read
+    /// "L/R send"), else how many.
+    /// </summary>
     public static string Text(IEnumerable<string> ports, SignalType signal)
     {
         List<string> shorts = ports.Select(p => Short(p, signal)).Distinct().ToList();
-        string joined = string.Join(", ", shorts);
-        return shorts.Count == 1 || joined.Length <= maxJoinedChars ? joined : $"{shorts.Count} × {SignalShort(signal)}";
+        List<string> paired = StereoPairs(shorts);
+        string joined = string.Join(", ", paired);
+        return paired.Count == 1 || joined.Length <= maxJoinedChars ? joined : $"{shorts.Count} × {SignalShort(signal)}";
+    }
+
+    /// <summary>Names that differ only by their L / R word become one "L/R" name, where the first of them was.</summary>
+    private static List<string> StereoPairs(List<string> shorts)
+    {
+        static string Both(string name) => StereoSide().Replace(name, "L/R", 1);
+        HashSet<string> pairs = shorts.Where(n => StereoSide().IsMatch(n))
+            .GroupBy(Both)
+            .Where(g => g.Select(n => StereoSide().Match(n).Value).Distinct().Count() == 2)
+            .Select(g => g.Key)
+            .ToHashSet();
+        return shorts.Select(n => pairs.Contains(Both(n)) ? Both(n) : n).Distinct().ToList();
     }
 
     public static double Width(string text) => (text.Length * charWidth) + padding;
@@ -64,4 +80,7 @@ public static partial class PortTabs
 
     [GeneratedRegex(@"v\s*/\s*oct|pitch", RegexOptions.IgnoreCase)]
     private static partial Regex Pitch();
+
+    [GeneratedRegex(@"\b[LR]\b")]
+    private static partial Regex StereoSide();
 }
